@@ -1,0 +1,15 @@
+@use './global_vars.scss' as vars;
+
+@mixin inner-shadow-panel {
+  -webkit-box-shadow: inset 0px 0px 4px 1px vars.$bg-color;
+  -moz-box-shadow: inset 0px 0px 4px 1px vars.$bg-color;
+  box-shadow: inset 0px 0px 4px 1px vars.$bg-color;
+}
+
+@mixin shadow-panel {
+  $outer: 0px 0px 4px 2px vars.$focus-color;
+  $inner: inset 0px 0px 4px 1px vars.$bg-color;
+  -webkit-box-shadow: $outer, $inner;
+  -moz-box-shadow: $outer, $inner;
+  box-shadow: $outer, $inner;
+}

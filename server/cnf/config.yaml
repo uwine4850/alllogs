@@ -1,0 +1,13 @@
+GeneratedDefault: true
+GeneratedAdditionally: true
+Config:
+    Debug:
+        PrintInfo: true
+        Debug: true
+        DebugRelativeFilepath: true
+        ErrorLogging: true
+        ErrorLoggingPath: cnf/log/errors.log
+        RequestInfoLog: true
+        RequestInfoLogPath: cnf/log/request.log
+        SkipLoggingLevel: 3
+Additionally: {}

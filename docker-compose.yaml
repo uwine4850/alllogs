@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  vitevue:
+    build:
+      dockerfile: docker/Dockerfile.vitevue
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
