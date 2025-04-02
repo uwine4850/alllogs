@@ -1,7 +1,5 @@
-version: '3'
-
 services:
-  vitevue:
+  client:
     build:
       dockerfile: docker/Dockerfile.vitevue
     ports:
@@ -11,3 +9,40 @@ services:
       - /client/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+
+  server:
+    build:
+      dockerfile: docker/Dockerfile.golang
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./client:/client
+      - ./server:/server
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1111
+      MYSQL_DATABASE: alllogs
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: 1111
+    ports:
+      - "8100:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

@@ -1,8 +1,5 @@
-<!-- <script lang="ts">
-</script> -->
-
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
 import eyeIcon from '@/assets/svg/eye.svg'
 
@@ -21,7 +18,15 @@ const props = defineProps({
   value: {
     type: String,
   },
+  modelValue: {
+    type: String,
+  },
 })
+
+const emit = defineEmits(['update:modelValue'])
+
+const passwordInput = ref<HTMLInputElement | null>(null)
+const togglePasswordButton = ref<HTMLButtonElement | null>(null)
 
 onMounted(() => {
   if (props.readonly) {
@@ -30,30 +35,35 @@ onMounted(() => {
       passwordInput.value = props.value
     }
   }
+  if(togglePasswordButton.value && passwordInput.value){
+    toggle(togglePasswordButton.value, passwordInput.value);
+  }
 })
+
+const updateValue = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.value)
+}
+
 </script>
 
 <template>
   <InputTemplate :text="props.text">
-    <input v-if="props.readonly" readonly type="password" id="password" class="p-input" />
-    <input v-else type="password" :name="props.name" id="password" class="p-input" />
-    <button id="toggle-password" class="p-toggle">
+    <input ref="passwordInput" :readonly="props.readonly" type="password" class="p-input" :value="modelValue" @input="updateValue" />
+    <button ref="togglePasswordButton" type="button" class="p-toggle">
       <img :src="eyeIcon" />
     </button>
   </InputTemplate>
 </template>
 
 <script lang="ts">
-document.addEventListener('DOMContentLoaded', () => {
-  const passwordInput = document.getElementById('password') as HTMLInputElement
-  const toggleButton = document.getElementById('toggle-password') as HTMLElement
-
-  if (passwordInput && toggleButton) {
-    toggleButton.addEventListener('click', () => {
+function toggle(togglePasswordButton: HTMLButtonElement, passwordInput: HTMLInputElement){
+  if (passwordInput && togglePasswordButton) {
+    togglePasswordButton.addEventListener('click', () => {
       passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password'
     })
   }
-})
+}
 </script>
 
 <style scoped lang="scss">

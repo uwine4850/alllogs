@@ -10,19 +10,26 @@ defineProps({
 </script>
 
 <template>
-  <Separator />
-  <div class="text">
-    {{ text }}
-  </div>
-  <Separator />
-  <div class="inp">
-    <slot></slot>
+  <div class="it-wrapper">
+    <Separator />
+    <div class="text">
+      {{ text }}
+    </div>
+    <Separator />
+    <div class="inp">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 @use '@/assets/style/global_vars.scss' as vars;
 @use '@/assets/style/presets.scss' as ps;
+
+.it-wrapper{
+  display: flex;
+  flex-direction: column;
+}
 
 .text {
   font-size: 1.25rem;

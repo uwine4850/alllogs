@@ -9,27 +9,39 @@ defineProps({
     required: true,
   },
   link: {
-    type: String,
-    default: '#',
+    type: String
   },
 })
 </script>
 
 <template>
-  <router-link :to="link">
-    <button class="btn">
-      <div class="content">
-        <img class="icon" :src="icon" alt="icon" />
-        <p class="text">{{ text }}</p>
-      </div>
-    </button>
-  </router-link>
+  <div v-if="link">
+    <router-link class="wrapper" :to="link">
+      <button class="btn" v-bind="$attrs">
+        <div class="content">
+          <img class="icon" :src="icon" alt="icon" />
+          <p class="text">{{ text }}</p>
+        </div>
+      </button>
+    </router-link>
+  </div>
+
+  <div v-else>
+    <span class="wrapper">
+      <button class="btn" v-bind="$attrs">
+        <div class="content">
+          <img class="icon" :src="icon" alt="icon" />
+          <p class="text">{{ text }}</p>
+        </div>
+      </button>
+    </span>
+  </div>
 </template>
 
 <style scoped lang="scss">
 @use '@/assets/style/global_vars.scss' as vars;
 
-a {
+.wrapper {
   text-decoration: none;
   border-radius: 5px;
   -webkit-box-shadow: 0px 0px 4px 0px vars.$bg-color;
