@@ -2,7 +2,13 @@ module github.com/uwine4850/alllogs
 
 go 1.24.1
 
-require github.com/uwine4850/foozy v0.4.1-0.20250328110746-247f2baab32f
+require (
+	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/rs/cors v1.11.1
+	github.com/uwine4850/foozy v0.4.1-0.20250412083319-97fd9abc43db
+)
+
+replace github.com/uwine4850/foozy => /home/fhx/Documents/golang/foozy
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -10,7 +16,6 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/rs/cors v1.11.1 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

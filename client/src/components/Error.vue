@@ -30,6 +30,7 @@
 		display: none;
 		flex-direction: column;
 		#text{
+			font-size: 1.1rem;
 			padding: 10px;
 			background-color: transparent;
 			box-sizing: border-box;

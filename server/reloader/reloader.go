@@ -7,6 +7,11 @@ import (
 
 func main() {
 	initcnf.InitCnf()
-	reload := livereload.NewReload("cmd/main.go", livereload.NewWiretap([]string{"cmd", "cnf", "reloader", "mydto", "rest"}, []string{"cnf/log"}))
-	reload.Start()
+	wrt := livereload.NewWiretap()
+	wrt.SetDirs([]string{"cmd", "cnf", "reloader", "mydto", "rest"})
+	wrt.SetExcludeDirs([]string{"cnf/log"})
+	reload := livereload.NewReloader("cmd/main.go", wrt)
+	if err := reload.Start(); err != nil {
+		panic(err)
+	}
 }

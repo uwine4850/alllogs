@@ -10,5 +10,11 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.POST: {"/register": rauth.Register()},
 		},
+		{
+			router.POST: {"/login": rauth.Login()},
+		},
+		{
+			router.GET: {"/isauth": rauth.IsAuth()},
+		},
 	}
 }

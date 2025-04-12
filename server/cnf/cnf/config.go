@@ -5,7 +5,7 @@ import "github.com/uwine4850/foozy/pkg/database"
 var DATABASE_ARGS = database.DbArgs{
 	Username:     "root",
 	Password:     "1111",
-	Host:         "mysql",
+	Host:         "localhost", // mysql for docker
 	Port:         "3306",
 	DatabaseName: "alllogs",
 }

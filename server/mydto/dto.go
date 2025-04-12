@@ -14,6 +14,14 @@ var AllowMessages = []rest.AllowMessage{
 	},
 	{
 		Package: "mydto",
+		Name:    "Login",
+	},
+	{
+		Package: "mydto",
+		Name:    "LoginResponse",
+	},
+	{
+		Package: "mydto",
 		Name:    "BaseResponse",
 	},
 }
@@ -21,6 +29,8 @@ var AllowMessages = []rest.AllowMessage{
 var TSGenMessages = map[string]*[]irest.IMessage{
 	"../client/src/dto/auth.ts": {
 		Register{},
+		Login{},
+		LoginResponse{},
 	},
 	"../client/src/dto/common.ts": {
 		BaseResponse{},

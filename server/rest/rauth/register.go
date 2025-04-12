@@ -56,12 +56,3 @@ func Register() router.Handler {
 		}
 	}
 }
-
-func sendError(w http.ResponseWriter, _err error) func() {
-	return func() {
-		resp := mydto.NewBaseResponse(false, _err.Error())
-		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			rest.SendJsonError(err.Error(), w)
-		}
-	}
-}
