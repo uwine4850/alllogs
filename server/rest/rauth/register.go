@@ -11,6 +11,7 @@ import (
 	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
@@ -44,10 +45,14 @@ func Register() router.Handler {
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)
-		if err := myauth.RegisterUser(registerForm.Username, registerForm.Password); err != nil {
+		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
+		if err != nil {
 			return sendError(w, err)
 		}
-
+		// Create profile in database.
+		if err := createProfile(db, regUserId); err != nil {
+			return sendError(w, err)
+		}
 		return func() {
 			resp := mydto.NewBaseResponse(true, "")
 			if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
@@ -55,4 +60,14 @@ func Register() router.Handler {
 			}
 		}
 	}
+}
+
+func createProfile(db *database.Database, userID int) error {
+	qb := qb.NewSyncQB(db.SyncQ()).Insert(cnf.DBT_PROFILE, map[string]any{"user_id": userID})
+	qb.Merge()
+	_, err := qb.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
 }

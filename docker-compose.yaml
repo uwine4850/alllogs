@@ -10,14 +10,14 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
 
-  server:
-    build:
-      dockerfile: docker/Dockerfile.golang
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./client:/client
-      - ./server:/server
+  # server:
+  #   build:
+  #     dockerfile: docker/Dockerfile.golang
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./client:/client
+  #     - ./server:/server
 
   mysql:
     image: mysql:8
@@ -30,6 +30,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - "./schema:/schema"
 
   phpmyadmin:
     image: phpmyadmin:latest

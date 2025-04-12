@@ -9,3 +9,7 @@ var DATABASE_ARGS = database.DbArgs{
 	Port:         "3306",
 	DatabaseName: "alllogs",
 }
+
+const (
+	DBT_PROFILE = "profile"
+)
