@@ -5,8 +5,8 @@ import profileIcon from '@/assets/svg/user.svg'
 </script>
 
 <script setup lang="ts">
-import MiddlePanel from './MiddlePanel.vue';
-import BaseTemplate from './BaseTemplate.vue';
+import MiddlePanel from '@/views/MiddlePanel.vue';
+import BaseTemplate from '@/views/BaseTemplate.vue';
 import PanelTitle from '@/components/PanelTitle.vue';
 import InputTextarea from '@/components/input/InputTextarea.vue';
 import InputFile from '@/components/input/InputFile.vue';

@@ -3,14 +3,28 @@ import updateIcon from '@/assets/svg/update.svg'
 import logoutIcon from '@/assets/svg/log_out.svg'
 import refreshIcon from '@/assets/svg/refresh.svg'
 import deleteIcon from '@/assets/svg/delete.svg'
+import { onMounted } from 'vue'
 </script>
 
 <script setup lang="ts">
 import MiddlePanel from '@/views/MiddlePanel.vue'
-import Button from '../components/Button.vue'
-import Separator from '../components/Separator.vue'
-import InputPassword from '../components/input/InputPassword.vue'
-import BaseTemplate from './BaseTemplate.vue'
+import Button from '@/components/Button.vue'
+import Separator from '@/components/Separator.vue'
+import InputPassword from '@/components/input/InputPassword.vue'
+import BaseTemplate from '@/views/BaseTemplate.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+onMounted(() => {
+  const logoutBtn = document.getElementById("logout-btn")
+  if (logoutBtn){
+    logoutBtn.onclick = function(){
+      sessionStorage.removeItem("authJWT");
+      router.go(0);
+    }
+  }
+});
 </script>
 
 <template>
@@ -31,7 +45,7 @@ import BaseTemplate from './BaseTemplate.vue'
         </div>
         <div class="profile-btns">
           <Button class="pbtn" :icon="updateIcon" text="Update" link="/profile/update" />
-          <Button class="pbtn" :icon="logoutIcon" text="Log out" />
+          <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>
       </div>
       <InputPassword text="Token" name="token" :readonly="true" value="TOKEN" />
@@ -45,8 +59,8 @@ import BaseTemplate from './BaseTemplate.vue'
 </template>
 
 <style scoped lang="scss">
-@use '../assets/style/global_vars.scss' as vars;
-@use '../assets/style/presets.scss' as ps;
+@use '@/assets/style/global_vars.scss' as vars;
+@use '@/assets/style/presets.scss' as ps;
 
 .middle-panel {
   height: calc(100vh - 58px);
