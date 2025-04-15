@@ -4,6 +4,8 @@ import logoutIcon from '@/assets/svg/log_out.svg'
 import refreshIcon from '@/assets/svg/refresh.svg'
 import deleteIcon from '@/assets/svg/delete.svg'
 import { onMounted } from 'vue'
+import type { ProfileMessage } from '@/dto/profile'
+import { AsyncRequest } from '@/classes/request'
 </script>
 
 <script setup lang="ts">
@@ -12,11 +14,37 @@ import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
 import InputPassword from '@/components/input/InputPassword.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import axios, { type AxiosResponse } from 'axios'
+import { ref } from 'vue'
 
 const router = useRouter()
+const route = useRoute()
 
+const profileData = ref<ProfileMessage | null>(null)
+
+const getProfileData = async () => {
+  const req = new AsyncRequest("http://localhost:8000/profile/" + route.params.id, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+  req.onResponse((response: AxiosResponse) => {
+    const profileResponse = response.data as ProfileMessage;
+    if (profileResponse.Error !== "") {
+      // errorStore.setText(profileResponse.Error);
+    } else {
+      profileData.value = profileResponse
+    }
+  });
+  req.onError((error: unknown) => {
+    // errorStore.setText(String(error));
+  });
+  await req.get()
+}
 onMounted(() => {
+  getProfileData()
   const logoutBtn = document.getElementById("logout-btn")
   if (logoutBtn){
     logoutBtn.onclick = function(){
@@ -33,7 +61,7 @@ onMounted(() => {
       <div class="base-info">
         <div class="profile-info">
           <div class="avatar">
-            <img src="../assets/tmp/1.jpg" alt="" />
+            <img :src="profileData?.Avatar" alt="" />
           </div>
           <div class="description">
             <div class="username">renxob</div>

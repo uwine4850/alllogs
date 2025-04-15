@@ -9,6 +9,6 @@ import (
 
 func IsAuth() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-		return SendLoginResponse(w, "", "")
+		return SendLoginResponse(w, "", "", "")
 	}
 }

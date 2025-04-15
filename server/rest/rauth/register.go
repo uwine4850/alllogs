@@ -26,7 +26,7 @@ func Register() router.Handler {
 		if err := frm.Parse(); err != nil {
 			return sendError(w, err)
 		}
-		registerForm := mydto.Register{}
+		registerForm := mydto.RegisterMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
 			return sendError(w, err)
 		}

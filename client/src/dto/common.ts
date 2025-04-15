@@ -1,5 +1,5 @@
 
-export interface BaseResponse {
+export interface BaseResponseMessage {
     Ok: boolean;
     Error: string;
 }

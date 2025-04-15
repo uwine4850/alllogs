@@ -2,7 +2,9 @@ package rauth
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/alllogs/cnf/cnf"
@@ -10,6 +12,8 @@ import (
 	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
@@ -28,57 +32,42 @@ func Login() router.Handler {
 		// Parse and validate form.
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
-			return SendLoginResponse(w, "", err.Error())
+			return SendLoginResponse(w, "", "", err.Error())
 		}
 
-		loginForm := mydto.Login{}
+		loginForm := mydto.LoginMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
-			return SendLoginResponse(w, "", err.Error())
+			return SendLoginResponse(w, "", "", err.Error())
 		}
 
 		// Database operation.
 		db := database.NewDatabase(cnf.DATABASE_ARGS)
 		if err := db.Connect(); err != nil {
-			return SendLoginResponse(w, "", err.Error())
+			return SendLoginResponse(w, "", "", err.Error())
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				SendLoginResponse(w, "", err.Error())
+				SendLoginResponse(w, "", "", err.Error())
 			}
 		}()
-		// userDB, err := auth.UserByUsername(db, loginForm.Username)
-		// if err != nil {
-		// 	return SendLoginResponse(w, "", err.Error())
-		// }
-		// if userDB == nil {
-		// 	return sendError(w, &auth.ErrUserNotExist{Username: loginForm.Username})
-		// }
-		// err = auth.ComparePassword(dbutils.ParseString(userDB["password"]), loginForm.Password)
-		// if err != nil {
-		// 	return SendLoginResponse(w, "", err.Error())
-		// }
-		// var authUser auth.AuthUser
-		// if err := dbmapper.FillStructFromDb(userDB, typeopr.Ptr{}.New(&authUser)); err != nil {
-		// 	return SendLoginResponse(w, "", err.Error())
-		// }
-		// // JWT
-		// tokenString, err := NewLoginJWT(authUser.Id, manager)
-		// if err != nil {
-		// 	return SendLoginResponse(w, "", err.Error())
-		// }
 		myauth := auth.NewAuth(db, w, manager)
 		authUser, err := myauth.LoginUser(loginForm.Username, loginForm.Password)
 		if err != nil {
-			return SendLoginResponse(w, "", err.Error())
+			return SendLoginResponse(w, "", "", err.Error())
+		}
+
+		profileId, err := getProfileIdByUserId(db, authUser.Id)
+		if err != nil {
+			return SendLoginResponse(w, "", "", err.Error())
 		}
 		authClaims := auth.JWTClaims{
 			Id: authUser.Id,
 		}
 		tokenString, err := secure.NewHmacJwtWithClaims(authClaims, manager)
 		if err != nil {
-			return SendLoginResponse(w, "", err.Error())
+			return SendLoginResponse(w, "", "", err.Error())
 		}
-		return SendLoginResponse(w, tokenString, "")
+		return SendLoginResponse(w, tokenString, profileId, "")
 	}
 }
 
@@ -94,14 +83,32 @@ func NewLoginJWT(uid string, manager interfaces.IManager) (string, error) {
 	return tokenString, nil
 }
 
-func SendLoginResponse(w http.ResponseWriter, jwt string, _err string) func() {
+func SendLoginResponse(w http.ResponseWriter, jwt string, UID string, _err string) func() {
 	return func() {
-		resp := &mydto.LoginResponse{
+		resp := &mydto.LoginResponseMessage{
 			JWT:   jwt,
+			UID:   UID,
 			Error: _err,
 		}
 		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 			rest.SendJsonError(err.Error(), w)
 		}
 	}
+}
+
+func getProfileIdByUserId(db *database.Database, id string) (string, error) {
+	newQB := qb.NewSyncQB(db.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, id))
+	newQB.Merge()
+	profileId, err := newQB.Query()
+	if err != nil {
+		return "", err
+	}
+	if len(profileId) != 1 {
+		return "", errors.New("User not found.")
+	}
+	intProfileId, err := dbutils.ParseInt(profileId[0]["id"])
+	if err != nil {
+		return "", err
+	}
+	return strconv.Itoa(intProfileId), nil
 }

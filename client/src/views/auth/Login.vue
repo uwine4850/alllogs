@@ -2,45 +2,67 @@
 import checkboxIcon from '@/assets/svg/checkbox.svg'
 import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
-import type { Login } from '@/dto/auth'
+import type { LoginMessage, LoginResponseMessage } from '@/dto/auth'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
 import PasswordInp from '@/components/input/InputPassword.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
-import type { LoginResponse } from '@/dto/auth'
-import axios from 'axios'
+import axios, { type AxiosResponse } from 'axios'
 import Error from '@/components/Error.vue'
+import { AsyncRequest } from '@/classes/request'
+import type { ProfileMessage } from '@/dto/profile'
 </script>
 
 <script setup lang="ts">
 const errorStore = useErrorStore();
 const router = useRouter();
 
-const formData = ref<Login>({
+const formData = ref<LoginMessage>({
   Username: "",
   Password: "",
 });
 
 const submitForm = async () => {
-  try{
-    const response = await axios.post("http://localhost:8000/login", formData.value, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    });
-    const loginResponse = response.data as LoginResponse;
+  const loginReq = new AsyncRequest("http://localhost:8000/login", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+  loginReq.onResponse((response: AxiosResponse) => {
+    const loginResponse = response.data as LoginResponseMessage;
     if (loginResponse.Error != ""){
       errorStore.setText(loginResponse.Error);
     } else {
       sessionStorage.setItem("authJWT", loginResponse.JWT)
-      router.push("/")
+      // Get profile data.
+      const req = new AsyncRequest("http://localhost:8000/profile/" + loginResponse.UID, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      req.onResponse(function(response: AxiosResponse){
+        const profileResponse = response.data as ProfileMessage;
+        if (profileResponse.Error != ""){
+          errorStore.setText(loginResponse.Error);
+        } else {
+          sessionStorage.setItem("profile", JSON.stringify(profileResponse))
+        }
+        router.push("/")
+      });
+      req.onError((error: unknown) => {
+        errorStore.setText(loginResponse.Error);
+      });
+      req.get();
     }
-  } catch (error){
+  });
+  loginReq.onError((error: unknown) => {
     errorStore.setText(String(error));
-  }
+  });
+  loginReq.post(formData.value);
 }
 </script>
 

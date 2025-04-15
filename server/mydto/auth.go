@@ -2,21 +2,22 @@ package mydto
 
 import "github.com/uwine4850/foozy/pkg/router/rest"
 
-type Register struct {
+type RegisterMessage struct {
 	rest.ImplementDTOMessage
 	Username       string
 	Password       string
 	RepeatPassword string
 }
 
-type Login struct {
+type LoginMessage struct {
 	rest.ImplementDTOMessage
 	Username string
 	Password string
 }
 
-type LoginResponse struct {
+type LoginResponseMessage struct {
 	rest.ImplementDTOMessage
 	JWT   string
+	UID   string
 	Error string
 }

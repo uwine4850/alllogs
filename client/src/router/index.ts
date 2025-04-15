@@ -10,33 +10,38 @@ import NewGroup from '@/views/NewGroup.vue'
 import MyOwnGroups from '@/views/MyOwnGroups.vue'
 import Group from '@/views/Group.vue'
 import ProfileUpdate from '@/views/profile/ProfileUpdate.vue'
-import axios from 'axios'
-import type { LoginResponse } from '@/dto/auth'
+import { type AxiosResponse } from 'axios'
+import type { LoginResponseMessage } from '@/dto/auth'
+import { AsyncRequest } from '@/classes/request'
 
 async function isAuthenticated(){
-  try{
-    const response = await axios.get("http://localhost:8000/isauth", {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": sessionStorage.getItem("authJWT")
-      },
-      withCredentials: true,
-    });
-    const loginResponse = response.data as LoginResponse;
+  let isOK: boolean = false
+  const req = new AsyncRequest("http://localhost:8000/isauth", {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": sessionStorage.getItem("authJWT")
+    },
+    withCredentials: true,
+  });
+  req.onResponse((response: AxiosResponse) => {
+    const loginResponse = response.data as LoginResponseMessage;
     if (loginResponse.Error != ""){
       sessionStorage.removeItem("authJWT");
-      return false
+      sessionStorage.removeItem("profile");
+      isOK = false;
     } else if (loginResponse.JWT != "") {
-      sessionStorage.setItem("authJWT", loginResponse.JWT)
-      return true
+      sessionStorage.setItem("authJWT", loginResponse.JWT);
+      isOK = true;
     } else {
-      return true
+      isOK = true;
     }
-  } catch (error){
-    console.log(error)
+  });
+  req.onError((error: unknown) => {
     sessionStorage.removeItem("authJWT");
-    return false
-  }
+    isOK = false;
+  });
+  await req.get();
+  return isOK
 }
 
 const router = createRouter({
@@ -61,7 +66,7 @@ const router = createRouter({
       meta: {requiresAuth: true},
     },
     {
-      path: '/profile',
+      path: '/profile/:id',
       name: 'profile',
       component: Profile,
       meta: {requiresAuth: true},

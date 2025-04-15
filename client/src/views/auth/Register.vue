@@ -1,6 +1,7 @@
 <script lang="ts">
 import checkboxIcon from '@/assets/svg/checkbox.svg'
 import { useRouter } from 'vue-router'
+import { AsyncRequest } from '@/classes/request'
 </script>
 
 <script setup lang="ts">
@@ -12,35 +13,37 @@ import Button from '@/components/Button.vue'
 import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
-import type { Register } from '@/dto/auth'
-import type { BaseResponse } from '@/dto/common'
-import axios from 'axios';
+import type { RegisterMessage } from '@/dto/auth'
+import type { BaseResponseMessage } from '@/dto/common'
+import axios, { type AxiosResponse } from 'axios';
 
 const errorStore = useErrorStore();
 const router = useRouter();
 
-const formData = ref<Register>({
+const formData = ref<RegisterMessage>({
   Username: "",
   Password: "",
   RepeatPassword: "",
 })
 
 const submitForm = async () => {
-  try{
-    const response = await axios.post("http://localhost:8000/register", formData.value, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const baseResponse = response.data as BaseResponse;
+  const req = new AsyncRequest("http://localhost:8000/register", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  req.onResponse((response: AxiosResponse) => {
+    const baseResponse = response.data as BaseResponseMessage;
     if (!baseResponse.Ok){
       errorStore.setText(baseResponse.Error);
     } else {
       router.push("/login")
     }
-  } catch (error){
+  });
+  req.onError((error: unknown) => {
     errorStore.setText(String(error));
-  }
+  });
+  req.post(formData.value);
 }
 </script>
 

@@ -22,14 +22,14 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 			}
 			return tokenStr, nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, UID string) error {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, token, "")()
+			rauth.SendLoginResponse(w, token, UID, "")()
 			return nil
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, "", err.Error())()
+			rauth.SendLoginResponse(w, "", "", err.Error())()
 		},
 	)(w, r, manager)
 }

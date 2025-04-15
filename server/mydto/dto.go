@@ -10,30 +10,42 @@ var DTO = rest.NewDTO()
 var AllowMessages = []rest.AllowMessage{
 	{
 		Package: "mydto",
-		Name:    "Register",
+		Name:    "RegisterMessage",
 	},
 	{
 		Package: "mydto",
-		Name:    "Login",
+		Name:    "LoginMessage",
 	},
 	{
 		Package: "mydto",
-		Name:    "LoginResponse",
+		Name:    "LoginResponseMessage",
 	},
 	{
 		Package: "mydto",
-		Name:    "BaseResponse",
+		Name:    "BaseResponseMessage",
+	},
+	{
+		Package: "mydto",
+		Name:    "ProfileMessage",
+	},
+	{
+		Package: "mydto",
+		Name:    "UserMessage",
 	},
 }
 
 var TSGenMessages = map[string]*[]irest.IMessage{
-	"../client/src/dto/auth.ts": {
-		Register{},
-		Login{},
-		LoginResponse{},
-	},
 	"../client/src/dto/common.ts": {
-		BaseResponse{},
+		BaseResponseMessage{},
+	},
+	"../client/src/dto/auth.ts": {
+		RegisterMessage{},
+		LoginMessage{},
+		LoginResponseMessage{},
+	},
+	"../client/src/dto/profile.ts": {
+		ProfileMessage{},
+		UserMessage{},
 	},
 }
 

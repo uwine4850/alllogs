@@ -1,6 +1,7 @@
 <script lang="ts">
 import addIcon from '@/assets/svg/add.svg'
 import groupIcon from '@/assets/svg/group.svg'
+import type { ProfileMessage } from '@/dto/profile'
 </script>
 
 <script setup lang="ts">
@@ -13,6 +14,12 @@ defineProps({
     required: true,
   },
 })
+
+let profileData: ProfileMessage;
+const profileJsonData = sessionStorage.getItem("profile")
+if (profileJsonData){
+  profileData = JSON.parse(profileJsonData) as ProfileMessage;
+}
 </script>
 
 <template>
@@ -45,11 +52,11 @@ defineProps({
             <div class="hn-count">63</div>
           </a>
           <Separator :vertical="true" />
-          <router-link class="header-profile" to="/profile">
+          <router-link class="header-profile" :to="`/profile/${profileData.Id}`">
             <div class="hp-avatar">
-              <img src="../assets/tmp/1.jpg" alt="" />
+              <img :src="profileData.Avatar" alt="" />
             </div>
-            <div class="hp-username">renxob</div>
+            <div class="hp-username">{{ profileData.User.Username }}</div>
           </router-link>
         </div>
       </div>
