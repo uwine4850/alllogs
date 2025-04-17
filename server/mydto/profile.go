@@ -4,12 +4,12 @@ import "github.com/uwine4850/foozy/pkg/router/rest"
 
 type ProfileMessage struct {
 	rest.ImplementDTOMessage
-	User        UserMessage `json:"User"`
-	Id          string      `json:"Id"`
-	UserId      string      `json:"UserId"`
-	Description string      `json:"Description"`
-	Avatar      string      `json:"Avatar"`
-	Token       string      `json:"Token"`
+	User        UserMessage `name:"User"`
+	Id          string      `name:"Id"`
+	UserId      string      `name:"UserId"`
+	Description string      `name:"Description"`
+	Avatar      string      `name:"Avatar"`
+	Token       string      `name:"Token"`
 	Error       string
 }
 

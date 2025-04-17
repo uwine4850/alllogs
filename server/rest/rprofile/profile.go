@@ -18,11 +18,11 @@ import (
 )
 
 type DBRowView struct {
-	Id          string `db:"id"`
-	UserId      string `db:"user_id"`
-	Description string `db:"description"`
-	Avatar      string `db:"avatar"`
-	Token       string `db:"token"`
+	Id          string `name:"id"`
+	UserId      string `name:"user_id"`
+	Description string `name:"description"`
+	Avatar      string `name:"avatar"`
+	Token       string `name:"token"`
 }
 
 type JsonProfileObject struct {
@@ -34,8 +34,8 @@ func (v *JsonProfileObject) OnError(w http.ResponseWriter, r *http.Request, mana
 	router.ServerError(w, err.Error(), manager)
 }
 
-func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.ObjectContext, error) {
-	return object.ObjectContext{}, nil
+func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+	return object.Context{}, nil
 }
 
 func JsonProfileObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -63,7 +63,7 @@ func JsonProfileObjectView() func(w http.ResponseWriter, r *http.Request, manage
 		if err != nil {
 			return err
 		}
-		var authUser []auth.AuthUser
+		var authUser []auth.User
 		mapper := dbmapper.NewMapper(userData, typeopr.Ptr{}.New(&authUser))
 		if err := mapper.Fill(); err != nil {
 			return err

@@ -63,12 +63,23 @@ if (profileJsonData){
       <slot></slot>
     </div>
   </div>
+  <img class="global-bg-image" src="@/assets/img/ALLLOGS_BG.jpg"/>
 </template>
 
 <style scoped lang="scss">
 @use '../assets/style/global_vars.scss' as vars;
 @use '../assets/style/presets.scss' as ps;
 
+.global-bg-image{
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  left: 0;
+  top: 0;
+  filter: brightness(30%);
+}
 .container {
   display: flex;
   height: 100vh;
@@ -120,6 +131,7 @@ if (profileJsonData){
 }
 .right-side {
   flex: 1;
+  position: relative;
   .header-wrapper {
     background: vars.$primary-color;
     height: 58px;

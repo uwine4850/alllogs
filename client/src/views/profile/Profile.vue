@@ -17,12 +17,15 @@ import BaseTemplate from '@/views/BaseTemplate.vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios, { type AxiosResponse } from 'axios'
 import { ref } from 'vue'
+import Error from '@/components/Error.vue'
+import { useErrorStore } from '@/stores/error'
 
+const errorStore = useErrorStore();
 const router = useRouter()
 const route = useRoute()
 
 const profileData = ref<ProfileMessage | null>(null)
-
+const token = ref("");
 const getProfileData = async () => {
   const req = new AsyncRequest("http://localhost:8000/profile/" + route.params.id, {
     headers: {
@@ -33,13 +36,14 @@ const getProfileData = async () => {
   req.onResponse((response: AxiosResponse) => {
     const profileResponse = response.data as ProfileMessage;
     if (profileResponse.Error !== "") {
-      // errorStore.setText(profileResponse.Error);
+      errorStore.setText(profileResponse.Error);
     } else {
       profileData.value = profileResponse
+      token.value = profileData.value.Token
     }
   });
   req.onError((error: unknown) => {
-    // errorStore.setText(String(error));
+    errorStore.setText(String(error));
   });
   await req.get()
 }
@@ -58,16 +62,16 @@ onMounted(() => {
 <template>
   <BaseTemplate title="Profile">
     <MiddlePanel class="middle-panel">
+      <Error />
       <div class="base-info">
         <div class="profile-info">
           <div class="avatar">
             <img :src="profileData?.Avatar" alt="" />
           </div>
           <div class="description">
-            <div class="username">renxob</div>
+            <div class="username">{{ profileData?.User.Username }}</div>
             <div class="desc-text">
-              It is a long established fact that a reader will be distracted by the readable content
-              of a page when looking at its layout. The point of using Lorem Ipsum is that it has
+             {{ profileData?.Description }}
             </div>
           </div>
         </div>
@@ -76,7 +80,7 @@ onMounted(() => {
           <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>
       </div>
-      <InputPassword text="Token" name="token" :readonly="true" value="TOKEN" />
+      <InputPassword text="Token" name="token" :readonly="true" v-model="token" />
       <div class="token-btns">
         <Button class="tbtn" :icon="refreshIcon" text="Regenerate" />
         <Separator class="tsep" :vertical="true" />

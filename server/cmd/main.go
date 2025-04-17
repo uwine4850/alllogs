@@ -45,7 +45,7 @@ func main() {
 	newManager := manager.NewManager(render)
 	newManager.Key().Generate32BytesKeys()
 	newMiddleware := middlewares.NewMiddleware()
-	newMiddleware.HandlerMddl(0, mddlauth.CheckJWT)
+	newMiddleware.SyncMddl(0, mddlauth.CheckJWT)
 	newRouter := router.NewRouter(newManager)
 	newRouter.SetMiddleware(newMiddleware)
 
