@@ -12,12 +12,13 @@ defineProps({
     type: String
   },
 })
+defineEmits(['click']);
 </script>
 
 <template>
   <div v-if="link">
     <router-link class="wrapper" :to="link">
-      <button class="btn" v-bind="$attrs">
+      <button class="btn" v-bind="$attrs" @click="$emit('click')">
         <div class="content">
           <img class="icon" :src="icon" alt="icon" />
           <p class="text">{{ text }}</p>
@@ -28,7 +29,7 @@ defineProps({
 
   <div v-else>
     <span class="wrapper">
-      <button class="btn" v-bind="$attrs">
+      <button class="btn" v-bind="$attrs" @click="$emit('click')">
         <div class="content">
           <img class="icon" :src="icon" alt="icon" />
           <p class="text">{{ text }}</p>

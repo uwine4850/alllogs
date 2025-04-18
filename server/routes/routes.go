@@ -20,5 +20,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.GET: {"/profile/<id>": rprofile.JsonProfileObjectView()},
 		},
+		{
+			router.POST: {"/gen-token": rprofile.GenerateToken},
+		},
 	}
 }

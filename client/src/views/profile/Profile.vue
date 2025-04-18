@@ -4,7 +4,7 @@ import logoutIcon from '@/assets/svg/log_out.svg'
 import refreshIcon from '@/assets/svg/refresh.svg'
 import deleteIcon from '@/assets/svg/delete.svg'
 import { onMounted } from 'vue'
-import type { ProfileMessage } from '@/dto/profile'
+import type { GenTokenMessage, ProfileMessage, TokenResponse } from '@/dto/profile'
 import { AsyncRequest } from '@/classes/request'
 </script>
 
@@ -47,6 +47,36 @@ const getProfileData = async () => {
   });
   await req.get()
 }
+
+
+const generateTokenForm = async () => {
+  if (!profileData.value){
+    return
+  }
+  const tokenFormData = ref<GenTokenMessage>({
+    UserId: profileData.value.Id
+  });
+
+  const req = new AsyncRequest("http://localhost:8000/gen-token",  {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+  req.onResponse((response: AxiosResponse) => {
+    const tokenResponse = response.data as TokenResponse;
+    if (tokenResponse.Error !== "") {
+      errorStore.setText(tokenResponse.Error);
+    } else {
+      token.value = tokenResponse.Token;
+    }
+  });
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error));
+  });
+  req.post(tokenFormData.value);
+}
+
 onMounted(() => {
   getProfileData()
   const logoutBtn = document.getElementById("logout-btn")
@@ -82,7 +112,7 @@ onMounted(() => {
       </div>
       <InputPassword text="Token" name="token" :readonly="true" v-model="token" />
       <div class="token-btns">
-        <Button class="tbtn" :icon="refreshIcon" text="Regenerate" />
+        <Button @click="generateTokenForm" class="tbtn" :icon="refreshIcon" text="Regenerate" />
         <Separator class="tsep" :vertical="true" />
         <Button class="tbtn tbtn-delete" :icon="deleteIcon" text="Delete" />
       </div>

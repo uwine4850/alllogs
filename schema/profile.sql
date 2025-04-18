@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `alllogs`.`profile` (
     `avatar` TEXT NULL,
     `token` VARCHAR(300) NULL,
     PRIMARY KEY(id),
+    UNIQUE (`token`),
     FOREIGN KEY (user_id) REFERENCES `auth`(id)
 );
 

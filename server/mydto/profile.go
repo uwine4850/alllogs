@@ -18,3 +18,14 @@ type UserMessage struct {
 	Id       string
 	Username string
 }
+
+type GenTokenMessage struct {
+	rest.ImplementDTOMessage
+	UserId string
+}
+
+type TokenResponse struct {
+	rest.ImplementDTOMessage
+	Token string
+	Error string
+}

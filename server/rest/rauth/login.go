@@ -16,7 +16,6 @@ import (
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -30,10 +29,6 @@ type LoginJWTClaims struct {
 func Login() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		// Parse and validate form.
-		frm := form.NewForm(r)
-		if err := frm.Parse(); err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
-		}
 
 		loginForm := mydto.LoginMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
@@ -47,7 +42,7 @@ func Login() router.Handler {
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				SendLoginResponse(w, "", "", err.Error())
+				SendLoginResponse(w, "", "", err.Error())()
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)

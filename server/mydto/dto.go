@@ -32,6 +32,14 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "mydto",
 		Name:    "UserMessage",
 	},
+	{
+		Package: "mydto",
+		Name:    "GenTokenMessage",
+	},
+	{
+		Package: "mydto",
+		Name:    "TokenResponse",
+	},
 }
 
 var TSGenMessages = map[string]*[]irest.IMessage{
@@ -46,6 +54,8 @@ var TSGenMessages = map[string]*[]irest.IMessage{
 	"../client/src/dto/profile.ts": {
 		ProfileMessage{},
 		UserMessage{},
+		GenTokenMessage{},
+		TokenResponse{},
 	},
 }
 

@@ -41,7 +41,7 @@ func Register() router.Handler {
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				sendError(w, err)
+				sendError(w, err)()
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)

@@ -12,3 +12,10 @@ export interface UserMessage {
     Id: string;
     Username: string;
 }
+export interface GenTokenMessage {
+    UserId: string;
+}
+export interface TokenResponse {
+    Token: string;
+    Error: string;
+}
