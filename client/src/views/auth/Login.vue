@@ -50,8 +50,8 @@ const submitForm = async () => {
           errorStore.setText(loginResponse.Error);
         } else {
           sessionStorage.setItem("profile", JSON.stringify(profileResponse))
+          router.push("/")
         }
-        router.push("/")
       });
       req.onError((error: unknown) => {
         errorStore.setText(loginResponse.Error);
@@ -62,7 +62,8 @@ const submitForm = async () => {
   loginReq.onError((error: unknown) => {
     errorStore.setText(String(error));
   });
-  loginReq.post(formData.value);
+  loginReq.setData(formData.value);
+  loginReq.post();
 }
 </script>
 

@@ -23,5 +23,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.POST: {"/gen-token": rprofile.GenerateToken},
 		},
+		{
+			router.DELETE: {"/del-token": rprofile.DeleteToken},
+		},
 	}
 }

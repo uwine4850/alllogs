@@ -43,7 +43,8 @@ const submitForm = async () => {
   req.onError((error: unknown) => {
     errorStore.setText(String(error));
   });
-  req.post(formData.value);
+  req.setData(formData.value);
+  req.post();
 }
 </script>
 

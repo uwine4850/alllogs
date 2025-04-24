@@ -5,7 +5,9 @@ import refreshIcon from '@/assets/svg/refresh.svg'
 import deleteIcon from '@/assets/svg/delete.svg'
 import { onMounted } from 'vue'
 import type { GenTokenMessage, ProfileMessage, TokenResponse } from '@/dto/profile'
-import { AsyncRequest } from '@/classes/request'
+import { AsyncRequest, AsyncRequestWithAuthorization } from '@/classes/request'
+import type { BaseResponseMessage } from '@/dto/common'
+import { getConfigFileParsingDiagnostics } from 'typescript'
 </script>
 
 <script setup lang="ts">
@@ -15,7 +17,7 @@ import Separator from '@/components/Separator.vue'
 import InputPassword from '@/components/input/InputPassword.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
 import { useRouter, useRoute } from 'vue-router'
-import axios, { type AxiosResponse } from 'axios'
+import { type AxiosResponse } from 'axios'
 import { ref } from 'vue'
 import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
@@ -25,9 +27,9 @@ const router = useRouter()
 const route = useRoute()
 
 const profileData = ref<ProfileMessage | null>(null)
-const token = ref("");
+const tokenRef = ref("");
 const getProfileData = async () => {
-  const req = new AsyncRequest("http://localhost:8000/profile/" + route.params.id, {
+  const req = new AsyncRequestWithAuthorization("http://localhost:8000/profile/" + route.params.id, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -39,7 +41,7 @@ const getProfileData = async () => {
       errorStore.setText(profileResponse.Error);
     } else {
       profileData.value = profileResponse
-      token.value = profileData.value.Token
+      tokenRef.value = profileData.value.Token
     }
   });
   req.onError((error: unknown) => {
@@ -48,16 +50,15 @@ const getProfileData = async () => {
   await req.get()
 }
 
-
 const generateTokenForm = async () => {
   if (!profileData.value){
     return
   }
-  const tokenFormData = ref<GenTokenMessage>({
+  const formData = ref<GenTokenMessage>({
     UserId: profileData.value.Id
   });
 
-  const req = new AsyncRequest("http://localhost:8000/gen-token",  {
+  const req = new AsyncRequestWithAuthorization("http://localhost:8000/gen-token",  {
     headers: {
       "Content-Type": "application/json",
     },
@@ -68,13 +69,38 @@ const generateTokenForm = async () => {
     if (tokenResponse.Error !== "") {
       errorStore.setText(tokenResponse.Error);
     } else {
-      token.value = tokenResponse.Token;
+      tokenRef.value = tokenResponse.Token;
     }
   });
   req.onError((error: unknown) => {
     errorStore.setText(String(error));
   });
-  req.post(tokenFormData.value);
+  req.setData(formData.value)
+  req.post();
+}
+
+const deleteToken = async () => {
+  if (!profileData.value){
+    return
+  }
+  const req = new AsyncRequestWithAuthorization("http://localhost:8000/del-token", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
+  });
+  req.onResponse((response: AxiosResponse) => {
+    const baseResponse = response.data as BaseResponseMessage;
+    if (baseResponse.Error != "") {
+      errorStore.setText(baseResponse.Error);
+    } else {
+      tokenRef.value = "";
+    }
+  });
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error));
+  });
+  req.delete();
 }
 
 onMounted(() => {
@@ -110,11 +136,11 @@ onMounted(() => {
           <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>
       </div>
-      <InputPassword text="Token" name="token" :readonly="true" v-model="token" />
+      <InputPassword text="Token" name="token" :readonly="true" v-model="tokenRef" />
       <div class="token-btns">
         <Button @click="generateTokenForm" class="tbtn" :icon="refreshIcon" text="Regenerate" />
         <Separator class="tsep" :vertical="true" />
-        <Button class="tbtn tbtn-delete" :icon="deleteIcon" text="Delete" />
+        <Button @click="deleteToken" class="tbtn tbtn-delete" :icon="deleteIcon" text="Delete" />
       </div>
     </MiddlePanel>
   </BaseTemplate>

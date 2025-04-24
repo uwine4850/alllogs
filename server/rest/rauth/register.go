@@ -24,34 +24,34 @@ func Register() router.Handler {
 		// Parse and validate form.
 		frm := form.NewForm(r)
 		if err := frm.Parse(); err != nil {
-			return sendError(w, err)
+			return rest.SendBeseResponse(w, false, err)
 		}
 		registerForm := mydto.RegisterMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
-			return sendError(w, err)
+			return rest.SendBeseResponse(w, false, err)
 		}
 		if strings.Trim(registerForm.Password, "") != strings.Trim(registerForm.RepeatPassword, "") {
-			return sendError(w, errors.New("passwords don`t match"))
+			return rest.SendBeseResponse(w, false, errors.New("passwords don`t match"))
 		}
 
 		// Database operation.
 		db := database.NewDatabase(cnf.DATABASE_ARGS)
 		if err := db.Connect(); err != nil {
-			return sendError(w, err)
+			return rest.SendBeseResponse(w, false, err)
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				sendError(w, err)()
+				rest.SendBeseResponse(w, false, err)()
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)
 		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
 		if err != nil {
-			return sendError(w, err)
+			return rest.SendBeseResponse(w, false, err)
 		}
 		// Create profile in database.
 		if err := createProfile(db, regUserId); err != nil {
-			return sendError(w, err)
+			return rest.SendBeseResponse(w, false, err)
 		}
 		return func() {
 			resp := mydto.NewBaseResponse(true, "")

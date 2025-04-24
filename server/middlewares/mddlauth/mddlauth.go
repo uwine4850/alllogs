@@ -11,7 +11,7 @@ import (
 )
 
 func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
-	if r.URL.Path != "/isauth" {
+	if r.URL.Path == "/login" || r.URL.Path == "/register" {
 		return
 	}
 	builtin_mddl.AuthJWT(
@@ -22,9 +22,13 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 			}
 			return tokenStr, nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, UID string) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID string) error {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, token, UID, "")()
+			rauth.SendLoginResponse(w, token, AID, "")()
+			return nil
+		},
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID string) error {
+			manager.OneTimeData().SetUserContext("AID", AID)
 			return nil
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {

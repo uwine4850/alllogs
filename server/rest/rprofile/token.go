@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/uwine4850/alllogs/cnf/cnf"
@@ -44,6 +45,30 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	return func() {
 		sendToken(w, token, "")()
 	}
+}
+
+func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	AID, ok := manager.OneTimeData().GetUserContext("AID")
+	if !ok {
+		return rest.SendBeseResponse(w, false, errors.New("User ID not found."))
+	}
+	db := database.NewDatabase(cnf.DATABASE_ARGS)
+	if err := db.Connect(); err != nil {
+		return rest.SendBeseResponse(w, false, err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			rest.SendBeseResponse(w, false, err)()
+		}
+	}()
+	newQB := qb.NewSyncQB(db.SyncQ())
+	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, AID))
+	newQB.Merge()
+	_, err := newQB.Exec()
+	if err != nil {
+		return rest.SendBeseResponse(w, false, err)
+	}
+	return rest.SendBeseResponse(w, true, nil)
 }
 
 func newToken(db *database.Database) (string, error) {
