@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { clearHTMLElement } from '@/utils/component';
-import Panel from '@/components/Panel.vue';
+import { onMounted } from 'vue'
+import { clearHTMLElement } from '@/utils/component'
+import Panel from '@/components/Panel.vue'
 
 defineProps({
   hide: {
@@ -10,19 +10,19 @@ defineProps({
 })
 
 onMounted(() => {
-  const alertPanel = document.getElementById('alert-panel');
+  const alertPanel = document.getElementById('alert-panel')
   if (alertPanel) {
     alertPanel.onclick = function () {
-      closeAlertPanel();
+      closeAlertPanel()
     }
   }
 })
 </script>
 
 <script lang="ts">
-  export function closeAlertPanel(){
-    clearHTMLElement(document.getElementById('alert-container') as HTMLElement);
-  }
+export function closeAlertPanel() {
+  clearHTMLElement(document.getElementById('alert-container') as HTMLElement)
+}
 </script>
 
 <template>

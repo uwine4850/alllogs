@@ -9,10 +9,10 @@ defineProps({
     required: true,
   },
   link: {
-    type: String
+    type: String,
   },
 })
-defineEmits(['click']);
+defineEmits(['click'])
 </script>
 
 <template>
@@ -48,6 +48,7 @@ defineEmits(['click']);
   -webkit-box-shadow: 0px 0px 4px 0px vars.$bg-color;
   -moz-box-shadow: 0px 0px 4px 0px vars.$bg-color;
   box-shadow: 0px 0px 4px 0px vars.$bg-color;
+  width: 100%;
   .btn {
     background-color: vars.$secondary-color;
     border-radius: 5px;

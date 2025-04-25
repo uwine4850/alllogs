@@ -16,54 +16,54 @@ import type { ProfileMessage } from '@/dto/profile'
 </script>
 
 <script setup lang="ts">
-const errorStore = useErrorStore();
-const router = useRouter();
+const errorStore = useErrorStore()
+const router = useRouter()
 
 const formData = ref<LoginMessage>({
-  Username: "",
-  Password: "",
-});
+  Username: '',
+  Password: '',
+})
 
 const submitForm = async () => {
-  const loginReq = new AsyncRequest("http://localhost:8000/login", {
+  const loginReq = new AsyncRequest('http://localhost:8000/login', {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     withCredentials: true,
-  });
+  })
   loginReq.onResponse((response: AxiosResponse) => {
-    const loginResponse = response.data as LoginResponseMessage;
-    if (loginResponse.Error != ""){
-      errorStore.setText(loginResponse.Error);
+    const loginResponse = response.data as LoginResponseMessage
+    if (loginResponse.Error != '') {
+      errorStore.setText(loginResponse.Error)
     } else {
-      sessionStorage.setItem("authJWT", loginResponse.JWT)
+      sessionStorage.setItem('authJWT', loginResponse.JWT)
       // Get profile data.
-      const req = new AsyncRequest("http://localhost:8000/profile/" + loginResponse.UID, {
+      const req = new AsyncRequest('http://localhost:8000/profile/' + loginResponse.UID, {
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         withCredentials: true,
-      });
-      req.onResponse(function(response: AxiosResponse){
-        const profileResponse = response.data as ProfileMessage;
-        if (profileResponse.Error != ""){
-          errorStore.setText(loginResponse.Error);
+      })
+      req.onResponse(function (response: AxiosResponse) {
+        const profileResponse = response.data as ProfileMessage
+        if (profileResponse.Error != '') {
+          errorStore.setText(loginResponse.Error)
         } else {
-          sessionStorage.setItem("profile", JSON.stringify(profileResponse))
-          router.push("/")
+          sessionStorage.setItem('profile', JSON.stringify(profileResponse))
+          router.push('/')
         }
-      });
+      })
       req.onError((error: unknown) => {
-        errorStore.setText(loginResponse.Error);
-      });
-      req.get();
+        errorStore.setText(loginResponse.Error)
+      })
+      req.get()
     }
-  });
+  })
   loginReq.onError((error: unknown) => {
-    errorStore.setText(String(error));
-  });
-  loginReq.setData(formData.value);
-  loginReq.post();
+    errorStore.setText(String(error))
+  })
+  loginReq.setData(formData.value)
+  loginReq.post()
 }
 </script>
 
@@ -93,7 +93,7 @@ const submitForm = async () => {
   padding: 10px;
 }
 
-form{
+form {
   display: flex;
   flex-direction: column;
   background-color: transparent;

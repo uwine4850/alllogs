@@ -18,92 +18,92 @@ export const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/project',
       name: 'project',
       component: Project,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/project-group',
       name: 'project-group',
       component: ProjectGroup,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/profile/:id',
       name: 'profile',
       component: Profile,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/register',
       name: 'register',
       component: Register,
-      meta: {isAuth: false},
+      meta: { isAuth: false },
     },
     {
       path: '/login',
       name: 'login',
       component: Login,
-      meta: {isAuth: false},
+      meta: { isAuth: false },
     },
     {
       path: '/new-project',
       name: 'new-project',
       component: NewProject,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/new-group',
       name: 'new-group',
       component: NewGroup,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/my-own-groups',
       name: 'my-own-groups',
       component: MyOwnGroups,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/group',
       name: 'group',
       component: Group,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
     {
       path: '/profile/update',
       name: 'profile-update',
       component: ProfileUpdate,
-      meta: {authorized: true},
+      meta: { authorized: true },
     },
   ],
 })
 
 router.beforeEach((to, from, next) => {
-  let isUserAuth: boolean;
-  if(sessionStorage.getItem("profile") === null && sessionStorage.getItem("authJWT") === null){
-    isUserAuth = false;
+  let isUserAuth: boolean
+  if (sessionStorage.getItem('profile') === null && sessionStorage.getItem('authJWT') === null) {
+    isUserAuth = false
   } else {
-    isUserAuth = true;
+    isUserAuth = true
   }
-  if("isAuth" in to.meta){
-    if(to.meta.isAuth === isUserAuth){
-      next();
+  if ('isAuth' in to.meta) {
+    if (to.meta.isAuth === isUserAuth) {
+      next()
     } else {
-      next("/");
+      next('/')
     }
   }
-  if("authorized" in to.meta){
-    if(to.meta.authorized === isUserAuth){
-      next();
+  if ('authorized' in to.meta) {
+    if (to.meta.authorized === isUserAuth) {
+      next()
     } else {
-      next("/login");
+      next('/login')
     }
   }
-});
+})
 
 export default router

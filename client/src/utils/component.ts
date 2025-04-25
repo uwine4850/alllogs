@@ -12,5 +12,5 @@ export function addComponent(placeID: string, component: Component) {
 }
 
 export function clearHTMLElement(element: HTMLElement) {
-  render(null, element);
+  render(null, element)
 }

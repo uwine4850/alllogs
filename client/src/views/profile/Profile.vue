@@ -4,10 +4,8 @@ import logoutIcon from '@/assets/svg/log_out.svg'
 import refreshIcon from '@/assets/svg/refresh.svg'
 import deleteIcon from '@/assets/svg/delete.svg'
 import { onMounted } from 'vue'
-import type { GenTokenMessage, ProfileMessage, TokenResponse } from '@/dto/profile'
-import { AsyncRequest, AsyncRequestWithAuthorization } from '@/classes/request'
-import type { BaseResponseMessage } from '@/dto/common'
-import { getConfigFileParsingDiagnostics } from 'typescript'
+import type { ProfileMessage } from '@/dto/profile'
+import { deleteToken, generateTokenForm, getProfileData } from '@/services/profile'
 </script>
 
 <script setup lang="ts">
@@ -17,102 +15,39 @@ import Separator from '@/components/Separator.vue'
 import InputPassword from '@/components/input/InputPassword.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
 import { useRouter, useRoute } from 'vue-router'
-import { type AxiosResponse } from 'axios'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 
-const errorStore = useErrorStore();
+const errorStore = useErrorStore()
 const router = useRouter()
 const route = useRoute()
 
-const profileData = ref<ProfileMessage | null>(null)
-const tokenRef = ref("");
-const getProfileData = async () => {
-  const req = new AsyncRequestWithAuthorization("http://localhost:8000/profile/" + route.params.id, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    withCredentials: true,
-  });
-  req.onResponse((response: AxiosResponse) => {
-    const profileResponse = response.data as ProfileMessage;
-    if (profileResponse.Error !== "") {
-      errorStore.setText(profileResponse.Error);
-    } else {
-      profileData.value = profileResponse
-      tokenRef.value = profileData.value.Token
-    }
-  });
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error));
-  });
-  await req.get()
+const profileDataRef = ref<ProfileMessage | null>(null)
+const tokenRef = ref('')
+
+const handleGetProfileData = () => {
+  getProfileData(profileDataRef, tokenRef, route.params.id as string, errorStore)
 }
 
-const generateTokenForm = async () => {
-  if (!profileData.value){
-    return
-  }
-  const formData = ref<GenTokenMessage>({
-    UserId: profileData.value.Id
-  });
-
-  const req = new AsyncRequestWithAuthorization("http://localhost:8000/gen-token",  {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    withCredentials: true,
-  });
-  req.onResponse((response: AxiosResponse) => {
-    const tokenResponse = response.data as TokenResponse;
-    if (tokenResponse.Error !== "") {
-      errorStore.setText(tokenResponse.Error);
-    } else {
-      tokenRef.value = tokenResponse.Token;
-    }
-  });
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error));
-  });
-  req.setData(formData.value)
-  req.post();
+const handleGenerateTokenForm = () => {
+  generateTokenForm(tokenRef, profileDataRef.value, errorStore)
 }
 
-const deleteToken = async () => {
-  if (!profileData.value){
-    return
-  }
-  const req = new AsyncRequestWithAuthorization("http://localhost:8000/del-token", {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    withCredentials: true,
-  });
-  req.onResponse((response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage;
-    if (baseResponse.Error != "") {
-      errorStore.setText(baseResponse.Error);
-    } else {
-      tokenRef.value = "";
-    }
-  });
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error));
-  });
-  req.delete();
+const handleDeleteToken = () => {
+  deleteToken(tokenRef, profileDataRef.value, errorStore)
 }
 
-onMounted(() => {
-  getProfileData()
-  const logoutBtn = document.getElementById("logout-btn")
-  if (logoutBtn){
-    logoutBtn.onclick = function(){
-      sessionStorage.removeItem("authJWT");
-      router.go(0);
+onMounted(async () => {
+  handleGetProfileData()
+  const logoutBtn = document.getElementById('logout-btn')
+  if (logoutBtn) {
+    logoutBtn.onclick = function () {
+      sessionStorage.removeItem('authJWT')
+      router.go(0)
     }
   }
-});
+})
 </script>
 
 <template>
@@ -122,12 +57,12 @@ onMounted(() => {
       <div class="base-info">
         <div class="profile-info">
           <div class="avatar">
-            <img :src="profileData?.Avatar" alt="" />
+            <img :src="profileDataRef?.Avatar" alt="" />
           </div>
           <div class="description">
-            <div class="username">{{ profileData?.User.Username }}</div>
+            <div class="username">{{ profileDataRef?.User.Username }}</div>
             <div class="desc-text">
-             {{ profileData?.Description }}
+              {{ profileDataRef?.Description }}
             </div>
           </div>
         </div>
@@ -138,9 +73,19 @@ onMounted(() => {
       </div>
       <InputPassword text="Token" name="token" :readonly="true" v-model="tokenRef" />
       <div class="token-btns">
-        <Button @click="generateTokenForm" class="tbtn" :icon="refreshIcon" text="Regenerate" />
+        <Button
+          @click="handleGenerateTokenForm"
+          class="tbtn"
+          :icon="refreshIcon"
+          text="Regenerate"
+        />
         <Separator class="tsep" :vertical="true" />
-        <Button @click="deleteToken" class="tbtn tbtn-delete" :icon="deleteIcon" text="Delete" />
+        <Button
+          @click="handleDeleteToken"
+          class="tbtn tbtn-delete"
+          :icon="deleteIcon"
+          text="Delete"
+        />
       </div>
     </MiddlePanel>
   </BaseTemplate>

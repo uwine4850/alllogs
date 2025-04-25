@@ -26,5 +26,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.DELETE: {"/del-token": rprofile.DeleteToken},
 		},
+		{
+			router.GET: {"/profile/update/1": rprofile.JsonProfileObjectView()},
+		},
 	}
 }

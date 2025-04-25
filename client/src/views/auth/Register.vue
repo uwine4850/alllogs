@@ -15,36 +15,36 @@ import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
 import type { RegisterMessage } from '@/dto/auth'
 import type { BaseResponseMessage } from '@/dto/common'
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from 'axios'
 
-const errorStore = useErrorStore();
-const router = useRouter();
+const errorStore = useErrorStore()
+const router = useRouter()
 
 const formData = ref<RegisterMessage>({
-  Username: "",
-  Password: "",
-  RepeatPassword: "",
+  Username: '',
+  Password: '',
+  RepeatPassword: '',
 })
 
 const submitForm = async () => {
-  const req = new AsyncRequest("http://localhost:8000/register", {
+  const req = new AsyncRequest('http://localhost:8000/register', {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-  });
+  })
   req.onResponse((response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage;
-    if (!baseResponse.Ok){
-      errorStore.setText(baseResponse.Error);
+    const baseResponse = response.data as BaseResponseMessage
+    if (!baseResponse.Ok) {
+      errorStore.setText(baseResponse.Error)
     } else {
-      router.push("/login")
+      router.push('/login')
     }
-  });
+  })
   req.onError((error: unknown) => {
-    errorStore.setText(String(error));
-  });
-  req.setData(formData.value);
-  req.post();
+    errorStore.setText(String(error))
+  })
+  req.setData(formData.value)
+  req.post()
 }
 </script>
 
@@ -57,7 +57,11 @@ const submitForm = async () => {
         <input v-model="formData.Username" type="text" name="Username" required />
       </InputTemplate>
       <PasswordInp v-model="formData.Password" text="Password" name="Password" />
-      <PasswordInp v-model="formData.RepeatPassword" text="Repeat password" name="repeat_password" />
+      <PasswordInp
+        v-model="formData.RepeatPassword"
+        text="Repeat password"
+        name="repeat_password"
+      />
       <Separator />
       <router-link class="link" to="/login">Log in</router-link>
       <Button type="submit" class="button" text="Register" :icon="checkboxIcon" />
@@ -75,7 +79,7 @@ const submitForm = async () => {
   padding: 10px;
 }
 
-form{
+form {
   display: flex;
   flex-direction: column;
   background-color: transparent;

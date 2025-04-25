@@ -15,10 +15,10 @@ defineProps({
   },
 })
 
-let profileData: ProfileMessage;
-const profileJsonData = sessionStorage.getItem("profile")
-if (profileJsonData){
-  profileData = JSON.parse(profileJsonData) as ProfileMessage;
+let profileData: ProfileMessage
+const profileJsonData = sessionStorage.getItem('profile')
+if (profileJsonData) {
+  profileData = JSON.parse(profileJsonData) as ProfileMessage
 }
 </script>
 
@@ -32,13 +32,18 @@ if (profileJsonData){
         <Separator />
         <div class="partition">
           <div class="partition-title">menu</div>
-          <Button class="partition-button" :icon="addIcon" text="New project" link="/new-project"/>
-          <Button class="partition-button" :icon="addIcon" text="New group" link="/new-group"/>
+          <Button class="partition-button" :icon="addIcon" text="New project" link="/new-project" />
+          <Button class="partition-button" :icon="addIcon" text="New group" link="/new-group" />
         </div>
         <Separator />
         <div class="partition">
           <div class="partition-title">projects</div>
-          <Button class="partition-button" :icon="groupIcon" text="Group owner" link="/my-own-groups" />
+          <Button
+            class="partition-button"
+            :icon="groupIcon"
+            text="Group owner"
+            link="/my-own-groups"
+          />
         </div>
       </div>
     </div>
@@ -63,14 +68,14 @@ if (profileJsonData){
       <slot></slot>
     </div>
   </div>
-  <img class="global-bg-image" src="@/assets/img/ALLLOGS_BG.jpg"/>
+  <img class="global-bg-image" src="@/assets/img/ALLLOGS_BG.jpg" />
 </template>
 
 <style scoped lang="scss">
 @use '../assets/style/global_vars.scss' as vars;
 @use '../assets/style/presets.scss' as ps;
 
-.global-bg-image{
+.global-bg-image {
   position: absolute;
   z-index: -1;
   width: 100%;

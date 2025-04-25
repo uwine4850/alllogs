@@ -13,7 +13,7 @@ defineProps({
   sep: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 </script>
 

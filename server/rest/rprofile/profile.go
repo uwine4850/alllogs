@@ -1,7 +1,6 @@
 package rprofile
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/uwine4850/alllogs/cnf/cnf"
@@ -12,8 +11,8 @@ import (
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/namelib"
-	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
+	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -30,8 +29,9 @@ type JsonProfileObject struct {
 }
 
 func (v *JsonProfileObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	fmt.Println(err.Error())
-	router.ServerError(w, err.Error(), manager)
+	msg := mydto.ProfileMessage{}
+	msg.Error = err.Error()
+	restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(&msg))
 }
 
 func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {

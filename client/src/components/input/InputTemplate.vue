@@ -26,7 +26,7 @@ defineProps({
 @use '@/assets/style/global_vars.scss' as vars;
 @use '@/assets/style/presets.scss' as ps;
 
-.it-wrapper{
+.it-wrapper {
   display: flex;
   flex-direction: column;
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AlertPanelTemplate from '@/components/alertpanel/AlertPanelTemplate.vue';
+import AlertPanelTemplate from '@/components/alertpanel/AlertPanelTemplate.vue'
 
 const props = defineProps({
   text: {

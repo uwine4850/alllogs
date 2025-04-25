@@ -4,13 +4,13 @@ import Panel from '../components/Panel.vue'
 const props = defineProps({
   single: {
     type: Boolean,
-  }
-});
+  },
+})
 </script>
 
 <template>
-  <img v-if="single" class="global-bg-image" src="@/assets/img/ALLLOGS_BG.jpg"/>
-  <div :class="['wrapper', {'singe-wrapper': single}]">
+  <img v-if="single" class="global-bg-image" src="@/assets/img/ALLLOGS_BG.jpg" />
+  <div :class="['wrapper', { 'singe-wrapper': single }]">
     <Panel class="middle-panel">
       <slot></slot>
     </Panel>
@@ -18,7 +18,7 @@ const props = defineProps({
 </template>
 
 <style scoped>
-.global-bg-image{
+.global-bg-image {
   position: absolute;
   z-index: -1;
   width: 100%;
@@ -36,7 +36,7 @@ const props = defineProps({
   box-sizing: border-box;
   padding: 20px;
 }
-.single-wrapper{
+.single-wrapper {
   height: 100vh;
 }
 

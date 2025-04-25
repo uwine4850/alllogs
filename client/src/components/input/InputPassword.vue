@@ -35,8 +35,8 @@ onMounted(() => {
       passwordInput.value = props.value
     }
   }
-  if(togglePasswordButton.value && passwordInput.value){
-    toggle(togglePasswordButton.value, passwordInput.value);
+  if (togglePasswordButton.value && passwordInput.value) {
+    toggle(togglePasswordButton.value, passwordInput.value)
   }
 })
 
@@ -44,12 +44,18 @@ const updateValue = (event: Event) => {
   const target = event.target as HTMLInputElement
   emit('update:modelValue', target.value)
 }
-
 </script>
 
 <template>
   <InputTemplate :text="props.text">
-    <input ref="passwordInput" :readonly="props.readonly" type="password" class="p-input" :value="modelValue" @input="updateValue" />
+    <input
+      ref="passwordInput"
+      :readonly="props.readonly"
+      type="password"
+      class="p-input"
+      :value="modelValue"
+      @input="updateValue"
+    />
     <button ref="togglePasswordButton" type="button" class="p-toggle">
       <img :src="eyeIcon" />
     </button>
@@ -57,7 +63,7 @@ const updateValue = (event: Event) => {
 </template>
 
 <script lang="ts">
-function toggle(togglePasswordButton: HTMLButtonElement, passwordInput: HTMLInputElement){
+function toggle(togglePasswordButton: HTMLButtonElement, passwordInput: HTMLInputElement) {
   if (passwordInput && togglePasswordButton) {
     togglePasswordButton.addEventListener('click', () => {
       passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password'
