@@ -67,7 +67,7 @@ onMounted(async () => {
           </div>
         </div>
         <div class="profile-btns">
-          <Button class="pbtn" :icon="updateIcon" text="Update" link="/profile/update" />
+          <Button class="pbtn" :icon="updateIcon" text="Update" :link="`/profile/update/${profileDataRef?.Id}`" />
           <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>
       </div>
@@ -77,14 +77,14 @@ onMounted(async () => {
           @click="handleGenerateTokenForm"
           class="tbtn"
           :icon="refreshIcon"
-          text="Regenerate"
+          text="Regenerate token"
         />
         <Separator class="tsep" :vertical="true" />
         <Button
           @click="handleDeleteToken"
           class="tbtn tbtn-delete"
           :icon="deleteIcon"
-          text="Delete"
+          text="Delete token"
         />
       </div>
     </MiddlePanel>

@@ -10,13 +10,18 @@ const props = defineProps({
     type: String,
   },
 })
+const emit = defineEmits(['update:modelValue'])
+const updateValue = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.checked)
+}
 </script>
 
 <template>
   <InputTemplate :text="props.text">
     <span>
       <label for="ch">{{ props.inptext }}</label>
-      <input id="ch" type="checkbox" class="inp" />
+      <input id="ch" type="checkbox" class="inp" @input="updateValue" />
     </span>
   </InputTemplate>
 </template>

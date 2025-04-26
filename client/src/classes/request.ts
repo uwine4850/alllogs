@@ -84,6 +84,21 @@ export class AsyncRequest<D = any> {
       }
     }
   }
+
+  public async put() {
+    this.currentRequest = this.put.bind(this)
+    try {
+      const response = await axios.put(this.url, this.data, this.config)
+      this.response = response
+      if (this.onResponseFn) {
+        this.onResponseFn(response)
+      }
+    } catch (error) {
+      if (this.onErrorFn) {
+        this.onErrorFn(error)
+      }
+    }
+  }
 }
 
 export class AsyncRequestWithAuthorization extends AsyncRequest {

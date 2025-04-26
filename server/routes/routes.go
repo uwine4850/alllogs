@@ -29,5 +29,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.GET: {"/profile/update/1": rprofile.JsonProfileObjectView()},
 		},
+		{
+			router.PUT: {"/profile/update": rprofile.Update},
+		},
 	}
 }

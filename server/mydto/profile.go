@@ -1,6 +1,9 @@
 package mydto
 
-import "github.com/uwine4850/foozy/pkg/router/rest"
+import (
+	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/rest"
+)
 
 type ProfileMessage struct {
 	rest.ImplementDTOMessage
@@ -28,4 +31,13 @@ type TokenResponse struct {
 	rest.ImplementDTOMessage
 	Token string
 	Error string
+}
+
+type ProfileUpdateMessage struct {
+	rest.ImplementDTOMessage
+	PID           string
+	Description   string
+	Avatar        form.FormFile
+	OldAvatarPath string
+	DelAvatar     bool
 }

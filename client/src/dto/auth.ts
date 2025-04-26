@@ -13,7 +13,3 @@ export interface LoginResponseMessage {
     UID: string;
     Error: string;
 }
-export interface AuthorizationMessage {
-    AID: string;
-    Error: string;
-}

@@ -7,12 +7,23 @@ const props = defineProps({
     required: true,
   },
 })
+const emit = defineEmits(['update:modelValue'])
+
+const updateValue = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0];
+    emit('update:modelValue', file);
+  } else {
+    emit('update:modelValue', null);
+  }
+}
 </script>
 
 <template>
   <InputTemplate :text="props.text">
     <span>
-      <input type="file" class="inp" />
+      <input type="file" class="inp" @change="updateValue" />
     </span>
   </InputTemplate>
 </template>

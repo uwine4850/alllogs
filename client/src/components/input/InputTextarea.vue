@@ -10,12 +10,21 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  modelValue: {
+    type: String,
+    required: true,
+  },
 })
+const emit = defineEmits(['update:modelValue'])
+const updateValue = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.value)
+}
 </script>
 
 <template>
   <InputTemplate :text="props.text">
-    <textarea :name="props.name" class="inp"></textarea>
+    <textarea :name="props.name" class="inp" @input="updateValue" :value="props.modelValue"></textarea>
   </InputTemplate>
 </template>
 

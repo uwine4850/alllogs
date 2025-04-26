@@ -75,7 +75,7 @@ export const router = createRouter({
       meta: { authorized: true },
     },
     {
-      path: '/profile/update',
+      path: '/profile/update/:id',
       name: 'profile-update',
       component: ProfileUpdate,
       meta: { authorized: true },

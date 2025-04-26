@@ -19,3 +19,10 @@ export interface TokenResponse {
     Token: string;
     Error: string;
 }
+export interface ProfileUpdateMessage {
+    PID: string;
+    Description: string;
+    Avatar: File | null;
+    OldAvatarPath: string;
+    DelAvatar: boolean;
+}

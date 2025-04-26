@@ -7,7 +7,7 @@ import { useErrorStore } from '@/stores/error'
 
 export const getProfileData = async (
   _profileDataRef: Ref<ProfileMessage | null>,
-  _tokenRef: Ref<string | null>,
+  _tokenRef: Ref<string | null> | null,
   id: string,
   errorStore: ReturnType<typeof useErrorStore>,
 ) => {
@@ -23,7 +23,9 @@ export const getProfileData = async (
       errorStore.setText(profileResponse.Error)
     } else {
       _profileDataRef.value = profileResponse
-      _tokenRef.value = _profileDataRef.value.Token
+      if(_tokenRef){
+        _tokenRef.value = _profileDataRef.value.Token
+      }
     }
   })
   req.onError((error: unknown) => {

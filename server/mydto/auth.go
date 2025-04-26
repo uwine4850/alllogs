@@ -21,9 +21,3 @@ type LoginResponseMessage struct {
 	UID   string
 	Error string
 }
-
-type AuthorizationMessage struct {
-	rest.ImplementDTOMessage
-	AID   string
-	Error string
-}

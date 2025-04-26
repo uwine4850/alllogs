@@ -14,3 +14,8 @@ const (
 	DBT_AUTH    = "auth"
 	DBT_PROFILE = "profile"
 )
+
+const (
+	DEFAULT_AVATAR_PATH = "/storage/avatars/default.jpg"
+	STORAGE_AVATAR_PATH = "/storage/avatars/"
+)
