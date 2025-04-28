@@ -24,8 +24,6 @@ if (profileJsonData) {
 
 <template>
   <div class="container">
-    <div id="alert-container"></div>
-
     <div class="left-side-wrapper">
       <div class="left-side">
         <router-link class="logo" :to="`/`">ALLLOGS</router-link>

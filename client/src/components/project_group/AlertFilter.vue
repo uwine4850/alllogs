@@ -4,7 +4,7 @@ import checkboxIcon from '@/assets/svg/checkbox.svg'
 </script>
 
 <script setup lang="ts">
-import AlertPanelTemplate, { closeAlertPanel } from '../alertpanel/AlertPanelTemplate.vue'
+import AlertPanelTemplate from '../alertpanel/AlertPanelTemplate.vue'
 import PanelTitle from '../PanelTitle.vue'
 import InputDropdown from '../input/InputDropdown.vue'
 import InputText from '../input/InputText.vue'
@@ -36,7 +36,6 @@ const options: Option[] = [
       class="save-btn"
       :icon="checkboxIcon"
       text="Save"
-      @click="closeAlertPanel"
     />
   </AlertPanelTemplate>
 </template>

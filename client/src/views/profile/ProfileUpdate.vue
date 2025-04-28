@@ -2,7 +2,7 @@
 import deleteIcon from '@/assets/svg/delete.svg'
 import checkboxIcon from '@/assets/svg/checkbox.svg'
 import profileIcon from '@/assets/svg/user.svg'
-import { onMounted, ref, watch } from 'vue'
+import { h, onMounted, ref, watch } from 'vue'
 import type { ProfileMessage, ProfileUpdateMessage } from '@/dto/profile'
 import { getProfileData } from '@/services/profile'
 import { useRoute, useRouter } from 'vue-router'
@@ -10,6 +10,8 @@ import { useErrorStore } from '@/stores/error'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
+import AlertPanelTemplate, { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
+import AlertPanelText from '@/components/alertpanel/AlertPanelText.vue'
 </script>
 
 <script setup lang="ts">
@@ -22,6 +24,7 @@ import InputCheckbox from '@/components/input/InputCheckbox.vue'
 import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
 import Error from '@/components/Error.vue'
+import AlertPanelDelProfile from '@/components/alertpanel/profile/AlertPanelDelProfile.vue'
 
 const errorStore = useErrorStore();
 const router = useRouter();
@@ -37,9 +40,6 @@ const formData = ref<ProfileUpdateMessage>({
 });
 const saveChanges = async () => {
   const req = new AsyncRequestWithAuthorization("http://localhost:8000/profile/update", {
-    headers: {
-
-    },
     withCredentials: true,
   });
   req.onResponse(async (response: AxiosResponse) => {
@@ -70,6 +70,12 @@ const saveChanges = async () => {
   req.put();
 }
 
+const showDeleteAlert = () => {
+  openAlertPanel();
+}
+
+const deleteAlertPanel = h(AlertPanelText, {text: "wew", hide: true})
+
 onMounted(() => {
   getProfileData(profileDataRef, null, route.params.id as string, errorStore);
 });
@@ -86,21 +92,22 @@ watch(profileDataRef, (profile) => {
 
 <template>
   <BaseTemplate title="Profile update">
-    <MiddlePanel>
-      <Error />
-      <PanelTitle :icon="profileIcon" text="Profile update" :sep="false" />
-      <form @submit.prevent="saveChanges">
-        <InputTextarea v-model="formData.Description" text="Description" name="description"/>
-        <InputFile v-model="formData.Avatar" text="Avatar" />
-        <InputCheckbox v-model="formData.DelAvatar" text="Delete avatar" inptext="delete" />
-        <Separator />
-        <div class="update-btns">
-          <Button type="button" class="btn btn-delete" :icon="deleteIcon" text="Delete user" />
-          <Button type="submit" class="btn" :icon="checkboxIcon" text="Save" />
-        </div>
-      </form>
-    </MiddlePanel>
-  </BaseTemplate>
+    <AlertPanelDelProfile />
+      <MiddlePanel>
+        <Error />
+        <PanelTitle :icon="profileIcon" text="Profile update" :sep="false" />
+        <form @submit.prevent="saveChanges">
+          <InputTextarea v-model="formData.Description" text="Description" name="description"/>
+          <InputFile v-model="formData.Avatar" text="Avatar" />
+          <InputCheckbox v-model="formData.DelAvatar" text="Delete avatar" inptext="delete" />
+          <Separator />
+          <div class="update-btns">
+            <Button @click="showDeleteAlert" type="button" class="btn btn-delete" :icon="deleteIcon" text="Delete user" />
+            <Button type="submit" class="btn" :icon="checkboxIcon" text="Save" />
+          </div>
+        </form>
+      </MiddlePanel>
+    </BaseTemplate>
 </template>
 
 <style scoped lang="scss">

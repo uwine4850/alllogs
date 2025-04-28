@@ -16,7 +16,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type DBRowView struct {
+type ProfileDBView struct {
 	Id          string `name:"id"`
 	UserId      string `name:"user_id"`
 	Description string `name:"description"`
@@ -46,7 +46,7 @@ func JsonProfileObjectView() func(w http.ResponseWriter, r *http.Request, manage
 				Name:       "object",
 				DB:         db,
 				TableName:  cnf.DBT_PROFILE,
-				FillStruct: DBRowView{},
+				FillStruct: ProfileDBView{},
 				Slug:       "id",
 			},
 		},

@@ -32,5 +32,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.PUT: {"/profile/update": rprofile.Update},
 		},
+		{
+			router.DELETE: {"/profile/del": rprofile.Delete},
+		},
 	}
 }
