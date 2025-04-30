@@ -6,15 +6,14 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
-	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -22,41 +21,37 @@ import (
 func Register() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 		// Parse and validate form.
-		frm := form.NewForm(r)
-		if err := frm.Parse(); err != nil {
-			return rest.SendBeseResponse(w, false, err)
-		}
 		registerForm := mydto.RegisterMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
-			return rest.SendBeseResponse(w, false, err)
+			return api.SendBeseResponse(w, false, err)
 		}
 		if strings.Trim(registerForm.Password, "") != strings.Trim(registerForm.RepeatPassword, "") {
-			return rest.SendBeseResponse(w, false, errors.New("passwords don`t match"))
+			return api.SendBeseResponse(w, false, errors.New("passwords don`t match"))
 		}
 
 		// Database operation.
 		db := database.NewDatabase(cnf.DATABASE_ARGS)
 		if err := db.Connect(); err != nil {
-			return rest.SendBeseResponse(w, false, err)
+			return api.SendBeseResponse(w, false, err)
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				rest.SendBeseResponse(w, false, err)()
+				api.SendBeseResponse(w, false, err)()
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)
 		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
 		if err != nil {
-			return rest.SendBeseResponse(w, false, err)
+			return api.SendBeseResponse(w, false, err)
 		}
 		// Create profile in database.
 		if err := createProfile(db, regUserId); err != nil {
-			return rest.SendBeseResponse(w, false, err)
+			return api.SendBeseResponse(w, false, err)
 		}
 		return func() {
 			resp := mydto.NewBaseResponse(true, "")
 			if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-				rest.SendJsonError(err.Error(), w)
+				api.SendJsonError(err.Error(), w)
 			}
 		}
 	}

@@ -31,12 +31,7 @@ const options: Option[] = [
     <InputText text="tag" name="tag" />
     <InputDateTime text="Date Time" name="dateTime" />
     <Separator />
-    <Button
-      id="save-btn"
-      class="save-btn"
-      :icon="checkboxIcon"
-      text="Save"
-    />
+    <Button id="save-btn" class="save-btn" :icon="checkboxIcon" text="Save" />
   </AlertPanelTemplate>
 </template>
 

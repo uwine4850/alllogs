@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
-import Button from '@/components/Button.vue';
-import deleteIcon from '@/assets/svg/delete.svg';
-import { ref } from 'vue';
-import { AsyncRequestWithAuthorization } from '@/classes/request';
-import type { AxiosResponse } from 'axios';
-import type { BaseResponseMessage } from '@/dto/common';
-import { useErrorStore } from '@/stores/error';
-import Error from '@/components/Error.vue';
-import { useRouter } from 'vue-router';
+import Button from '@/components/Button.vue'
+import deleteIcon from '@/assets/svg/delete.svg'
+import { ref } from 'vue'
+import { AsyncRequestWithAuthorization } from '@/classes/request'
+import type { AxiosResponse } from 'axios'
+import type { BaseResponseMessage } from '@/dto/common'
+import { useErrorStore } from '@/stores/error'
+import Error from '@/components/Error.vue'
+import { useRouter } from 'vue-router'
 
-const errorStore = useErrorStore();
-const router = useRouter();
+const errorStore = useErrorStore()
+const router = useRouter()
 
 const cancelButton = () => {
-  closeAlertPanel();
+  closeAlertPanel()
 }
 
 const deleteUser = () => {
-  const req = new AsyncRequestWithAuthorization("http://localhost:8000/profile/del", {
+  const req = new AsyncRequestWithAuthorization('http://localhost:8000/profile/del', {
     headers: {
       'Content-Type': 'application/json',
     },
     withCredentials: true,
-  });
+  })
   req.onResponse(async (response: AxiosResponse) => {
     const baseResponse = response.data as BaseResponseMessage
     if (!baseResponse.Ok) {
@@ -31,15 +31,14 @@ const deleteUser = () => {
     } else {
       sessionStorage.removeItem('profile')
       sessionStorage.removeItem('authJWT')
-      router.push('/login');
+      router.push('/login')
     }
   })
   req.onError((error: unknown) => {
     errorStore.setText(String(error))
   })
-  req.delete();
+  req.delete()
 }
-
 </script>
 
 <template>
@@ -47,8 +46,14 @@ const deleteUser = () => {
     <Error />
     <div class="text">Delete profile?</div>
     <div class="buttons">
-        <Button @click="deleteUser" type="button" class="_btn" :icon="deleteIcon" text="Delete profile" />
-        <Button @click="cancelButton" type="button" class="_btn" :icon="deleteIcon" text="Cancel" />
+      <Button
+        @click="deleteUser"
+        type="button"
+        class="_btn"
+        :icon="deleteIcon"
+        text="Delete profile"
+      />
+      <Button @click="cancelButton" type="button" class="_btn" :icon="deleteIcon" text="Cancel" />
     </div>
   </AlertPanelTemplate>
 </template>

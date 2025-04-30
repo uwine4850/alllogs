@@ -7,9 +7,9 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
-	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
@@ -50,15 +50,15 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return rest.SendBeseResponse(w, false, errors.New("User ID not found."))
+		return api.SendBeseResponse(w, false, errors.New("User ID not found."))
 	}
 	db := database.NewDatabase(cnf.DATABASE_ARGS)
 	if err := db.Connect(); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			rest.SendBeseResponse(w, false, err)()
+			api.SendBeseResponse(w, false, err)()
 		}
 	}()
 	newQB := qb.NewSyncQB(db.SyncQ())
@@ -66,9 +66,9 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
-	return rest.SendBeseResponse(w, true, nil)
+	return api.SendBeseResponse(w, true, nil)
 }
 
 func newToken(db *database.Database) (string, error) {
@@ -116,7 +116,7 @@ func sendToken(w http.ResponseWriter, token string, _err string) func() {
 	}
 	return func() {
 		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			rest.SendJsonError(err.Error(), w)
+			api.SendJsonError(err.Error(), w)
 		}
 	}
 }

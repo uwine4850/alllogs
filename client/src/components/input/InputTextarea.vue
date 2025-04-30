@@ -24,7 +24,12 @@ const updateValue = (event: Event) => {
 
 <template>
   <InputTemplate :text="props.text">
-    <textarea :name="props.name" class="inp" @input="updateValue" :value="props.modelValue"></textarea>
+    <textarea
+      :name="props.name"
+      class="inp"
+      @input="updateValue"
+      :value="props.modelValue"
+    ></textarea>
   </InputTemplate>
 </template>
 

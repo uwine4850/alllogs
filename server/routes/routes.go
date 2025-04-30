@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/uwine4850/alllogs/rest/rauth"
-	"github.com/uwine4850/alllogs/rest/rprofile"
+	"github.com/uwine4850/alllogs/api/notifications"
+	"github.com/uwine4850/alllogs/api/rauth"
+	"github.com/uwine4850/alllogs/api/rprofile"
 	"github.com/uwine4850/foozy/pkg/router"
 )
 
@@ -34,6 +35,9 @@ func Get() []map[string]map[string]router.Handler {
 		},
 		{
 			router.DELETE: {"/profile/del": rprofile.Delete},
+		},
+		{
+			router.WS: {"/notifications": notifications.Notification},
 		},
 	}
 }

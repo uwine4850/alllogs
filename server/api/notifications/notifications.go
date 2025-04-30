@@ -1,0 +1,92 @@
+package notifications
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"slices"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/websocket"
+	"github.com/uwine4850/foozy/pkg/builtin/auth"
+	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/router"
+)
+
+const (
+	TYPE_ERROR = iota
+	TYPE_INFO
+	TYPE_GROUP_INVITE
+	TYPE_PROJECT
+)
+
+type WSMessage struct {
+	Type    int
+	AID     string
+	Payload interface{}
+}
+
+var connections = map[string][]*websocket.Conn{}
+var connectionToUser = map[*websocket.Conn]string{}
+
+func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	socket := router.NewWebsocket(router.Upgrader)
+	socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
+		fmt.Println("CONNECT")
+		authJWT := r.URL.Query().Get("authJWT")
+		if authJWT == "" {
+			if err := conn.WriteJSON(&WSMessage{Type: TYPE_ERROR, Payload: "No authJWT."}); err != nil {
+				fmt.Println("Send message error:", err)
+			}
+			return
+		}
+		_claims := &auth.JWTClaims{}
+		_, err := jwt.ParseWithClaims(authJWT, _claims, func(t *jwt.Token) (interface{}, error) {
+			return []byte(manager.Key().HashKey()), nil
+		})
+		if err != nil {
+			if err := conn.WriteJSON(&WSMessage{Type: TYPE_ERROR, Payload: err.Error()}); err != nil {
+				fmt.Println("Send message error:", err)
+			}
+			return
+		}
+		connections[_claims.Id] = append(connections[_claims.Id], conn)
+		connectionToUser[conn] = _claims.Id
+	})
+	socket.OnClientClose(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
+		AID, ok := connectionToUser[conn]
+		if ok {
+			index := slices.Index(connections[AID], conn)
+			if index != -1 {
+				delete(connectionToUser, conn)
+				newConnections := slices.Delete(connections[AID], index, index+1)
+				if len(newConnections) == 0 {
+					delete(connections, AID)
+				} else {
+					connections[AID] = newConnections
+				}
+			}
+		}
+	})
+	socket.OnMessage(func(messageType int, msgData []byte, conn *websocket.Conn) {
+		var wsMessage WSMessage
+		fmt.Println(string(msgData))
+		if err := json.Unmarshal(msgData, &wsMessage); err != nil {
+			if err := conn.WriteJSON(&WSMessage{Type: TYPE_ERROR, Payload: err.Error()}); err != nil {
+				fmt.Println("Send message error:", err)
+			}
+			return
+		}
+		userConnections := connections[wsMessage.AID]
+		for i := 0; i < len(userConnections); i++ {
+			userConn := userConnections[i]
+			if err := userConn.WriteMessage(websocket.TextMessage, msgData); err != nil {
+				fmt.Println("Send message error:", err)
+			}
+		}
+	})
+	if err := socket.ReceiveMessages(w, r); err != nil {
+		fmt.Println("Receive messages error:", err)
+	}
+	return func() {}
+}

@@ -12,10 +12,10 @@ const emit = defineEmits(['update:modelValue'])
 const updateValue = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    const file = target.files[0];
-    emit('update:modelValue', file);
+    const file = target.files[0]
+    emit('update:modelValue', file)
   } else {
-    emit('update:modelValue', null);
+    emit('update:modelValue', null)
   }
 }
 </script>

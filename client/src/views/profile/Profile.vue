@@ -67,7 +67,12 @@ onMounted(async () => {
           </div>
         </div>
         <div class="profile-btns">
-          <Button class="pbtn" :icon="updateIcon" text="Update" :link="`/profile/update/${profileDataRef?.Id}`" />
+          <Button
+            class="pbtn"
+            :icon="updateIcon"
+            text="Update"
+            :link="`/profile/update/${profileDataRef?.Id}`"
+          />
           <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>
       </div>

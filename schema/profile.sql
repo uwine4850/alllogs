@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `alllogs`.`profile` (
 
 DELIMITER //
 
-CREATE TRIGGER set_default_avatar BEFORE INSERT ON `profile`
+CREATE TRIGGER IF NOT EXISTS set_default_avatar BEFORE INSERT ON `profile`
 FOR EACH ROW
 BEGIN
     IF NEW.avatar IS NULL THEN
@@ -22,3 +22,14 @@ BEGIN
 END//
 
 DELIMITER ;
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    type ENUM('info', 'group_invite', 'project') NOT NULL,
+    payload JSON NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(id),
+    FOREIGN KEY (user_id) REFERENCES `auth`(id) ON DELETE CASCADE
+);

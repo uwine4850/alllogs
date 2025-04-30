@@ -23,7 +23,7 @@ export const getProfileData = async (
       errorStore.setText(profileResponse.Error)
     } else {
       _profileDataRef.value = profileResponse
-      if(_tokenRef){
+      if (_tokenRef) {
         _tokenRef.value = _profileDataRef.value.Token
       }
     }

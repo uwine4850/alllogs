@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -27,12 +27,12 @@ type UpdateForm struct {
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 	updateForm := UpdateForm{}
 	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&updateForm), []string{"Description", "Avatar", "OldAvatarPath"})
 	if err := mapper.Fill(); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 
 	var oldRelativeAvatarPath string
@@ -46,7 +46,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 
 	var newAvatarPath string
 	if err := updateAvatar(&newAvatarPath, oldRelativeAvatarPath, &updateForm, w, manager); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 
 	var description string
@@ -54,9 +54,9 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		description = updateForm.Description[0]
 	}
 	if err := saveUpdate(description, newAvatarPath, &updateForm, w); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
-	return rest.SendBeseResponse(w, true, nil)
+	return api.SendBeseResponse(w, true, nil)
 }
 
 func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, w http.ResponseWriter, manager interfaces.IManager) error {
@@ -114,7 +114,7 @@ func saveUpdate(description string, newAvatarPath string, updateForm *UpdateForm
 	}
 	// Close database.
 	if err := db.Close(); err != nil {
-		rest.SendBeseResponse(w, false, err)()
+		api.SendBeseResponse(w, false, err)()
 	}
 	return nil
 }

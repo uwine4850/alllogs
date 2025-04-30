@@ -7,9 +7,9 @@ import (
 	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
-	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
@@ -86,7 +86,7 @@ func SendLoginResponse(w http.ResponseWriter, jwt string, UID string, _err strin
 			Error: _err,
 		}
 		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			rest.SendJsonError(err.Error(), w)
+			api.SendJsonError(err.Error(), w)
 		}
 	}
 }

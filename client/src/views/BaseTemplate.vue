@@ -2,11 +2,16 @@
 import addIcon from '@/assets/svg/add.svg'
 import groupIcon from '@/assets/svg/group.svg'
 import type { ProfileMessage } from '@/dto/profile'
+import { getSocket, MyWebsocket, type SockedMessage } from '@/classes/websocket'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { NotiicationType } from '@/services/nofications'
 </script>
 
 <script setup lang="ts">
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
+
+const notificationCount = ref(0)
 
 defineProps({
   title: {
@@ -20,6 +25,27 @@ const profileJsonData = sessionStorage.getItem('profile')
 if (profileJsonData) {
   profileData = JSON.parse(profileJsonData) as ProfileMessage
 }
+
+const socket = new MyWebsocket(
+  'notifications',
+  `ws://localhost:8000/notifications?authJWT=${sessionStorage.getItem('authJWT')}`,
+)
+socket.OnOpen(() => {
+  console.log('Connected')
+})
+socket.OnClose(() => {
+  console.log('WebSocket closed')
+})
+socket.OnMessage((event: MessageEvent) => {
+  const data = JSON.parse(event.data)
+  console.log('Message from server:', data)
+  notificationCount.value++
+})
+socket.Watch()
+
+onBeforeUnmount(() => {
+  socket.Close()
+})
 </script>
 
 <template>
@@ -52,7 +78,7 @@ if (profileJsonData) {
           <Separator :vertical="true" />
           <a class="header-notifications" href="">
             <img src="../assets/svg/bell-green.svg" alt="" class="hn-icon" />
-            <div class="hn-count">63</div>
+            <div class="hn-count">{{ notificationCount }}</div>
           </a>
           <Separator :vertical="true" />
           <router-link class="header-profile" :to="`/profile/${profileData.Id}`">

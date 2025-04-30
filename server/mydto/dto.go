@@ -44,6 +44,10 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "mydto",
 		Name:    "ProfileUpdateMessage",
 	},
+	{
+		Package: "mydto",
+		Name:    "NotificationInfoMessage",
+	},
 }
 
 var TSGenMessages = map[string]*[]irest.IMessage{
@@ -61,6 +65,9 @@ var TSGenMessages = map[string]*[]irest.IMessage{
 		GenTokenMessage{},
 		TokenResponse{},
 		ProfileUpdateMessage{},
+	},
+	"../client/src/dto/notifications.ts": {
+		NotificationInfoMessage{},
 	},
 }
 

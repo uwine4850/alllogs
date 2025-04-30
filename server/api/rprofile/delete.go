@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/rest"
 	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -16,15 +16,15 @@ import (
 func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return rest.SendBeseResponse(w, false, errors.New("User ID not found."))
+		return api.SendBeseResponse(w, false, errors.New("User ID not found."))
 	}
 	db := database.NewDatabase(cnf.DATABASE_ARGS)
 	if err := db.Connect(); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			rest.SendBeseResponse(w, false, err)()
+			api.SendBeseResponse(w, false, err)()
 		}
 	}()
 	profile, err := GetProfileByAID(db, AID.(string))
@@ -36,18 +36,18 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	newQB.Merge()
 	_, err = newQB.Exec()
 	if err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 	if err := deleteAvatar(profile); err != nil {
 		if err := db.RollBackTransaction(); err != nil {
-			return rest.SendBeseResponse(w, false, err)
+			return api.SendBeseResponse(w, false, err)
 		}
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
 	if err := db.CommitTransaction(); err != nil {
-		return rest.SendBeseResponse(w, false, err)
+		return api.SendBeseResponse(w, false, err)
 	}
-	return rest.SendBeseResponse(w, true, nil)
+	return api.SendBeseResponse(w, true, nil)
 }
 
 func deleteAvatar(profile *ProfileDBView) error {

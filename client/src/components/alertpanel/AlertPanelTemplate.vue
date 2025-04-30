@@ -7,7 +7,7 @@ onMounted(() => {
   const alertPanel = document.getElementById('alert-panel')
   if (alertPanel) {
     alertPanel.onclick = function () {
-      alertPanel.classList.add("hide");
+      alertPanel.classList.add('hide')
     }
   }
 })
@@ -16,15 +16,15 @@ onMounted(() => {
 <script lang="ts">
 export function openAlertPanel() {
   const alertPanel = document.getElementById('alert-panel')
-  if(alertPanel){
-    alertPanel.classList.remove("hide");
+  if (alertPanel) {
+    alertPanel.classList.remove('hide')
   }
 }
 
 export function closeAlertPanel() {
   const alertPanel = document.getElementById('alert-panel')
-  if(alertPanel){
-    alertPanel.classList.add("hide");
+  if (alertPanel) {
+    alertPanel.classList.add('hide')
   }
 }
 </script>

@@ -26,64 +26,64 @@ import Separator from '@/components/Separator.vue'
 import Error from '@/components/Error.vue'
 import AlertPanelDelProfile from '@/components/alertpanel/profile/AlertPanelDelProfile.vue'
 
-const errorStore = useErrorStore();
-const router = useRouter();
-const route = useRoute();
+const errorStore = useErrorStore()
+const router = useRouter()
+const route = useRoute()
 const profileDataRef = ref<ProfileMessage | null>(null)
 
 const formData = ref<ProfileUpdateMessage>({
-  PID: "",
-  Description: "",
+  PID: '',
+  Description: '',
   Avatar: null,
-  OldAvatarPath: "",
+  OldAvatarPath: '',
   DelAvatar: false,
-});
+})
 const saveChanges = async () => {
-  const req = new AsyncRequestWithAuthorization("http://localhost:8000/profile/update", {
+  const req = new AsyncRequestWithAuthorization('http://localhost:8000/profile/update', {
     withCredentials: true,
-  });
+  })
   req.onResponse(async (response: AxiosResponse) => {
     const baseResponse = response.data as BaseResponseMessage
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {
       const newProfileDataRef = ref<ProfileMessage | null>(null)
-      await getProfileData(newProfileDataRef, null, route.params.id as string, errorStore);
+      await getProfileData(newProfileDataRef, null, route.params.id as string, errorStore)
       sessionStorage.setItem('profile', JSON.stringify(newProfileDataRef.value))
-      router.push('/');
+      router.push('/')
     }
   })
   req.onError((error: unknown) => {
     errorStore.setText(String(error))
   })
 
-  const data = new FormData();
-  data.append('PID', formData.value.PID);
-  data.append('Description', formData.value.Description);
+  const data = new FormData()
+  data.append('PID', formData.value.PID)
+  data.append('Description', formData.value.Description)
   if (formData.value.Avatar) {
-    data.append('Avatar', formData.value.Avatar);
+    data.append('Avatar', formData.value.Avatar)
   }
-  data.append('OldAvatarPath', formData.value.OldAvatarPath);
-  data.append('DelAvatar', formData.value.DelAvatar ? 'true' : 'false');
-  req.setData(data);
-  
-  req.put();
+  data.append('OldAvatarPath', formData.value.OldAvatarPath)
+  data.append('DelAvatar', formData.value.DelAvatar ? 'true' : 'false')
+  req.setData(data)
+
+  req.put()
 }
 
 const showDeleteAlert = () => {
-  openAlertPanel();
+  openAlertPanel()
 }
 
-const deleteAlertPanel = h(AlertPanelText, {text: "wew", hide: true})
+const deleteAlertPanel = h(AlertPanelText, { text: 'wew', hide: true })
 
 onMounted(() => {
-  getProfileData(profileDataRef, null, route.params.id as string, errorStore);
-});
+  getProfileData(profileDataRef, null, route.params.id as string, errorStore)
+})
 
 watch(profileDataRef, (profile) => {
   if (profile) {
     formData.value.PID = profile.Id
-    formData.value.Description = profile.Description || ""
+    formData.value.Description = profile.Description || ''
     formData.value.DelAvatar = false
     formData.value.OldAvatarPath = profile.Avatar
   }
@@ -93,21 +93,27 @@ watch(profileDataRef, (profile) => {
 <template>
   <BaseTemplate title="Profile update">
     <AlertPanelDelProfile />
-      <MiddlePanel>
-        <Error />
-        <PanelTitle :icon="profileIcon" text="Profile update" :sep="false" />
-        <form @submit.prevent="saveChanges">
-          <InputTextarea v-model="formData.Description" text="Description" name="description"/>
-          <InputFile v-model="formData.Avatar" text="Avatar" />
-          <InputCheckbox v-model="formData.DelAvatar" text="Delete avatar" inptext="delete" />
-          <Separator />
-          <div class="update-btns">
-            <Button @click="showDeleteAlert" type="button" class="btn btn-delete" :icon="deleteIcon" text="Delete user" />
-            <Button type="submit" class="btn" :icon="checkboxIcon" text="Save" />
-          </div>
-        </form>
-      </MiddlePanel>
-    </BaseTemplate>
+    <MiddlePanel>
+      <Error />
+      <PanelTitle :icon="profileIcon" text="Profile update" :sep="false" />
+      <form @submit.prevent="saveChanges">
+        <InputTextarea v-model="formData.Description" text="Description" name="description" />
+        <InputFile v-model="formData.Avatar" text="Avatar" />
+        <InputCheckbox v-model="formData.DelAvatar" text="Delete avatar" inptext="delete" />
+        <Separator />
+        <div class="update-btns">
+          <Button
+            @click="showDeleteAlert"
+            type="button"
+            class="btn btn-delete"
+            :icon="deleteIcon"
+            text="Delete user"
+          />
+          <Button type="submit" class="btn" :icon="checkboxIcon" text="Save" />
+        </div>
+      </form>
+    </MiddlePanel>
+  </BaseTemplate>
 </template>
 
 <style scoped lang="scss">
