@@ -15,9 +15,10 @@ export class AsyncRequest<D = any> {
   constructor(url: string, config: AxiosRequestConfig) {
     this.url = url
     this.config = config
-    if (this.config.headers) {
-      this.config.headers.Authorization = sessionStorage.getItem('authJWT')
+    if (!this.config.headers) {
+      this.config.headers = {}
     }
+    this.config.headers.Authorization = sessionStorage.getItem('authJWT')
   }
 
   protected updateAuthToken() {

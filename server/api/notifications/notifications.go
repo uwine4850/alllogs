@@ -32,7 +32,6 @@ var connectionToUser = map[*websocket.Conn]string{}
 func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	socket := router.NewWebsocket(router.Upgrader)
 	socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
-		fmt.Println("CONNECT")
 		authJWT := r.URL.Query().Get("authJWT")
 		if authJWT == "" {
 			if err := conn.WriteJSON(&WSMessage{Type: TYPE_ERROR, Payload: "No authJWT."}); err != nil {

@@ -48,6 +48,10 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "mydto",
 		Name:    "NotificationInfoMessage",
 	},
+	{
+		Package: "mydto",
+		Name:    "ProjectMessage",
+	},
 }
 
 var TSGenMessages = map[string]*[]irest.IMessage{
@@ -68,6 +72,9 @@ var TSGenMessages = map[string]*[]irest.IMessage{
 	},
 	"../client/src/dto/notifications.ts": {
 		NotificationInfoMessage{},
+	},
+	"../client/src/dto/project.ts": {
+		ProjectMessage{},
 	},
 }
 

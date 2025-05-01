@@ -13,6 +13,7 @@ var DATABASE_ARGS = database.DbArgs{
 const (
 	DBT_AUTH    = "auth"
 	DBT_PROFILE = "profile"
+	DBT_PROJECT = "project"
 )
 
 const (
