@@ -52,6 +52,10 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "mydto",
 		Name:    "ProjectMessage",
 	},
+	{
+		Package: "mydto",
+		Name:    "ProjectAuthor",
+	},
 }
 
 var TSGenMessages = map[string]*[]irest.IMessage{
@@ -75,6 +79,7 @@ var TSGenMessages = map[string]*[]irest.IMessage{
 	},
 	"../client/src/dto/project.ts": {
 		ProjectMessage{},
+		ProjectAuthor{},
 	},
 }
 

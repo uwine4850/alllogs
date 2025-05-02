@@ -2,7 +2,7 @@
 import projectIcon from '@/assets/svg/project.svg'
 import checkBoxIcon from '@/assets/svg/checkbox.svg'
 import type { ProjectMessage } from '@/dto/project'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
@@ -27,6 +27,7 @@ const formData = ref<ProjectMessage>({
   UserId: '',
   Name: '',
   Description: '',
+  Error: '',
 })
 
 const submitForm = () => {

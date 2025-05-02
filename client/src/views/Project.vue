@@ -5,6 +5,12 @@ import groupIcon from '@/assets/svg/group.svg'
 import userIcon from '@/assets/svg/user.svg'
 import exportIcon from '@/assets/svg/upload.svg'
 import updateIcon from '@/assets/svg/update.svg'
+import { useRoute } from 'vue-router'
+import { AsyncRequestWithAuthorization } from '@/classes/request'
+import type { AxiosResponse } from 'axios'
+import type { ProjectMessage } from '@/dto/project'
+import { useErrorStore } from '@/stores/error'
+import { onMounted, ref } from 'vue'
 </script>
 
 <script setup lang="ts">
@@ -12,27 +18,56 @@ import ProjectTemplate from '@/views/ProjectTemplate.vue'
 import Button from '../components/Button.vue'
 import Separator from '../components/Separator.vue'
 import PanelTitle from '../components/PanelTitle.vue'
+import Error from '@/components/Error.vue'
+
+const route = useRoute();
+const errorStore = useErrorStore();
+const projectRef = ref<ProjectMessage | null>(null);
+
+const getProject = () => {
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/project/${route.params.id}`, {
+    withCredentials: true,
+  })
+  req.onResponse(async (response: AxiosResponse) => {
+    const projectMessage = response.data as ProjectMessage
+    console.log(projectMessage);
+    if (projectMessage.Error != "") {
+      errorStore.setText(projectMessage.Error);
+    } else {
+      projectRef.value = projectMessage;
+    }
+  })
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error))
+  })
+  req.get();
+}
+
+onMounted(() => {
+  getProject();
+});
+
 </script>
 
 <template>
   <ProjectTemplate title="Project">
     <template #panel-project>
+      <Error />
       <div class="proj-base-view">
-        <div class="proj-name">Project name</div>
+        <div class="proj-name">{{ projectRef?.Name }}</div>
         <div class="proj-description">
-          It is a long established fact that a reader will be distracted by the readable content of
-          a page when looking at its layout. The point of using Lorem Ipsum is that it has
+          {{ projectRef?.Description }}
         </div>
       </div>
       <Separator />
       <div class="info-line">
         <Separator class="info-sep" :vertical="true" />
-        <a class="author-info" href="">
+        <router-link class="author-info" :to="`/profile/${projectRef?.Author.PID}`">
           <div class="ai-avatar">
-            <img src="../assets/tmp/1.jpg" alt="" />
+            <img :src="projectRef?.Author.Avatar" alt="" />
           </div>
-          <div class="ai-username">renxob</div>
-        </a>
+          <div class="ai-username">{{ projectRef?.Author.Username }}</div>
+        </router-link>
       </div>
       <Separator />
       <PanelTitle :icon="groupIcon" text="log groups" />

@@ -7,12 +7,12 @@ import (
 
 type ProfileMessage struct {
 	rest.ImplementDTOMessage
-	User        UserMessage `name:"User"`
-	Id          string      `name:"Id"`
-	UserId      string      `name:"UserId"`
-	Description string      `name:"Description"`
-	Avatar      string      `name:"Avatar"`
-	Token       string      `name:"Token"`
+	User        UserMessage `dto:"User"`
+	Id          string      `dto:"Id"`
+	UserId      string      `dto:"UserId"`
+	Description string      `dto:"Description"`
+	Avatar      string      `dto:"Avatar"`
+	Token       string      `dto:"Token"`
 	Error       string
 }
 

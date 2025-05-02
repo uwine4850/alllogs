@@ -43,5 +43,8 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.POST: {"/new-project": rproject.NewProject},
 		},
+		{
+			router.GET: {"/project/<id>": rproject.ProjectObjectView()},
+		},
 	}
 }

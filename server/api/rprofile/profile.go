@@ -17,11 +17,11 @@ import (
 )
 
 type ProfileDBView struct {
-	Id          string `name:"id"`
-	UserId      string `name:"user_id"`
-	Description string `name:"description"`
-	Avatar      string `name:"avatar"`
-	Token       string `name:"token"`
+	Id          string `db:"id"`
+	UserId      string `db:"user_id"`
+	Description string `db:"description"`
+	Avatar      string `db:"avatar"`
+	Token       string `db:"token"`
 }
 
 type JsonProfileObject struct {

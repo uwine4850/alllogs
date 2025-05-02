@@ -21,7 +21,7 @@ export const router = createRouter({
       meta: { authorized: true },
     },
     {
-      path: '/project',
+      path: '/project/:id',
       name: 'project',
       component: Project,
       meta: { authorized: true },
