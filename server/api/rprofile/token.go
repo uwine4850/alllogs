@@ -50,7 +50,7 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return api.SendBeseResponse(w, false, errors.New("User ID not found."))
+		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
 	}
 	db := database.NewDatabase(cnf.DATABASE_ARGS)
 	if err := db.Connect(); err != nil {

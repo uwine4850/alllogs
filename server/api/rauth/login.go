@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/alllogs/api"
@@ -22,7 +21,7 @@ import (
 )
 
 type LoginJWTClaims struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 	jwt.RegisteredClaims
 }
 
@@ -32,41 +31,41 @@ func Login() router.Handler {
 
 		loginForm := mydto.LoginMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
+			return SendLoginResponse(w, "", 0, err.Error())
 		}
 
 		// Database operation.
 		db := database.NewDatabase(cnf.DATABASE_ARGS)
 		if err := db.Connect(); err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
+			return SendLoginResponse(w, "", 0, err.Error())
 		}
 		defer func() {
 			if err := db.Close(); err != nil {
-				SendLoginResponse(w, "", "", err.Error())()
+				SendLoginResponse(w, "", 0, err.Error())()
 			}
 		}()
 		myauth := auth.NewAuth(db, w, manager)
 		authUser, err := myauth.LoginUser(loginForm.Username, loginForm.Password)
 		if err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
+			return SendLoginResponse(w, "", 0, err.Error())
 		}
 
 		profileId, err := getProfileIdByUserId(db, authUser.Id)
 		if err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
+			return SendLoginResponse(w, "", 0, err.Error())
 		}
 		authClaims := auth.JWTClaims{
 			Id: authUser.Id,
 		}
 		tokenString, err := secure.NewHmacJwtWithClaims(authClaims, manager)
 		if err != nil {
-			return SendLoginResponse(w, "", "", err.Error())
+			return SendLoginResponse(w, "", 0, err.Error())
 		}
 		return SendLoginResponse(w, tokenString, profileId, "")
 	}
 }
 
-func NewLoginJWT(uid string, manager interfaces.IManager) (string, error) {
+func NewLoginJWT(uid int, manager interfaces.IManager) (string, error) {
 	claims := &LoginJWTClaims{
 		Id: uid,
 	}
@@ -78,7 +77,7 @@ func NewLoginJWT(uid string, manager interfaces.IManager) (string, error) {
 	return tokenString, nil
 }
 
-func SendLoginResponse(w http.ResponseWriter, jwt string, UID string, _err string) func() {
+func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) func() {
 	return func() {
 		resp := &mydto.LoginResponseMessage{
 			JWT:   jwt,
@@ -91,19 +90,19 @@ func SendLoginResponse(w http.ResponseWriter, jwt string, UID string, _err strin
 	}
 }
 
-func getProfileIdByUserId(db *database.Database, id string) (string, error) {
+func getProfileIdByUserId(db *database.Database, id int) (int, error) {
 	newQB := qb.NewSyncQB(db.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, id))
 	newQB.Merge()
 	profileId, err := newQB.Query()
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	if len(profileId) != 1 {
-		return "", errors.New("User not found.")
+		return 0, errors.New("User not found.")
 	}
 	intProfileId, err := dbutils.ParseInt(profileId[0]["id"])
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	return strconv.Itoa(intProfileId), nil
+	return intProfileId, nil
 }

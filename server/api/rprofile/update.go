@@ -1,6 +1,7 @@
 package rprofile
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,11 +18,11 @@ import (
 )
 
 type UpdateForm struct {
-	PID           []string        `name:"PID"`
-	Description   []string        `name:"Description"`
-	Avatar        []form.FormFile `name:"Avatar"`
-	OldAvatarPath []string        `name:"OldAvatarPath"`
-	DelAvatar     []string        `name:"DelAvatar"`
+	PID           []string        `form:"PID"`
+	Description   []string        `form:"Description"`
+	Avatar        []form.FormFile `form:"Avatar"`
+	OldAvatarPath []string        `form:"OldAvatarPath"`
+	DelAvatar     []string        `form:"DelAvatar"`
 }
 
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
@@ -29,12 +30,12 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err := frm.Parse(); err != nil {
 		return api.SendBeseResponse(w, false, err)
 	}
+	fmt.Println(frm.GetMultipartForm())
 	updateForm := UpdateForm{}
 	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&updateForm), []string{"Description", "Avatar", "OldAvatarPath"})
 	if err := mapper.Fill(); err != nil {
 		return api.SendBeseResponse(w, false, err)
 	}
-
 	var oldRelativeAvatarPath string
 	if updateForm.OldAvatarPath != nil {
 		if updateForm.OldAvatarPath[0] == cnf.DEFAULT_AVATAR_PATH {

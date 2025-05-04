@@ -32,7 +32,7 @@ const route = useRoute()
 const profileDataRef = ref<ProfileMessage | null>(null)
 
 const formData = ref<ProfileUpdateMessage>({
-  PID: '',
+  PID: 0,
   Description: '',
   Avatar: null,
   OldAvatarPath: '',
@@ -58,7 +58,7 @@ const saveChanges = async () => {
   })
 
   const data = new FormData()
-  data.append('PID', formData.value.PID)
+  data.append('PID', String(formData.value.PID))
   data.append('Description', formData.value.Description)
   if (formData.value.Avatar) {
     data.append('Avatar', formData.value.Avatar)
@@ -73,8 +73,6 @@ const saveChanges = async () => {
 const showDeleteAlert = () => {
   openAlertPanel()
 }
-
-const deleteAlertPanel = h(AlertPanelText, { text: 'wew', hide: true })
 
 onMounted(() => {
   getProfileData(profileDataRef, null, route.params.id as string, errorStore)

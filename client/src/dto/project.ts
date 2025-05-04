@@ -1,13 +1,13 @@
 
 export interface ProjectMessage {
-    Author: ProjectAuthor;
-    UserId: string;
+    Author: ProjectAuthor | undefined;
+    UserId: number;
     Name: string;
     Description: string;
     Error: string;
 }
 export interface ProjectAuthor {
-    PID: string;
+    PID: number;
     Username: string;
     Avatar: string;
 }

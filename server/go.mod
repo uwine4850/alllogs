@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/rs/cors v1.11.1
-	github.com/uwine4850/foozy v0.4.1-0.20250412083319-97fd9abc43db
+	github.com/uwine4850/foozy v0.4.1-0.20250503123701-4a5b757018e9
 )
 
 replace github.com/uwine4850/foozy => /home/fhx/Documents/golang/foozy
@@ -16,6 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect

@@ -30,18 +30,18 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 			}
 			return tokenStr, nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID string) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error {
 			middlewares.SkipNextPage(manager.OneTimeData())
 			rauth.SendLoginResponse(w, token, AID, "")()
 			return nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID string) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error {
 			manager.OneTimeData().SetUserContext("AID", AID)
 			return nil
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, "", "", err.Error())()
+			rauth.SendLoginResponse(w, "", 0, err.Error())()
 		},
 	)(w, r, manager)
 }

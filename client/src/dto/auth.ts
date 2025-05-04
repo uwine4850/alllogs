@@ -10,6 +10,6 @@ export interface LoginMessage {
 }
 export interface LoginResponseMessage {
     JWT: string;
-    UID: string;
+    UID: number;
     Error: string;
 }

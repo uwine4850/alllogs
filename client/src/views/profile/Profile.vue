@@ -44,6 +44,7 @@ onMounted(async () => {
   if (logoutBtn) {
     logoutBtn.onclick = function () {
       sessionStorage.removeItem('authJWT')
+      sessionStorage.removeItem('profile')
       router.go(0)
     }
   }

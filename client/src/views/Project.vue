@@ -30,7 +30,6 @@ const getProject = () => {
   })
   req.onResponse(async (response: AxiosResponse) => {
     const projectMessage = response.data as ProjectMessage
-    console.log(projectMessage);
     if (projectMessage.Error != "") {
       errorStore.setText(projectMessage.Error);
     } else {
@@ -62,11 +61,11 @@ onMounted(() => {
       <Separator />
       <div class="info-line">
         <Separator class="info-sep" :vertical="true" />
-        <router-link class="author-info" :to="`/profile/${projectRef?.Author.PID}`">
+        <router-link class="author-info" :to="`/profile/${projectRef?.Author?.PID}`">
           <div class="ai-avatar">
-            <img :src="projectRef?.Author.Avatar" alt="" />
+            <img :src="projectRef?.Author?.Avatar" alt="" />
           </div>
-          <div class="ai-username">{{ projectRef?.Author.Username }}</div>
+          <div class="ai-username">{{ projectRef?.Author?.Username }}</div>
         </router-link>
       </div>
       <Separator />

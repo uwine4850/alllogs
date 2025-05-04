@@ -18,6 +18,6 @@ type LoginMessage struct {
 type LoginResponseMessage struct {
 	rest.ImplementDTOMessage
 	JWT   string
-	UID   string
+	UID   int
 	Error string
 }

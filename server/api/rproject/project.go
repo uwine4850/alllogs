@@ -15,8 +15,8 @@ import (
 )
 
 type ProjectForm struct {
-	Name        []string `name:"Name"`
-	Description []string `name:"Description"`
+	Name        []string `form:"Name"`
+	Description []string `form:"Description"`
 }
 
 func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {

@@ -8,7 +8,7 @@ export function getSocket(key: string): MyWebsocket {
 
 export interface SockedMessage {
   Type: number
-  AID: string
+  AID: number
   Payload: any
 }
 

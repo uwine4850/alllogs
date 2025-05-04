@@ -1,26 +1,26 @@
 
 export interface ProfileMessage {
-    User: UserMessage;
-    Id: string;
-    UserId: string;
+    User: UserMessage | undefined;
+    Id: number;
+    UserId: number;
     Description: string;
     Avatar: string;
     Token: string;
     Error: string;
 }
 export interface UserMessage {
-    Id: string;
+    Id: number;
     Username: string;
 }
 export interface GenTokenMessage {
-    UserId: string;
+    UserId: number;
 }
 export interface TokenResponse {
     Token: string;
     Error: string;
 }
 export interface ProfileUpdateMessage {
-    PID: string;
+    PID: number;
     Description: string;
     Avatar: File | null;
     OldAvatarPath: string;

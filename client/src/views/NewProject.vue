@@ -24,10 +24,11 @@ const errorStore = useErrorStore()
 const router = useRouter()
 
 const formData = ref<ProjectMessage>({
-  UserId: '',
+  UserId: 0,
   Name: '',
   Description: '',
   Error: '',
+  Author: undefined
 })
 
 const submitForm = () => {

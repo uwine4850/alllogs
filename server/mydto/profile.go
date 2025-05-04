@@ -8,8 +8,8 @@ import (
 type ProfileMessage struct {
 	rest.ImplementDTOMessage
 	User        UserMessage `dto:"User"`
-	Id          string      `dto:"Id"`
-	UserId      string      `dto:"UserId"`
+	Id          int         `dto:"Id"`
+	UserId      int         `dto:"UserId"`
 	Description string      `dto:"Description"`
 	Avatar      string      `dto:"Avatar"`
 	Token       string      `dto:"Token"`
@@ -18,13 +18,13 @@ type ProfileMessage struct {
 
 type UserMessage struct {
 	rest.ImplementDTOMessage
-	Id       string
+	Id       int
 	Username string
 }
 
 type GenTokenMessage struct {
 	rest.ImplementDTOMessage
-	UserId string
+	UserId int
 }
 
 type TokenResponse struct {
@@ -35,7 +35,7 @@ type TokenResponse struct {
 
 type ProfileUpdateMessage struct {
 	rest.ImplementDTOMessage
-	PID           string
+	PID           int
 	Description   string
 	Avatar        form.FormFile
 	OldAvatarPath string

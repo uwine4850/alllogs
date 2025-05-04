@@ -22,12 +22,12 @@ const (
 
 type WSMessage struct {
 	Type    int
-	AID     string
+	AID     int
 	Payload interface{}
 }
 
-var connections = map[string][]*websocket.Conn{}
-var connectionToUser = map[*websocket.Conn]string{}
+var connections = map[int][]*websocket.Conn{}
+var connectionToUser = map[*websocket.Conn]int{}
 
 func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
 	socket := router.NewWebsocket(router.Upgrader)
@@ -79,7 +79,8 @@ func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 		userConnections := connections[wsMessage.AID]
 		for i := 0; i < len(userConnections); i++ {
 			userConn := userConnections[i]
-			if err := userConn.WriteMessage(websocket.TextMessage, msgData); err != nil {
+			if err := userConn.WriteMessage(websocket.TextMessage, msgData); err != nil &&
+				!websocket.IsUnexpectedCloseError(err, websocket.CloseNoStatusReceived) {
 				fmt.Println("Send message error:", err)
 			}
 		}
