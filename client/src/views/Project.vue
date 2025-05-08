@@ -79,7 +79,7 @@ onMounted(() => {
     <template #panel-menu>
       <PanelTitle :icon="projectIcon" text="project management" />
       <div class="pm-wrapper">
-        <Button class="pm-button" :icon="addIcon" text="New log group" link="#" />
+        <Button class="pm-button" :icon="addIcon" text="New log group" :link="`/project/${route.params.id}/new-log-group`" />
         <Button class="pm-button" :icon="addIcon" text="Add group" link="#" />
       </div>
       <Separator />

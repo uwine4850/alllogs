@@ -12,7 +12,17 @@ type ProjectAuthor struct {
 type ProjectMessage struct {
 	rest.ImplementDTOMessage
 	Author      ProjectAuthor
+	Id          int    `db:"id"`
 	UserId      int    `db:"user_id"`
+	Name        string `db:"name"`
+	Description string `db:"description"`
+	Error       string
+}
+
+type ProjectLogGroupMessage struct {
+	rest.ImplementDTOMessage
+	Id          int    `db:"id"`
+	ProjectId   int    `db:"project_id"`
 	Name        string `db:"name"`
 	Description string `db:"description"`
 	Error       string

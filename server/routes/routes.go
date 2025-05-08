@@ -46,5 +46,11 @@ func Get() []map[string]map[string]router.Handler {
 		{
 			router.GET: {"/project/<id>": rproject.ProjectObjectView()},
 		},
+		{
+			router.POST: {"/new-log-group": rproject.NewLogGroup},
+		},
+		{
+			router.GET: {"/project-detail/<projID>/log-group/<logID>": rproject.LogGroupObjectView()},
+		},
 	}
 }

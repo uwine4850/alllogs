@@ -9,26 +9,66 @@ import uploadIcon from '@/assets/svg/upload.svg'
 import updateIcon from '@/assets/svg/update.svg'
 import clearIcon from '@/assets/svg/clear.svg'
 import bellIcon from '@/assets/svg/bell.svg'
+import { AsyncRequestWithAuthorization } from '@/classes/request'
+import type { AxiosResponse } from 'axios'
+import { useErrorStore } from '@/stores/error'
+import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 </script>
 
 <script setup lang="ts">
 import ProjectTemplate from '@/views/ProjectTemplate.vue'
-import Separator from '../components/Separator.vue'
-import Button from '../components/Button.vue'
-import PanelTitle from '../components/PanelTitle.vue'
+import Separator from '@/components/Separator.vue'
+import Button from '@/components/Button.vue'
+import PanelTitle from '@/components/PanelTitle.vue'
 import AlertFilter from '@/components/project_group/AlertFilter.vue'
 import { addComponent } from '@/utils/component'
+import Error from '@/components/Error.vue'
+
+const route = useRoute();
+const errorStore = useErrorStore();
+const projectRef = ref<ProjectMessage | null>(null);
+const logRef = ref<ProjectLogGroupMessage | null>(null);
+
+const getProject = () => {
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/project-detail/${route.params.projID}/log-group/${route.params.logID}`, {
+    withCredentials: true,
+  })
+  req.onResponse(async (response: AxiosResponse) => {
+    const _project = response.data["project"];
+    const _log = response.data["log"];
+    if (_log){
+      const log = _log as ProjectLogGroupMessage;
+      if(log.Error != ""){
+        errorStore.setText(log.Error)
+      } else {
+        if(_project){
+          projectRef.value = _project as ProjectMessage;   
+        }
+        logRef.value = log;
+      } 
+    }
+  })
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error))
+  })
+  req.get();
+}
+
+onMounted(() => {
+  getProject();
+});
+
 </script>
 
 <template>
   <ProjectTemplate title="Project group">
     <template #panel-project>
+      <Error />
       <div class="base-info-view">
-        <div class="biv-name">Database</div>
-        <div class="biv-description">
-          It is a long established fact that a reader will be distracted by the readable content of
-          a page when looking at its layout. The point of using Lorem Ipsum is that it has
-        </div>
+        <div class="biv-name">{{ logRef?.Name }}</div>
+        <div class="biv-description">{{ logRef?.Description }}</div>
       </div>
       <Separator />
       <div class="info-line">
@@ -46,9 +86,9 @@ import { addComponent } from '@/utils/component'
           <p>filters</p>
         </button>
         <Separator :vertical="true" />
-        <router-link class="il-button" :to="`/project`">
+        <router-link class="il-button" :to="`/project/${projectRef?.Id}`">
           <img :src="projectIcon" alt="project" />
-          <p>project</p>
+          <p>{{ projectRef?.Name }}</p>
         </router-link>
       </div>
       <Separator class="row-header-sep" />
@@ -121,8 +161,8 @@ import { addComponent } from '@/utils/component'
 </template>
 
 <style scoped lang="scss">
-@use '../assets/style/global_vars.scss' as vars;
-@use '../assets/style/presets.scss' as ps;
+@use '@/assets/style/global_vars.scss' as vars;
+@use '@/assets/style/presets.scss' as ps;
 
 .base-info-view {
   background-color: transparent;

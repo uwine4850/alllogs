@@ -11,9 +11,10 @@ var DATABASE_ARGS = database.DbArgs{
 }
 
 const (
-	DBT_AUTH    = "auth"
-	DBT_PROFILE = "profile"
-	DBT_PROJECT = "project"
+	DBT_AUTH              = "auth"
+	DBT_PROFILE           = "profile"
+	DBT_PROJECT           = "project"
+	DBT_PROJECT_LOG_GROUP = "project_log_group"
 )
 
 const (
