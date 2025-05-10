@@ -8,9 +8,9 @@ import updateIcon from '@/assets/svg/update.svg'
 import { useRoute } from 'vue-router'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosResponse } from 'axios'
-import type { ProjectMessage } from '@/dto/project'
+import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 </script>
 
 <script setup lang="ts">
@@ -20,32 +20,62 @@ import Separator from '../components/Separator.vue'
 import PanelTitle from '../components/PanelTitle.vue'
 import Error from '@/components/Error.vue'
 
-const route = useRoute();
-const errorStore = useErrorStore();
-const projectRef = ref<ProjectMessage | null>(null);
+const route = useRoute()
+const errorStore = useErrorStore()
+const projectRef = ref<ProjectMessage | null>(null)
+const logGroupsRef = ref<ProjectLogGroupMessage[]>()
 
 const getProject = () => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/project/${route.params.id}`, {
-    withCredentials: true,
-  })
+  const req = new AsyncRequestWithAuthorization(
+    `http://localhost:8000/project/${route.params.id}`,
+    {
+      withCredentials: true,
+    },
+  )
   req.onResponse(async (response: AxiosResponse) => {
     const projectMessage = response.data as ProjectMessage
-    if (projectMessage.Error != "") {
-      errorStore.setText(projectMessage.Error);
+    if (projectMessage.Error != '') {
+      errorStore.setText(projectMessage.Error)
     } else {
-      projectRef.value = projectMessage;
+      projectRef.value = projectMessage
     }
   })
   req.onError((error: unknown) => {
     errorStore.setText(String(error))
   })
-  req.get();
+  req.get()
+}
+
+const getLogGroups = (project_id: number) => {
+  const req = new AsyncRequestWithAuthorization(
+    `http://localhost:8000/all-log-groups/${project_id}`,
+    {
+      withCredentials: true,
+    },
+  )
+  req.onResponse(async (response: AxiosResponse) => {
+    const projectMessages = response.data as ProjectLogGroupMessage[]
+    if (projectMessages[0].Error != '') {
+      errorStore.setText(projectMessages[0].Error)
+    } else {
+      logGroupsRef.value = projectMessages
+    }
+  })
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error))
+  })
+  req.get()
 }
 
 onMounted(() => {
-  getProject();
-});
+  getProject()
+})
 
+watch(projectRef, (project) => {
+  if (project) {
+    getLogGroups(project.Id)
+  }
+})
 </script>
 
 <template>
@@ -71,15 +101,24 @@ onMounted(() => {
       <Separator />
       <PanelTitle :icon="groupIcon" text="log groups" />
       <div class="log-group-list">
-        <router-link class="log-group" :to="`/project-group`"> Auth </router-link>
-        <router-link class="log-group" :to="`/project-group`"> Database </router-link>
-        <router-link class="log-group" :to="`/project-group`"> Router </router-link>
+        <router-link
+          v-for="group in logGroupsRef"
+          :key="group.Id"
+          class="log-group"
+          :to="`/project-detail/${projectRef?.Id}/log-group/${group.Id}`"
+          >{{ group.Name }}</router-link
+        >
       </div>
     </template>
     <template #panel-menu>
       <PanelTitle :icon="projectIcon" text="project management" />
       <div class="pm-wrapper">
-        <Button class="pm-button" :icon="addIcon" text="New log group" :link="`/project/${route.params.id}/new-log-group`" />
+        <Button
+          class="pm-button"
+          :icon="addIcon"
+          text="New log group"
+          :link="`/project/${route.params.id}/new-log-group`"
+        />
         <Button class="pm-button" :icon="addIcon" text="Add group" link="#" />
       </div>
       <Separator />

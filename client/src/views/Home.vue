@@ -1,6 +1,11 @@
 <script lang="ts">
 import projectIcon from '@/assets/svg/project.svg'
 import groupIcon from '@/assets/svg/group.svg'
+import { AsyncRequestWithAuthorization } from '@/classes/request'
+import type { AxiosResponse } from 'axios'
+import type { ProjectMessage } from '@/dto/project'
+import { useErrorStore } from '@/stores/error'
+import { ref } from 'vue'
 </script>
 
 <script setup lang="ts">
@@ -8,6 +13,24 @@ import BaseTemplate from '../views/BaseTemplate.vue'
 import Panel from '../components/Panel.vue'
 import PanelTitle from '../components/PanelTitle.vue'
 import PanelItem from '@/components/PanelItem.vue'
+
+const projectsRef = ref<ProjectMessage[]>()
+
+const req = new AsyncRequestWithAuthorization('http://localhost:8000/all-projects', {
+  withCredentials: true,
+})
+req.onResponse(async (response: AxiosResponse) => {
+  const projectMessages = response.data as ProjectMessage[]
+  if (projectMessages[0].Error != '') {
+    console.log('Error: ', projectMessages[0].Error)
+  } else {
+    projectsRef.value = projectMessages
+  }
+})
+req.onError((error: unknown) => {
+  console.log('Error: ', error)
+})
+req.get()
 </script>
 
 <template>
@@ -16,7 +39,13 @@ import PanelItem from '@/components/PanelItem.vue'
       <Panel class="panel">
         <PanelTitle :icon="projectIcon" text="my projects" />
         <div class="panel-content-wrapper">
-          <PanelItem title="Project name" descr="DESCR" link="/project" />
+          <PanelItem
+            v-for="project in projectsRef"
+            :key="project.Id"
+            :title="project.Name"
+            :descr="project.Description"
+            :link="`/project/${project.Id}`"
+          />
         </div>
       </Panel>
       <Panel class="panel">

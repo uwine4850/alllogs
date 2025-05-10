@@ -26,40 +26,42 @@ import AlertFilter from '@/components/project_group/AlertFilter.vue'
 import { addComponent } from '@/utils/component'
 import Error from '@/components/Error.vue'
 
-const route = useRoute();
-const errorStore = useErrorStore();
-const projectRef = ref<ProjectMessage | null>(null);
-const logRef = ref<ProjectLogGroupMessage | null>(null);
+const route = useRoute()
+const errorStore = useErrorStore()
+const projectRef = ref<ProjectMessage | null>(null)
+const logRef = ref<ProjectLogGroupMessage | null>(null)
 
 const getProject = () => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/project-detail/${route.params.projID}/log-group/${route.params.logID}`, {
-    withCredentials: true,
-  })
+  const req = new AsyncRequestWithAuthorization(
+    `http://localhost:8000/project-detail/${route.params.projID}/log-group/${route.params.logID}`,
+    {
+      withCredentials: true,
+    },
+  )
   req.onResponse(async (response: AxiosResponse) => {
-    const _project = response.data["project"];
-    const _log = response.data["log"];
-    if (_log){
-      const log = _log as ProjectLogGroupMessage;
-      if(log.Error != ""){
+    const _project = response.data['project']
+    const _log = response.data['log']
+    if (_log) {
+      const log = _log as ProjectLogGroupMessage
+      if (log.Error != '') {
         errorStore.setText(log.Error)
       } else {
-        if(_project){
-          projectRef.value = _project as ProjectMessage;   
+        if (_project) {
+          projectRef.value = _project as ProjectMessage
         }
-        logRef.value = log;
-      } 
+        logRef.value = log
+      }
     }
   })
   req.onError((error: unknown) => {
     errorStore.setText(String(error))
   })
-  req.get();
+  req.get()
 }
 
 onMounted(() => {
-  getProject();
-});
-
+  getProject()
+})
 </script>
 
 <template>

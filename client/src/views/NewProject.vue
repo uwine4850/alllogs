@@ -29,7 +29,7 @@ const formData = ref<ProjectMessage>({
   Name: '',
   Description: '',
   Error: '',
-  Author: undefined
+  Author: undefined,
 })
 
 const submitForm = () => {

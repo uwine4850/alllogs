@@ -20,9 +20,9 @@ import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
 import Error from '@/components/Error.vue'
 
-const errorStore = useErrorStore();
-const router = useRouter();
-const route = useRoute();
+const errorStore = useErrorStore()
+const router = useRouter()
+const route = useRoute()
 
 const formData = ref<ProjectLogGroupMessage>({
   Id: 0,
