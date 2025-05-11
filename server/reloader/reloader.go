@@ -7,6 +7,7 @@ import (
 
 func main() {
 	initcnf.InitCnf()
+	livereload.SetObserverEventDelay(500)
 	wrt := livereload.NewWiretap()
 	wrt.SetDirs([]string{"cmd", "cnf", "reloader", "mydto", "api", "middlewares"})
 	wrt.SetExcludeDirs([]string{"cnf/log"})
