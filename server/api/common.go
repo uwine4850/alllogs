@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/mydto"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -22,7 +22,7 @@ func SendBeseResponse(w http.ResponseWriter, ok bool, _err error) func() {
 			errValue = ""
 		}
 		resp := mydto.NewBaseResponse(ok, errValue)
-		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 			SendJsonError(err.Error(), w)
 		}
 	}

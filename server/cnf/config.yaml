@@ -4,10 +4,12 @@ Config:
     Debug:
         PrintInfo: true
         Debug: true
-        DebugRelativeFilepath: true
-        ErrorLogging: true
-        ErrorLoggingPath: cnf/log/errors.log
-        RequestInfoLog: true
-        RequestInfoLogPath: cnf/log/request.log
+        DebugRelativeFilepath: false
+        ErrorLogging: false
+        ErrorLoggingPath: errors.log
+        RequestInfoLog: false
+        RequestInfoLogPath: request.log
         SkipLoggingLevel: 3
+    Database:
+        MainConnectionPoolName: main
 Additionally: {}

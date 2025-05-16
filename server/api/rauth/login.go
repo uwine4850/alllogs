@@ -10,12 +10,11 @@ import (
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
-	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -35,22 +34,25 @@ func Login() router.Handler {
 		}
 
 		// Database operation.
-		db := database.NewDatabase(cnf.DATABASE_ARGS)
-		if err := db.Connect(); err != nil {
+		// db := database.NewDatabase(cnf.DATABASE_ARGS)
+		// if err := db.Connect(); err != nil {
+		// 	return SendLoginResponse(w, "", 0, err.Error())
+		// }
+		// defer func() {
+		// 	if err := db.Close(); err != nil {
+		// 		SendLoginResponse(w, "", 0, err.Error())()
+		// 	}
+		// }()
+		myauth, err := auth.NewAuth(w, manager)
+		if err != nil {
 			return SendLoginResponse(w, "", 0, err.Error())
 		}
-		defer func() {
-			if err := db.Close(); err != nil {
-				SendLoginResponse(w, "", 0, err.Error())()
-			}
-		}()
-		myauth := auth.NewAuth(db, w, manager)
 		authUser, err := myauth.LoginUser(loginForm.Username, loginForm.Password)
 		if err != nil {
 			return SendLoginResponse(w, "", 0, err.Error())
 		}
 
-		profileId, err := getProfileIdByUserId(db, authUser.Id)
+		profileId, err := getProfileIdByUserId(cnf.DatabaseReader, authUser.Id)
 		if err != nil {
 			return SendLoginResponse(w, "", 0, err.Error())
 		}
@@ -84,14 +86,14 @@ func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) 
 			UID:   UID,
 			Error: _err,
 		}
-		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 			api.SendJsonError(err.Error(), w)
 		}
 	}
 }
 
-func getProfileIdByUserId(db *database.Database, id int) (int, error) {
-	newQB := qb.NewSyncQB(db.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, id))
+func getProfileIdByUserId(dbRead interfaces.IReadDatabase, id int) (int, error) {
+	newQB := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, id))
 	newQB.Merge()
 	profileId, err := newQB.Query()
 	if err != nil {

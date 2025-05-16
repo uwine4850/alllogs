@@ -5,7 +5,6 @@ import (
 
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
-	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router"
@@ -28,11 +27,9 @@ func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager i
 }
 
 func LogGroupObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
-	db := database.NewDatabase(cnf.DATABASE_ARGS)
 	view := object.JsonMultipleObjectTemplateView{
 		View: &LogGroupView{
 			object.MultipleObjectView{
-				DB: db,
 				MultipleObjects: []object.MultipleObject{
 					{
 						Name:       "project",

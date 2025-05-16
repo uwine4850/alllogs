@@ -10,11 +10,10 @@ import (
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
-	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -30,35 +29,29 @@ func Register() router.Handler {
 		}
 
 		// Database operation.
-		db := database.NewDatabase(cnf.DATABASE_ARGS)
-		if err := db.Connect(); err != nil {
+		myauth, err := auth.NewAuth(w, manager)
+		if err != nil {
 			return api.SendBeseResponse(w, false, err)
 		}
-		defer func() {
-			if err := db.Close(); err != nil {
-				api.SendBeseResponse(w, false, err)()
-			}
-		}()
-		myauth := auth.NewAuth(db, w, manager)
 		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
 		if err != nil {
 			return api.SendBeseResponse(w, false, err)
 		}
 		// Create profile in database.
-		if err := createProfile(db, regUserId); err != nil {
+		if err := createProfile(cnf.DatabaseReader, regUserId); err != nil {
 			return api.SendBeseResponse(w, false, err)
 		}
 		return func() {
 			resp := mydto.NewBaseResponse(true, "")
-			if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+			if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 				api.SendJsonError(err.Error(), w)
 			}
 		}
 	}
 }
 
-func createProfile(db *database.Database, userID int) error {
-	qb := qb.NewSyncQB(db.SyncQ()).Insert(cnf.DBT_PROFILE, map[string]any{"user_id": userID})
+func createProfile(dbRead interfaces.IReadDatabase, userID int) error {
+	qb := qb.NewSyncQB(dbRead.SyncQ()).Insert(cnf.DBT_PROFILE, map[string]any{"user_id": userID})
 	qb.Merge()
 	_, err := qb.Exec()
 	if err != nil {

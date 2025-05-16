@@ -10,11 +10,10 @@ import (
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
-	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/router/rest/restmapper"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
@@ -23,21 +22,11 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	if err := json.NewDecoder(r.Body).Decode(&genTokenRequestMessage); err != nil {
 		return sendToken(w, "", err.Error())
 	}
-
-	db := database.NewDatabase(cnf.DATABASE_ARGS)
-	if err := db.Connect(); err != nil {
-		return sendToken(w, "", err.Error())
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			sendToken(w, "", err.Error())()
-		}
-	}()
-	token, err := newToken(db)
+	token, err := newToken(cnf.DatabaseReader)
 	if err != nil {
 		return sendToken(w, "", err.Error())
 	}
-	newQB := qb.NewSyncQB(db.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).Where(qb.Compare("id", qb.EQUAL, genTokenRequestMessage.UserId))
+	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).Where(qb.Compare("id", qb.EQUAL, genTokenRequestMessage.UserId))
 	newQB.Merge()
 	if _, err := newQB.Exec(); err != nil {
 		return sendToken(w, "", err.Error())
@@ -52,16 +41,7 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	if !ok {
 		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
 	}
-	db := database.NewDatabase(cnf.DATABASE_ARGS)
-	if err := db.Connect(); err != nil {
-		return api.SendBeseResponse(w, false, err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			api.SendBeseResponse(w, false, err)()
-		}
-	}()
-	newQB := qb.NewSyncQB(db.SyncQ())
+	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, AID))
 	newQB.Merge()
 	_, err := newQB.Exec()
@@ -71,18 +51,18 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	return api.SendBeseResponse(w, true, nil)
 }
 
-func newToken(db *database.Database) (string, error) {
+func newToken(dbRead interfaces.IReadDatabase) (string, error) {
 	bytes := make([]byte, 16)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
 	}
 	token := hex.EncodeToString(bytes)
-	exist, err := tokenExists(db, token)
+	exist, err := tokenExists(dbRead, token)
 	if err != nil {
 		return "", err
 	}
 	if exist {
-		nToken, err := newToken(db)
+		nToken, err := newToken(dbRead)
 		if err != nil {
 			return "", err
 		}
@@ -91,8 +71,8 @@ func newToken(db *database.Database) (string, error) {
 	return token, nil
 }
 
-func tokenExists(db *database.Database, token string) (bool, error) {
-	newQB := qb.NewSyncQB(db.SyncQ()).
+func tokenExists(dbRead interfaces.IReadDatabase, token string) (bool, error) {
+	newQB := qb.NewSyncQB(dbRead.SyncQ()).
 		Select(qb.Exists(qb.SQ(
 			false,
 			qb.NewNoDbQB().SelectFrom(1, cnf.DBT_PROFILE).Where(qb.Compare("token", qb.EQUAL, token)),
@@ -115,7 +95,7 @@ func sendToken(w http.ResponseWriter, token string, _err string) func() {
 		Error: _err,
 	}
 	return func() {
-		if err := restmapper.SendSafeJsonMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 			api.SendJsonError(err.Error(), w)
 		}
 	}

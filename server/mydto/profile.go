@@ -13,31 +13,31 @@ type ProfileMessage struct {
 	Description string      `dto:"Description"`
 	Avatar      string      `dto:"Avatar"`
 	Token       string      `dto:"Token"`
-	Error       string
+	Error       string      `dto:"Error"`
 }
 
 type UserMessage struct {
 	rest.ImplementDTOMessage
-	Id       int
-	Username string
+	Id       int    `dto:"Id"`
+	Username string `dto:"Username"`
 }
 
 type GenTokenMessage struct {
 	rest.ImplementDTOMessage
-	UserId int
+	UserId int `dto:"UserId"`
 }
 
 type TokenResponse struct {
 	rest.ImplementDTOMessage
-	Token string
-	Error string
+	Token string `dto:"Token"`
+	Error string `dto:"Error"`
 }
 
 type ProfileUpdateMessage struct {
 	rest.ImplementDTOMessage
-	PID           int
-	Description   string
-	Avatar        form.FormFile
-	OldAvatarPath string
-	DelAvatar     bool
+	PID           int           `dto:"PID"`
+	Description   string        `dto:"Description"`
+	Avatar        form.FormFile `dto:"Avatar"`
+	OldAvatarPath string        `dto:"OldAvatarPath"`
+	DelAvatar     bool          `dto:"DelAvatar"`
 }

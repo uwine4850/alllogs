@@ -12,6 +12,7 @@ import (
 	"github.com/uwine4850/alllogs/routes"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/builtin/bglobalflow"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
@@ -24,12 +25,23 @@ import (
 func main() {
 	initcnf.InitCnf()
 	gDB := database.NewDatabase(cnf.DATABASE_ARGS)
-	if err := gDB.Connect(); err != nil {
+	if err := gDB.Open(); err != nil {
 		panic(err)
 	}
 	defer gDB.Close()
+	render, err := tmlengine.NewRender()
+	if err != nil {
+		panic(err)
+	}
+	newManager := manager.NewManager(render)
+	database.InitDatabasePool(newManager, gDB)
 
-	if err := createAuthTable(); err != nil {
+	dbRead, err := newManager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
+	if err != nil {
+		panic(err)
+	}
+	cnf.DatabaseReader = dbRead
+	if err := auth.CreateAuthTable(dbRead, cnf.DATABASE_ARGS.DatabaseName); err != nil {
 		panic(err)
 	}
 
@@ -38,11 +50,6 @@ func main() {
 		panic(err)
 	}
 
-	render, err := tmlengine.NewRender()
-	if err != nil {
-		panic(err)
-	}
-	newManager := manager.NewManager(render)
 	newManager.Key().Generate32BytesKeys()
 	newMiddleware := middlewares.NewMiddleware()
 	newMiddleware.SyncMddl(0, mddlauth.CheckJWT)
@@ -68,20 +75,4 @@ func main() {
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
 		panic(err)
 	}
-}
-
-func createAuthTable() error {
-	db := database.NewDatabase(cnf.DATABASE_ARGS)
-	if err := db.Connect(); err != nil {
-		return err
-	}
-
-	if err := auth.CreateAuthTable(db); err != nil {
-		return err
-	}
-
-	if err := db.Close(); err != nil {
-		return err
-	}
-	return nil
 }

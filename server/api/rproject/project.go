@@ -6,12 +6,10 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/foozy/pkg/database"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/form"
-	"github.com/uwine4850/foozy/pkg/router/form/formmapper"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type ProjectForm struct {
@@ -30,23 +28,22 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 		return api.SendBeseResponse(w, false, err)
 	}
 	var projectForm ProjectForm
-	mapper := formmapper.NewMapper(frm, typeopr.Ptr{}.New(&projectForm), []string{})
-	if err := mapper.Fill(); err != nil {
+	if err := mapper.FillStructFromForm(frm, &projectForm); err != nil {
 		return api.SendBeseResponse(w, false, err)
 	}
 
 	// Database
-	db := database.NewDatabase(cnf.DATABASE_ARGS)
-	if err := db.Connect(); err != nil {
-		return api.SendBeseResponse(w, false, err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			api.SendBeseResponse(w, false, err)()
-		}
-	}()
+	// db := database.NewDatabase(cnf.DATABASE_ARGS)
+	// if err := db.Connect(); err != nil {
+	// 	return api.SendBeseResponse(w, false, err)
+	// }
+	// defer func() {
+	// 	if err := db.Close(); err != nil {
+	// 		api.SendBeseResponse(w, false, err)()
+	// 	}
+	// }()
 
-	newQB := qb.NewSyncQB(db.SyncQ()).Insert(cnf.DBT_PROJECT,
+	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT,
 		map[string]any{
 			"user_id": AID, "name": projectForm.Name[0], "description": projectForm.Description[0],
 		})
@@ -58,8 +55,8 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 	return api.SendBeseResponse(w, true, nil)
 }
 
-func IsProjectAuthor(AID int, projectId int, db *database.Database) (bool, error) {
-	newQB := qb.NewSyncQB(db.SyncQ())
+func IsProjectAuthor(AID int, projectId int, dbRead interfaces.IReadDatabase) (bool, error) {
+	newQB := qb.NewSyncQB(dbRead.SyncQ())
 	return qb.SelectExists(newQB, cnf.DBT_PROJECT,
 		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
 		qb.Compare("user_id", qb.EQUAL, AID))

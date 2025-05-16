@@ -1,6 +1,9 @@
 package cnf
 
-import "github.com/uwine4850/foozy/pkg/database"
+import (
+	"github.com/uwine4850/foozy/pkg/database"
+	"github.com/uwine4850/foozy/pkg/interfaces"
+)
 
 var DATABASE_ARGS = database.DbArgs{
 	Username:     "root",
@@ -21,3 +24,9 @@ const (
 	DEFAULT_AVATAR_PATH = "/storage/avatars/default.jpg"
 	STORAGE_AVATAR_PATH = "/storage/avatars/"
 )
+
+var DatabaseReader interfaces.IReadDatabase
+
+// func DatabaseReader() error {
+//
+// }
