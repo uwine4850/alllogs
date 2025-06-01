@@ -26,7 +26,3 @@ const (
 )
 
 var DatabaseReader interfaces.IReadDatabase
-
-// func DatabaseReader() error {
-//
-// }

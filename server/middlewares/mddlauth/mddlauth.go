@@ -13,11 +13,11 @@ import (
 
 var skipUrl = []string{"/login", "/register", "/notifications"}
 
-func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) {
+func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	if slices.Contains(skipUrl, r.URL.Path) {
-		return
+		return nil
 	}
-	builtin_mddl.AuthJWT(
+	err := builtin_mddl.AuthJWT(
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (string, error) {
 			tokenStr := r.Header.Get("Authorization")
 			if tokenStr == "" {
@@ -32,7 +32,7 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, token, AID, "")()
+			rauth.SendLoginResponse(w, token, AID, "")
 			return nil
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error {
@@ -41,7 +41,8 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			rauth.SendLoginResponse(w, "", 0, err.Error())()
+			rauth.SendLoginResponse(w, "", 0, err.Error())
 		},
 	)(w, r, manager)
+	return err
 }

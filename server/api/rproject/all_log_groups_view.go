@@ -28,12 +28,13 @@ func (v *AllLogGroupsView) Context(w http.ResponseWriter, r *http.Request, manag
 	return object.Context{}, nil
 }
 
-func LogGroupsAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func LogGroupsAllView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	view := object.JsonAllTemplateView{
 		View: &AllLogGroupsView{
 			object.AllView{
 				Name:       "groups",
 				TableName:  cnf.DBT_PROJECT_LOG_GROUP,
+				Database:   database,
 				Slug:       "project_id",
 				FillStruct: mydto.ProjectLogGroupMessage{},
 			},

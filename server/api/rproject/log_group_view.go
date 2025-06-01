@@ -26,10 +26,11 @@ func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager i
 	return object.Context{}, nil
 }
 
-func LogGroupObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	view := object.JsonMultipleObjectTemplateView{
 		View: &LogGroupView{
 			object.MultipleObjectView{
+				Database: database,
 				MultipleObjects: []object.MultipleObject{
 					{
 						Name:       "project",

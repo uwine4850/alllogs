@@ -6,57 +6,58 @@ import (
 	"github.com/uwine4850/alllogs/api/rprofile"
 	"github.com/uwine4850/alllogs/api/rproject"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/object"
 )
 
-func Get() []map[string]map[string]router.Handler {
+func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 	return []map[string]map[string]router.Handler{
 		{
-			router.POST: {"/register": rauth.Register()},
+			"POST": {"/register": rauth.Register()},
 		},
 		{
-			router.POST: {"/login": rauth.Login()},
+			"POST": {"/login": rauth.Login()},
 		},
 		{
-			router.GET: {"/isauth": rauth.IsAuth()},
+			"GET": {"/isauth": rauth.IsAuth()},
 		},
 		{
-			router.GET: {"/profile/<id>": rprofile.JsonProfileObjectView()},
+			"GET": {"/profile/:id": rprofile.JsonProfileObjectView(database)},
 		},
 		{
-			router.POST: {"/gen-token": rprofile.GenerateToken},
+			"POST": {"/gen-token": rprofile.GenerateToken},
 		},
 		{
-			router.DELETE: {"/del-token": rprofile.DeleteToken},
+			"DELETE": {"/del-token": rprofile.DeleteToken},
 		},
 		{
-			router.GET: {"/profile/update/1": rprofile.JsonProfileObjectView()},
+			"GET": {"/profile/update/1": rprofile.JsonProfileObjectView(database)},
 		},
 		{
-			router.PUT: {"/profile/update": rprofile.Update},
+			"PUT": {"/profile/update": rprofile.Update},
 		},
 		{
-			router.DELETE: {"/profile/del": rprofile.Delete},
+			"DELETE": {"/profile/del": rprofile.Delete},
 		},
 		{
-			router.WS: {"/notifications": notifications.Notification},
+			"GET": {"/notifications": notifications.Notification},
 		},
 		{
-			router.POST: {"/new-project": rproject.NewProject},
+			"POST": {"/new-project": rproject.NewProject},
 		},
 		{
-			router.GET: {"/project/<id>": rproject.ProjectObjectView()},
+			"GET": {"/project/:id": rproject.ProjectObjectView(database)},
 		},
 		{
-			router.POST: {"/new-log-group": rproject.NewLogGroup},
+			"POST": {"/new-log-group": rproject.NewLogGroup},
 		},
 		{
-			router.GET: {"/project-detail/<projID>/log-group/<logID>": rproject.LogGroupObjectView()},
+			"GET": {"/project-detail/:projID/log-group/:logID": rproject.LogGroupObjectView(database)},
 		},
 		{
-			router.GET: {"/all-projects": rproject.ProjectsAllView()},
+			"GET": {"/all-projects": rproject.ProjectsAllView(database)},
 		},
 		{
-			router.GET: {"/all-log-groups/<project_id>": rproject.LogGroupsAllView()},
+			"GET": {"/all-log-groups/:project_id": rproject.LogGroupsAllView(database)},
 		},
 	}
 }

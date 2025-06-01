@@ -17,31 +17,23 @@ type ProjectForm struct {
 	Description []string `form:"Description" empty:"-err"`
 }
 
-func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		return nil
 	}
 
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	var projectForm ProjectForm
 	if err := mapper.FillStructFromForm(frm, &projectForm); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-
-	// Database
-	// db := database.NewDatabase(cnf.DATABASE_ARGS)
-	// if err := db.Connect(); err != nil {
-	// 	return api.SendBeseResponse(w, false, err)
-	// }
-	// defer func() {
-	// 	if err := db.Close(); err != nil {
-	// 		api.SendBeseResponse(w, false, err)()
-	// 	}
-	// }()
 
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT,
 		map[string]any{
@@ -50,9 +42,11 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-	return api.SendBeseResponse(w, true, nil)
+	api.SendBeseResponse(w, true, nil)
+	return nil
 }
 
 func IsProjectAuthor(AID int, projectId int, dbRead interfaces.IReadDatabase) (bool, error) {

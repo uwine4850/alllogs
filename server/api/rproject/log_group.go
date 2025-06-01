@@ -19,31 +19,37 @@ type LogGroupForm struct {
 	Description []string `form:"Description" empty:"-err"`
 }
 
-func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		return nil
 	}
 
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	var logGroupForm LogGroupForm
 	if err := mapper.FillStructFromForm(frm, &logGroupForm); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	// Database
 	projectID, err := strconv.Atoi(logGroupForm.ProjectId[0])
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	isProjectAuthor, err := IsProjectAuthor(AID.(int), projectID, cnf.DatabaseReader)
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	if !isProjectAuthor {
-		return api.SendBeseResponse(w, false, errors.New("permission dained"))
+		api.SendBeseResponse(w, false, errors.New("permission dained"))
+		return nil
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT_LOG_GROUP,
 		map[string]any{
@@ -52,7 +58,9 @@ func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	newQB.Merge()
 	_, err = newQB.Exec()
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-	return api.SendBeseResponse(w, true, nil)
+	api.SendBeseResponse(w, true, nil)
+	return nil
 }

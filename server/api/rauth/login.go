@@ -10,10 +10,12 @@ import (
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
+	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
@@ -25,45 +27,41 @@ type LoginJWTClaims struct {
 }
 
 func Login() router.Handler {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 		// Parse and validate form.
 
 		loginForm := mydto.LoginMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
-			return SendLoginResponse(w, "", 0, err.Error())
+			SendLoginResponse(w, "", 0, err.Error())
+			return nil
 		}
 
-		// Database operation.
-		// db := database.NewDatabase(cnf.DATABASE_ARGS)
-		// if err := db.Connect(); err != nil {
-		// 	return SendLoginResponse(w, "", 0, err.Error())
-		// }
-		// defer func() {
-		// 	if err := db.Close(); err != nil {
-		// 		SendLoginResponse(w, "", 0, err.Error())()
-		// 	}
-		// }()
-		myauth, err := auth.NewAuth(w, manager)
+		db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 		if err != nil {
-			return SendLoginResponse(w, "", 0, err.Error())
+			return err
 		}
+		myauth := auth.NewAuth(w, auth.NewMysqlAuthQuery(db, namelib.AUTH.AUTH_TABLE), manager)
 		authUser, err := myauth.LoginUser(loginForm.Username, loginForm.Password)
 		if err != nil {
-			return SendLoginResponse(w, "", 0, err.Error())
+			SendLoginResponse(w, "", 0, err.Error())
+			return nil
 		}
 
 		profileId, err := getProfileIdByUserId(cnf.DatabaseReader, authUser.Id)
 		if err != nil {
-			return SendLoginResponse(w, "", 0, err.Error())
+			SendLoginResponse(w, "", 0, err.Error())
+			return nil
 		}
 		authClaims := auth.JWTClaims{
 			Id: authUser.Id,
 		}
 		tokenString, err := secure.NewHmacJwtWithClaims(authClaims, manager)
 		if err != nil {
-			return SendLoginResponse(w, "", 0, err.Error())
+			SendLoginResponse(w, "", 0, err.Error())
+			return nil
 		}
-		return SendLoginResponse(w, tokenString, profileId, "")
+		SendLoginResponse(w, tokenString, profileId, "")
+		return nil
 	}
 }
 
@@ -79,16 +77,14 @@ func NewLoginJWT(uid int, manager interfaces.IManager) (string, error) {
 	return tokenString, nil
 }
 
-func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) func() {
-	return func() {
-		resp := &mydto.LoginResponseMessage{
-			JWT:   jwt,
-			UID:   UID,
-			Error: _err,
-		}
-		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			api.SendJsonError(err.Error(), w)
-		}
+func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) {
+	resp := &mydto.LoginResponseMessage{
+		JWT:   jwt,
+		UID:   UID,
+		Error: _err,
+	}
+	if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		api.SendJsonError(err.Error(), w)
 	}
 }
 

@@ -17,38 +17,43 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	genTokenRequestMessage := mydto.GenTokenMessage{}
 	if err := json.NewDecoder(r.Body).Decode(&genTokenRequestMessage); err != nil {
-		return sendToken(w, "", err.Error())
+		sendToken(w, "", err.Error())
+		return nil
 	}
 	token, err := newToken(cnf.DatabaseReader)
 	if err != nil {
-		return sendToken(w, "", err.Error())
+		sendToken(w, "", err.Error())
+		return nil
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).Where(qb.Compare("id", qb.EQUAL, genTokenRequestMessage.UserId))
 	newQB.Merge()
 	if _, err := newQB.Exec(); err != nil {
-		return sendToken(w, "", err.Error())
+		sendToken(w, "", err.Error())
+		return nil
 	}
-	return func() {
-		sendToken(w, token, "")()
-	}
+	sendToken(w, token, "")
+	return nil
 }
 
-func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		return nil
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, AID))
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-	return api.SendBeseResponse(w, true, nil)
+	api.SendBeseResponse(w, true, nil)
+	return nil
 }
 
 func newToken(dbRead interfaces.IReadDatabase) (string, error) {
@@ -89,14 +94,12 @@ func tokenExists(dbRead interfaces.IReadDatabase, token string) (bool, error) {
 	return existInt != 0, nil
 }
 
-func sendToken(w http.ResponseWriter, token string, _err string) func() {
+func sendToken(w http.ResponseWriter, token string, _err string) {
 	resp := &mydto.TokenResponse{
 		Token: token,
 		Error: _err,
 	}
-	return func() {
-		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			api.SendJsonError(err.Error(), w)
-		}
+	if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		api.SendJsonError(err.Error(), w)
 	}
 }

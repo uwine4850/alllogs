@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/gorilla/websocket v1.5.0
 	github.com/rs/cors v1.11.1
 	github.com/uwine4850/foozy v0.4.1-0.20250503123701-4a5b757018e9
 )
@@ -15,7 +16,7 @@ require (
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect

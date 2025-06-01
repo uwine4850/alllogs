@@ -22,14 +22,16 @@ type UpdateForm struct {
 	DelAvatar     []string        `form:"DelAvatar"`
 }
 
-func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	updateForm := UpdateForm{}
 	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	var oldRelativeAvatarPath string
 	if updateForm.OldAvatarPath != nil {
@@ -41,21 +43,24 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	}
 
 	var newAvatarPath string
-	if err := updateAvatar(&newAvatarPath, oldRelativeAvatarPath, &updateForm, w, manager); err != nil {
-		return api.SendBeseResponse(w, false, err)
+	if err := updateAvatar(&newAvatarPath, oldRelativeAvatarPath, &updateForm, manager); err != nil {
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 
 	var description string
 	if updateForm.Description != nil {
 		description = updateForm.Description[0]
 	}
-	if err := saveUpdate(description, newAvatarPath, &updateForm, w); err != nil {
-		return api.SendBeseResponse(w, false, err)
+	if err := saveUpdate(description, newAvatarPath, &updateForm); err != nil {
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-	return api.SendBeseResponse(w, true, nil)
+	api.SendBeseResponse(w, true, nil)
+	return nil
 }
 
-func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, w http.ResponseWriter, manager interfaces.IManager) error {
+func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.IManager) error {
 	isDelAvatar, err := strconv.ParseBool(updateForm.DelAvatar[0])
 	if err != nil {
 		return err
@@ -63,11 +68,11 @@ func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateFor
 	if !isDelAvatar && updateForm.Avatar != nil && oldRelativeAvatarPath != "nil" {
 		avatar := updateForm.Avatar[0]
 		if oldRelativeAvatarPath == cnf.DEFAULT_AVATAR_PATH {
-			if err := form.SaveFile(w, avatar.Header, "../client/public/storage/avatars", newAvatarPath, manager); err != nil {
+			if err := form.SaveFile(avatar.Header, "../client/public/storage/avatars", newAvatarPath, manager); err != nil {
 				return err
 			}
 		} else {
-			err := form.ReplaceFile(oldRelativeAvatarPath, w, avatar.Header, "../client/public/storage/avatars", newAvatarPath, manager)
+			err := form.ReplaceFile(oldRelativeAvatarPath, avatar.Header, "../client/public/storage/avatars", newAvatarPath, manager)
 			if err != nil {
 				return err
 			}
@@ -85,7 +90,7 @@ func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateFor
 	return nil
 }
 
-func saveUpdate(description string, newAvatarPath string, updateForm *UpdateForm, w http.ResponseWriter) error {
+func saveUpdate(description string, newAvatarPath string, updateForm *UpdateForm) error {
 	updateArgs := map[string]any{"description": description}
 	if newAvatarPath != "" {
 		updateArgs["avatar"] = filepath.Join(cnf.STORAGE_AVATAR_PATH, filepath.Base(newAvatarPath))

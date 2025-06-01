@@ -12,10 +12,11 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	AID, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		return api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		api.SendBeseResponse(w, false, errors.New("user ID not found"))
+		return nil
 	}
 	profile, err := GetProfileByAID(cnf.DatabaseReader, AID.(int))
 	if err != nil {
@@ -26,18 +27,23 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	newQB.Merge()
 	_, err = newQB.Exec()
 	if err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	if err := deleteAvatar(profile); err != nil {
 		if err := transaction.RollBackTransaction(); err != nil {
-			return api.SendBeseResponse(w, false, err)
+			api.SendBeseResponse(w, false, err)
+			return nil
 		}
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
 	if err := transaction.CommitTransaction(); err != nil {
-		return api.SendBeseResponse(w, false, err)
+		api.SendBeseResponse(w, false, err)
+		return nil
 	}
-	return api.SendBeseResponse(w, true, nil)
+	api.SendBeseResponse(w, true, nil)
+	return nil
 }
 
 func deleteAvatar(profile *ProfileDBView) error {

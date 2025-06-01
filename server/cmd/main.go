@@ -17,6 +17,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
+	"github.com/uwine4850/foozy/pkg/router/object"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
@@ -24,7 +25,8 @@ import (
 
 func main() {
 	initcnf.InitCnf()
-	gDB := database.NewDatabase(cnf.DATABASE_ARGS)
+	syncQ := database.NewSyncQueries()
+	gDB := database.NewMysqlDatabase(cnf.DATABASE_ARGS, syncQ, database.NewAsyncQueries(syncQ))
 	if err := gDB.Open(); err != nil {
 		panic(err)
 	}
@@ -33,7 +35,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	newManager := manager.NewManager(render)
+	newManager := manager.NewManager(manager.NewOneTimeData(), render, manager.NewDatabasePool())
 	database.InitDatabasePool(newManager, gDB)
 
 	dbRead, err := newManager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
@@ -41,7 +43,7 @@ func main() {
 		panic(err)
 	}
 	cnf.DatabaseReader = dbRead
-	if err := auth.CreateAuthTable(dbRead, cnf.DATABASE_ARGS.DatabaseName); err != nil {
+	if err := auth.CreateMysqlAuthTable(dbRead, cnf.DATABASE_ARGS.DatabaseName); err != nil {
 		panic(err)
 	}
 
@@ -51,12 +53,12 @@ func main() {
 	}
 
 	newManager.Key().Generate32BytesKeys()
-	newMiddleware := middlewares.NewMiddleware()
-	newMiddleware.SyncMddl(0, mddlauth.CheckJWT)
-	newRouter := router.NewRouter(newManager)
-	newRouter.SetMiddleware(newMiddleware)
+	newMiddleware := middlewares.NewMiddlewares()
+	newMiddleware.PreMiddleware(0, mddlauth.CheckJWT)
+	newAdapter := router.NewAdapter(newManager, newMiddleware)
+	newRouter := router.NewRouter(newAdapter)
 
-	newRouter.AddHandlerSet(routes.Get())
+	newRouter.HandlerSet(routes.Get(object.NewViewMysqlDatabase(gDB)))
 
 	serv := server.NewServer(":8000", newRouter, &cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
@@ -72,7 +74,7 @@ func main() {
 	}()
 
 	err = serv.Start()
-	if err != nil && !errors.Is(http.ErrServerClosed, err) {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		panic(err)
 	}
 }

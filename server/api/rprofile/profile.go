@@ -35,12 +35,13 @@ func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, mana
 	return object.Context{}, nil
 }
 
-func JsonProfileObjectView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	view := object.JsonObjectTemplateView{
 		View: &JsonProfileObject{
 			object.ObjView{
 				Name:       "object",
 				TableName:  cnf.DBT_PROFILE,
+				Database:   database,
 				FillStruct: ProfileDBView{},
 				Slug:       "id",
 			},

@@ -28,12 +28,13 @@ func (v *AllProjectsView) Context(w http.ResponseWriter, r *http.Request, manage
 	return object.Context{}, nil
 }
 
-func ProjectsAllView() func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+func ProjectsAllView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	view := object.JsonAllTemplateView{
 		View: &AllProjectsView{
 			object.AllView{
 				Name:       "projects",
 				TableName:  cnf.DBT_PROJECT,
+				Database:   database,
 				FillStruct: mydto.ProjectMessage{},
 			},
 		},

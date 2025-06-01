@@ -10,43 +10,49 @@ import (
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
+	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
+	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 func Register() router.Handler {
-	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) func() {
+	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 		// Parse and validate form.
 		registerForm := mydto.RegisterMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
-			return api.SendBeseResponse(w, false, err)
+			api.SendBeseResponse(w, false, err)
+			return nil
 		}
 		if strings.Trim(registerForm.Password, "") != strings.Trim(registerForm.RepeatPassword, "") {
-			return api.SendBeseResponse(w, false, errors.New("passwords don`t match"))
+			api.SendBeseResponse(w, false, errors.New("passwords don`t match"))
+			return nil
 		}
 
 		// Database operation.
-		myauth, err := auth.NewAuth(w, manager)
+		db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 		if err != nil {
-			return api.SendBeseResponse(w, false, err)
+			return err
 		}
+		myauth := auth.NewAuth(w, auth.NewMysqlAuthQuery(db, namelib.AUTH.AUTH_TABLE), manager)
 		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
 		if err != nil {
-			return api.SendBeseResponse(w, false, err)
+			api.SendBeseResponse(w, false, err)
+			return nil
 		}
 		// Create profile in database.
 		if err := createProfile(cnf.DatabaseReader, regUserId); err != nil {
-			return api.SendBeseResponse(w, false, err)
+			api.SendBeseResponse(w, false, err)
+			return nil
 		}
-		return func() {
-			resp := mydto.NewBaseResponse(true, "")
-			if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-				api.SendJsonError(err.Error(), w)
-			}
+		resp := mydto.NewBaseResponse(true, "")
+		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+			api.SendJsonError(err.Error(), w)
 		}
+		return nil
 	}
 }
 

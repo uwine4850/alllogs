@@ -13,17 +13,15 @@ func SendJsonError(_error string, w http.ResponseWriter) {
 	router.SendJson(map[string]string{"Error": _error}, w)
 }
 
-func SendBeseResponse(w http.ResponseWriter, ok bool, _err error) func() {
-	return func() {
-		var errValue string
-		if _err != nil {
-			errValue = _err.Error()
-		} else {
-			errValue = ""
-		}
-		resp := mydto.NewBaseResponse(ok, errValue)
-		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			SendJsonError(err.Error(), w)
-		}
+func SendBeseResponse(w http.ResponseWriter, ok bool, _err error) {
+	var errValue string
+	if _err != nil {
+		errValue = _err.Error()
+	} else {
+		errValue = ""
+	}
+	resp := mydto.NewBaseResponse(ok, errValue)
+	if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		SendJsonError(err.Error(), w)
 	}
 }

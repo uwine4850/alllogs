@@ -46,6 +46,7 @@ const submitForm = async () => {
       })
       req.onResponse(function (response: AxiosResponse) {
         const profileResponse = response.data as ProfileMessage
+        console.log(profileResponse);
         if (profileResponse.Error != '') {
           errorStore.setText(profileResponse.Error)
           sessionStorage.remove('authJWT');
