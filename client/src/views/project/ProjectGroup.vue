@@ -18,7 +18,7 @@ import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 </script>
 
 <script setup lang="ts">
-import ProjectTemplate from '@/views/ProjectTemplate.vue'
+import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 import PanelTitle from '@/components/PanelTitle.vue'

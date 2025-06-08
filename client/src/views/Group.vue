@@ -5,7 +5,7 @@ import addUserIcon from '@/assets/svg/add-user.svg'
 </script>
 
 <script setup lang="ts">
-import ProjectTemplate from './ProjectTemplate.vue'
+import ProjectTemplate from './project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import PanelTitle from '@/components/PanelTitle.vue'
 import Button from '@/components/Button.vue'

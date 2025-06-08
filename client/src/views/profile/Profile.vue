@@ -61,7 +61,7 @@ onMounted(async () => {
             <img :src="profileDataRef?.Avatar" alt="" />
           </div>
           <div class="description">
-            <div class="username">{{ profileDataRef?.User.Username }}</div>
+            <div class="username">{{ profileDataRef?.User?.Username }}</div>
             <div class="desc-text">
               {{ profileDataRef?.Description }}
             </div>

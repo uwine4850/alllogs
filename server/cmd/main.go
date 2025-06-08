@@ -25,6 +25,12 @@ import (
 
 func main() {
 	initcnf.InitCnf()
+
+	mydto.SetUpMessages(mydto.DTO)
+	if err := mydto.DTO.Generate(); err != nil {
+		panic(err)
+	}
+
 	syncQ := database.NewSyncQueries()
 	gDB := database.NewMysqlDatabase(cnf.DATABASE_ARGS, syncQ, database.NewAsyncQueries(syncQ))
 	if err := gDB.Open(); err != nil {
@@ -47,15 +53,13 @@ func main() {
 		panic(err)
 	}
 
-	mydto.SetUpMessages(mydto.DTO)
-	if err := mydto.DTO.Generate(); err != nil {
-		panic(err)
-	}
-
 	newManager.Key().Generate32BytesKeys()
 	newMiddleware := middlewares.NewMiddlewares()
 	newMiddleware.PreMiddleware(0, mddlauth.CheckJWT)
 	newAdapter := router.NewAdapter(newManager, newMiddleware)
+	newAdapter.SetOnErrorFunc(func(w http.ResponseWriter, r *http.Request, err error) {
+		// router.SendJson(err, w)
+	})
 	newRouter := router.NewRouter(newAdapter)
 
 	newRouter.HandlerSet(routes.Get(object.NewViewMysqlDatabase(gDB)))

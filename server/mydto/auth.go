@@ -4,20 +4,23 @@ import "github.com/uwine4850/foozy/pkg/router/rest"
 
 type RegisterMessage struct {
 	rest.ImplementDTOMessage
-	Username       string `dto:"Username"`
-	Password       string `dto:"Password"`
-	RepeatPassword string `dto:"RepeatPassword"`
+	TypRegisterMessage rest.TypeId `dto:"-typeid"`
+	Username           string      `dto:"Username"`
+	Password           string      `dto:"Password"`
+	RepeatPassword     string      `dto:"RepeatPassword"`
 }
 
 type LoginMessage struct {
 	rest.ImplementDTOMessage
-	Username string `dto:"Username"`
-	Password string `dto:"Password"`
+	TypLoginMessage rest.TypeId `dto:"-typeid"`
+	Username        string      `dto:"Username"`
+	Password        string      `dto:"Password"`
 }
 
 type LoginResponseMessage struct {
 	rest.ImplementDTOMessage
-	JWT   string `dto:"JWT"`
-	UID   int    `dto:"UID"`
-	Error string `dto:"Error"`
+	TypLoginResponseMessage rest.TypeId `dto:"-typeid"`
+	JWT                     string      `dto:"JWT"`
+	UID                     int         `dto:"UID"`
+	Error                   string      `dto:"Error"`
 }

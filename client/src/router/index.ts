@@ -1,16 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
-import Project from '@/views/Project.vue'
+import Project from '@/views/project/Project.vue'
 import ProjectGroup from '@/views/project/ProjectGroup.vue'
 import Profile from '@/views/profile/Profile.vue'
 import Register from '@/views/auth/Register.vue'
 import Login from '@/views/auth/Login.vue'
-import NewProject from '@/views/NewProject.vue'
+import NewProject from '@/views/project/NewProject.vue'
 import NewGroup from '@/views/NewGroup.vue'
 import MyOwnGroups from '@/views/MyOwnGroups.vue'
 import Group from '@/views/Group.vue'
 import ProfileUpdate from '@/views/profile/ProfileUpdate.vue'
 import NewLogGroup from '@/views/project/NewLogGroup.vue'
+import UpdateProject from '@/views/project/UpdateProject.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,6 +68,12 @@ export const router = createRouter({
       path: '/project/:id/new-log-group',
       name: 'new-log-group',
       component: NewLogGroup,
+      meta: { authorized: true },
+    },
+    {
+      path: '/project/:id/update',
+      name: 'new-log-group',
+      component: UpdateProject,
       meta: { authorized: true },
     },
     {

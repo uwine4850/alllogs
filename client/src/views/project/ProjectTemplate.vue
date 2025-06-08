@@ -24,8 +24,8 @@ const props = defineProps({
 </template>
 
 <style scoped lang="scss">
-@use '../assets/style/global_vars.scss' as vars;
-@use '../assets/style/presets.scss' as ps;
+@use '@/assets/style/global_vars.scss' as vars;
+@use '@/assets/style/presets.scss' as ps;
 
 .content {
   box-sizing: border-box;

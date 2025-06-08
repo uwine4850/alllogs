@@ -7,37 +7,42 @@ import (
 
 type ProfileMessage struct {
 	rest.ImplementDTOMessage
-	User        UserMessage `dto:"User"`
-	Id          int         `dto:"Id"`
-	UserId      int         `dto:"UserId"`
-	Description string      `dto:"Description"`
-	Avatar      string      `dto:"Avatar"`
-	Token       string      `dto:"Token"`
-	Error       string      `dto:"Error"`
+	TypProfileMessage rest.TypeId `dto:"-typeid"`
+	User              UserMessage `dto:"User"`
+	Id                int         `dto:"Id"`
+	UserId            int         `dto:"UserId"`
+	Description       string      `dto:"Description"`
+	Avatar            string      `dto:"Avatar"`
+	Token             string      `dto:"Token"`
+	Error             string      `dto:"Error"`
 }
 
 type UserMessage struct {
 	rest.ImplementDTOMessage
-	Id       int    `dto:"Id"`
-	Username string `dto:"Username"`
+	TypUserMessage rest.TypeId `dto:"-typeid"`
+	Id             int         `dto:"Id"`
+	Username       string      `dto:"Username"`
 }
 
 type GenTokenMessage struct {
 	rest.ImplementDTOMessage
-	UserId int `dto:"UserId"`
+	TypGenTokenMessage rest.TypeId `dto:"-typeid"`
+	UserId             int         `dto:"UserId"`
 }
 
 type TokenResponse struct {
 	rest.ImplementDTOMessage
-	Token string `dto:"Token"`
-	Error string `dto:"Error"`
+	TypTokenResponse rest.TypeId `dto:"-typeid"`
+	Token            string      `dto:"Token"`
+	Error            string      `dto:"Error"`
 }
 
 type ProfileUpdateMessage struct {
 	rest.ImplementDTOMessage
-	PID           int           `dto:"PID"`
-	Description   string        `dto:"Description"`
-	Avatar        form.FormFile `dto:"Avatar"`
-	OldAvatarPath string        `dto:"OldAvatarPath"`
-	DelAvatar     bool          `dto:"DelAvatar"`
+	TypProfileUpdateMessage rest.TypeId   `dto:"-typeid"`
+	PID                     int           `dto:"PID"`
+	Description             string        `dto:"Description"`
+	Avatar                  form.FormFile `dto:"Avatar"`
+	OldAvatarPath           string        `dto:"OldAvatarPath"`
+	DelAvatar               bool          `dto:"DelAvatar"`
 }

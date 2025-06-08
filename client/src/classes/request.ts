@@ -1,5 +1,4 @@
-import type { LoginResponseMessage } from '@/dto/auth'
-import { IsLoginResponseMessage } from '@/dto/validation'
+import { isLoginResponseMessage, type LoginResponseMessage } from '@/dto/auth'
 import router from '@/router'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
@@ -106,7 +105,7 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   public onResponse(fn: (response: AxiosResponse) => void) {
     this.onResponseFn = async () => {
       if (this.response) {
-        if (IsLoginResponseMessage(this.response.data)) {
+        if (isLoginResponseMessage(this.response.data)) {
           const loginResponse = this.response.data as LoginResponseMessage
           if (loginResponse.Error != '') {
             sessionStorage.removeItem('authJWT')

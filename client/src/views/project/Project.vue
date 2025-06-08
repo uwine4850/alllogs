@@ -11,13 +11,14 @@ import type { AxiosResponse } from 'axios'
 import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { onMounted, ref, watch } from 'vue'
+import { getProject } from '@/services/project'
 </script>
 
 <script setup lang="ts">
-import ProjectTemplate from '@/views/ProjectTemplate.vue'
-import Button from '../components/Button.vue'
-import Separator from '../components/Separator.vue'
-import PanelTitle from '../components/PanelTitle.vue'
+import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
+import Button from '@/components/Button.vue'
+import Separator from '@/components/Separator.vue'
+import PanelTitle from '@/components/PanelTitle.vue'
 import Error from '@/components/Error.vue'
 
 const route = useRoute()
@@ -25,26 +26,26 @@ const errorStore = useErrorStore()
 const projectRef = ref<ProjectMessage | null>(null)
 const logGroupsRef = ref<ProjectLogGroupMessage[]>()
 
-const getProject = () => {
-  const req = new AsyncRequestWithAuthorization(
-    `http://localhost:8000/project/${route.params.id}`,
-    {
-      withCredentials: true,
-    },
-  )
-  req.onResponse(async (response: AxiosResponse) => {
-    const projectMessage = response.data as ProjectMessage
-    if (projectMessage.Error != '') {
-      errorStore.setText(projectMessage.Error)
-    } else {
-      projectRef.value = projectMessage
-    }
-  })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
-  req.get()
-}
+// const getProject = () => {
+//   const req = new AsyncRequestWithAuthorization(
+//     `http://localhost:8000/project/${route.params.id}`,
+//     {
+//       withCredentials: true,
+//     },
+//   )
+//   req.onResponse(async (response: AxiosResponse) => {
+//     const projectMessage = response.data as ProjectMessage
+//     if (projectMessage.Error != '') {
+//       errorStore.setText(projectMessage.Error)
+//     } else {
+//       projectRef.value = projectMessage
+//     }
+//   })
+//   req.onError((error: unknown) => {
+//     errorStore.setText(String(error))
+//   })
+//   req.get()
+// }
 
 const getLogGroups = (project_id: number) => {
   const req = new AsyncRequestWithAuthorization(
@@ -68,7 +69,7 @@ const getLogGroups = (project_id: number) => {
 }
 
 onMounted(() => {
-  getProject()
+  getProject(route.params.id, projectRef, errorStore);
 })
 
 watch(projectRef, (project) => {
@@ -117,14 +118,14 @@ watch(projectRef, (project) => {
           class="pm-button"
           :icon="addIcon"
           text="New log group"
-          :link="`/project/${route.params.id}/new-log-group`"
+          :link="`/project/${projectRef?.Id}/new-log-group`"
         />
         <Button class="pm-button" :icon="addIcon" text="Add group" link="#" />
       </div>
       <Separator />
       <div class="pm-wrapper">
         <Button class="pm-button" :icon="userIcon" text="Users" link="#" />
-        <Button class="pm-button" :icon="updateIcon" text="Update" link="#" />
+        <Button class="pm-button" :icon="updateIcon" text="Update" :link="`/project/${ projectRef?.Id }/update`" />
         <Button class="pm-button" :icon="exportIcon" text="Export all as JSON" />
       </div>
     </template>
@@ -132,8 +133,8 @@ watch(projectRef, (project) => {
 </template>
 
 <style scoped lang="scss">
-@use '../assets/style/global_vars.scss' as vars;
-@use '../assets/style/presets.scss' as ps;
+@use '@/assets/style/global_vars.scss' as vars;
+@use '@/assets/style/presets.scss' as ps;
 
 .proj-base-view {
   padding: 10px;
