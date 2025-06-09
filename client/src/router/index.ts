@@ -12,6 +12,7 @@ import Group from '@/views/Group.vue'
 import ProfileUpdate from '@/views/profile/ProfileUpdate.vue'
 import NewLogGroup from '@/views/project/NewLogGroup.vue'
 import UpdateProject from '@/views/project/UpdateProject.vue'
+import Error from '../views/Error.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -92,6 +93,12 @@ export const router = createRouter({
       path: '/profile/update/:id',
       name: 'profile-update',
       component: ProfileUpdate,
+      meta: { authorized: true },
+    },
+    {
+      path: '/error',
+      name: 'error',
+      component: Error,
       meta: { authorized: true },
     },
   ],

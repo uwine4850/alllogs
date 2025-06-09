@@ -33,3 +33,8 @@ func SendAnyMessage(message irest.IMessage, w http.ResponseWriter) {
 		SendServerError("DTO error", http.StatusInternalServerError, w)
 	}
 }
+
+func SendClientError(w http.ResponseWriter, code int, text string) {
+	resp := mydto.NewClientErrorMessage(code, text)
+	SendAnyMessage(resp, w)
+}

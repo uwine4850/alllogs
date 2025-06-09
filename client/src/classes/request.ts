@@ -135,5 +135,9 @@ function catchClientError(data: ClientErrorMessage){
       sessionStorage.removeItem('authJWT')
       sessionStorage.removeItem('profile')
       router.push('/login')
+      break;
+    case 403:
+      router.push(`/error?code=${"403 Forbidden"}&text=${data.Text}`)
+      break;
   }
 }

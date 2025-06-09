@@ -7,7 +7,6 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/api/rauth"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/builtin_mddl"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
@@ -63,8 +62,7 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
 			middlewares.SkipNextPage(manager.OneTimeData())
-			msg := mydto.NewClientErrorMessage(http.StatusUnauthorized, "")
-			api.SendAnyMessage(msg, w)
+			api.SendClientError(w, http.StatusUnauthorized, "")
 		},
 	)(w, r, manager)
 	return err

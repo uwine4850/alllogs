@@ -1,6 +1,7 @@
 package rprofile
 
 import (
+	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,7 +17,7 @@ import (
 )
 
 type UpdateForm struct {
-	UID           string        `form:"UID"`
+	UID           int           `form:"UID"`
 	Description   string        `form:"Description" nil:"-skip"`
 	Avatar        form.FormFile `form:"Avatar" nil:"-skip"`
 	OldAvatarPath string        `form:"OldAvatarPath" nil:"-skip"`
@@ -32,6 +33,15 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	updateForm := UpdateForm{}
 	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
 		api.SendBeseResponse(w, false, err)
+		return nil
+	}
+	hasPermission, err := permission(manager, updateForm.UID)
+	if err != nil {
+		api.SendBeseResponse(w, false, err)
+		return nil
+	}
+	if !hasPermission {
+		api.SendClientError(w, http.StatusForbidden, "no access for user profile updates")
 		return nil
 	}
 	var oldRelativeAvatarPath string
@@ -59,6 +69,18 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil
+}
+
+func permission(m interfaces.IManager, formUID int) (bool, error) {
+	UID, ok := m.OneTimeData().GetUserContext("UID")
+	if !ok {
+		return false, errors.New("uid not exists")
+	}
+	if UID.(int) != formUID {
+		return false, nil
+	} else {
+		return true, nil
+	}
 }
 
 func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.IManager) error {

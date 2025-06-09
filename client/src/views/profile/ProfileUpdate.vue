@@ -76,6 +76,15 @@ const showDeleteAlert = () => {
 
 onMounted(() => {
   getProfileData(profileDataRef, null, route.params.id as string, errorStore)
+  let profileData: ProfileMessage
+  const profileJsonData = sessionStorage.getItem('profile')
+  if (profileJsonData) {
+    profileData = JSON.parse(profileJsonData) as ProfileMessage
+    if (profileDataRef.value?.UserId != profileData.UserId){
+      router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
+      return
+    }
+  }
 })
 
 watch(profileDataRef, (profile) => {
