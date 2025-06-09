@@ -72,7 +72,7 @@ export const router = createRouter({
     },
     {
       path: '/project/:id/update',
-      name: 'new-log-group',
+      name: 'project-update',
       component: UpdateProject,
       meta: { authorized: true },
     },

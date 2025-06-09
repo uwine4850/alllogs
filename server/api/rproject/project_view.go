@@ -47,7 +47,7 @@ func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter
 			return errors.New(("error converting a filled message"))
 		}
 		newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-		newQB.SelectFrom("auth.username, profile.avatar, profile.id as pid", cnf.DBT_AUTH).
+		newQB.SelectFrom("auth.username, profile.avatar, profile.user_id", cnf.DBT_AUTH).
 			InnerJoin(cnf.DBT_PROFILE, qb.NoArgsCompare("user_id", qb.EQUAL, "auth.id")).
 			Where(qb.Compare("auth.id", qb.EQUAL, msg.UserId))
 		newQB.Merge()

@@ -50,7 +50,7 @@ func Register() router.Handler {
 		}
 		resp := mydto.NewBaseResponse(true, "")
 		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			api.SendJsonError(err.Error(), w)
+			api.SendServerError("DTO error", http.StatusInternalServerError, w)
 		}
 		return nil
 	}

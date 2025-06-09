@@ -28,7 +28,8 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 		sendToken(w, "", err.Error())
 		return nil
 	}
-	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).Where(qb.Compare("id", qb.EQUAL, genTokenRequestMessage.UserId))
+	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).
+		Where(qb.Compare("user_id", qb.EQUAL, genTokenRequestMessage.UserId))
 	newQB.Merge()
 	if _, err := newQB.Exec(); err != nil {
 		sendToken(w, "", err.Error())
@@ -39,13 +40,13 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 }
 
 func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	AID, ok := manager.OneTimeData().GetUserContext("AID")
+	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		api.SendBeseResponse(w, false, errors.New("user ID not found"))
 		return nil
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, AID))
+	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, UID))
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {
@@ -100,6 +101,6 @@ func sendToken(w http.ResponseWriter, token string, _err string) {
 		Error: _err,
 	}
 	if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-		api.SendJsonError(err.Error(), w)
+		api.SendServerError("DTO error", http.StatusInternalServerError, w)
 	}
 }

@@ -1,12 +1,10 @@
 USE alllogs;
 
 CREATE TABLE IF NOT EXISTS `alllogs`.`profile` (
-    `id` INT NOT NULL AUTO_INCREMENT,
     `user_id` INT NOT NULL,
     `description` TEXT NULL,
     `avatar` TEXT NULL,
     `token` VARCHAR(300) NULL,
-    PRIMARY KEY(id),
     UNIQUE (`token`),
     FOREIGN KEY (user_id) REFERENCES `auth`(id) ON DELETE CASCADE
 );

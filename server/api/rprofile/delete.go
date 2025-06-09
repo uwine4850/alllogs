@@ -13,12 +13,12 @@ import (
 )
 
 func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	AID, ok := manager.OneTimeData().GetUserContext("AID")
+	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		api.SendBeseResponse(w, false, errors.New("user ID not found"))
 		return nil
 	}
-	profile, err := GetProfileByAID(cnf.DatabaseReader, AID.(int))
+	profile, err := GetProfileByAID(cnf.DatabaseReader, UID.(int))
 	if err != nil {
 		panic(err)
 	}

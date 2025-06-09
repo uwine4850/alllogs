@@ -18,10 +18,7 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 			"POST": {"/login": rauth.Login()},
 		},
 		{
-			"GET": {"/isauth": rauth.IsAuth()},
-		},
-		{
-			"GET": {"/profile/:id": rprofile.JsonProfileObjectView(database)},
+			"GET": {"/profile/:user_id": rprofile.JsonProfileObjectView(database)},
 		},
 		{
 			"POST": {"/gen-token": rprofile.GenerateToken},
@@ -58,6 +55,9 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 		},
 		{
 			"GET": {"/all-log-groups/:project_id": rproject.LogGroupsAllView(database)},
+		},
+		{
+			"POST": {"/logout": rauth.Logout},
 		},
 	}
 }

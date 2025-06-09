@@ -16,7 +16,17 @@ func NewBaseResponse(ok bool, error string) *BaseResponseMessage {
 	}
 }
 
-type SeverErrorMessage struct {
-	ServerError bool   `dto:"ServerError"`
-	Error       string `dto:"Error"`
+// 400 - 499
+type ClientErrorMessage struct {
+	rest.ImplementDTOMessage
+	TypClientErrorMessage rest.TypeId `dto:"-typeid"`
+	Code                  int         `dto:"Code"`
+	Text                  string      `dto:"Text"`
+}
+
+func NewClientErrorMessage(code int, text string) *ClientErrorMessage {
+	return &ClientErrorMessage{
+		Code: code,
+		Text: text,
+	}
 }

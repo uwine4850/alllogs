@@ -14,7 +14,7 @@ import (
 )
 
 type ProfileDBView struct {
-	Id          int    `db:"id"`
+	// Id          int    `db:"id"`
 	UserId      int    `db:"user_id"`
 	Description string `db:"description"`
 	Avatar      string `db:"avatar"`
@@ -43,7 +43,7 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 				TableName:  cnf.DBT_PROFILE,
 				Database:   database,
 				FillStruct: ProfileDBView{},
-				Slug:       "id",
+				Slug:       "user_id",
 			},
 		},
 		DTO:     mydto.DTO,

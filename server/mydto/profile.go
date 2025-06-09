@@ -9,7 +9,6 @@ type ProfileMessage struct {
 	rest.ImplementDTOMessage
 	TypProfileMessage rest.TypeId `dto:"-typeid"`
 	User              UserMessage `dto:"User"`
-	Id                int         `dto:"Id"`
 	UserId            int         `dto:"UserId"`
 	Description       string      `dto:"Description"`
 	Avatar            string      `dto:"Avatar"`
@@ -40,7 +39,7 @@ type TokenResponse struct {
 type ProfileUpdateMessage struct {
 	rest.ImplementDTOMessage
 	TypProfileUpdateMessage rest.TypeId   `dto:"-typeid"`
-	PID                     int           `dto:"PID"`
+	UID                     int           `dto:"UID"`
 	Description             string        `dto:"Description"`
 	Avatar                  form.FormFile `dto:"Avatar"`
 	OldAvatarPath           string        `dto:"OldAvatarPath"`

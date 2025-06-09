@@ -24,3 +24,9 @@ type LoginResponseMessage struct {
 	UID                     int         `dto:"UID"`
 	Error                   string      `dto:"Error"`
 }
+
+type LogoutMessage struct {
+	rest.ImplementDTOMessage
+	TypLogoutMessage rest.TypeId `dto:"-typeid"`
+	UID              int         `dto:"AID"`
+}

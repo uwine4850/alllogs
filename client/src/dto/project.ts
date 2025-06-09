@@ -13,7 +13,7 @@ export function isProjectMessage(obj: any): obj is ProjectMessage {
 }
 export interface ProjectAuthor {
     TypProjectAuthor?: unknown;
-    PID: number;
+    UID: number;
     Username: string;
     Avatar: string;
 }

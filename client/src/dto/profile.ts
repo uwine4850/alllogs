@@ -2,7 +2,6 @@
 export interface ProfileMessage {
     TypProfileMessage?: unknown;
     User: UserMessage | undefined;
-    Id: number;
     UserId: number;
     Description: string;
     Avatar: string;
@@ -37,7 +36,7 @@ export function isTokenResponse(obj: any): obj is TokenResponse {
 }
 export interface ProfileUpdateMessage {
     TypProfileUpdateMessage?: unknown;
-    PID: number;
+    UID: number;
     Description: string;
     Avatar: File | null;
     OldAvatarPath: string;

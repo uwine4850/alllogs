@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/cors"
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	initcnf "github.com/uwine4850/alllogs/cnf/init_cnf"
 	"github.com/uwine4850/alllogs/middlewares/mddlauth"
@@ -58,7 +59,7 @@ func main() {
 	newMiddleware.PreMiddleware(0, mddlauth.CheckJWT)
 	newAdapter := router.NewAdapter(newManager, newMiddleware)
 	newAdapter.SetOnErrorFunc(func(w http.ResponseWriter, r *http.Request, err error) {
-		// router.SendJson(err, w)
+		api.SendServerError(err.Error(), http.StatusInternalServerError, w)
 	})
 	newRouter := router.NewRouter(newAdapter)
 

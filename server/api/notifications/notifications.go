@@ -22,7 +22,7 @@ const (
 
 type WSMessage struct {
 	Type    int
-	AID     int
+	UID     int
 	Payload interface{}
 }
 
@@ -53,16 +53,16 @@ func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 		connectionToUser[conn] = _claims.Id
 	})
 	socket.OnClientClose(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
-		AID, ok := connectionToUser[conn]
+		UID, ok := connectionToUser[conn]
 		if ok {
-			index := slices.Index(connections[AID], conn)
+			index := slices.Index(connections[UID], conn)
 			if index != -1 {
 				delete(connectionToUser, conn)
-				newConnections := slices.Delete(connections[AID], index, index+1)
+				newConnections := slices.Delete(connections[UID], index, index+1)
 				if len(newConnections) == 0 {
-					delete(connections, AID)
+					delete(connections, UID)
 				} else {
-					connections[AID] = newConnections
+					connections[UID] = newConnections
 				}
 			}
 		}
@@ -76,7 +76,7 @@ func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IMa
 			}
 			return
 		}
-		userConnections := connections[wsMessage.AID]
+		userConnections := connections[wsMessage.UID]
 		for i := 0; i < len(userConnections); i++ {
 			userConn := userConnections[i]
 			if err := userConn.WriteMessage(websocket.TextMessage, msgData); err != nil &&

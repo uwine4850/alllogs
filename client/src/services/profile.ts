@@ -43,7 +43,7 @@ export const generateTokenForm = async (
     return
   }
   const formData = ref<GenTokenMessage>({
-    UserId: profileData.Id,
+    UserId: profileData.UserId,
   })
 
   const req = new AsyncRequestWithAuthorization('http://localhost:8000/gen-token', {

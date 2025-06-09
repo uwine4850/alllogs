@@ -20,7 +20,7 @@ type LogGroupForm struct {
 }
 
 func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	AID, ok := manager.OneTimeData().GetUserContext("AID")
+	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		api.SendBeseResponse(w, false, errors.New("user ID not found"))
 		return nil
@@ -42,7 +42,7 @@ func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 		api.SendBeseResponse(w, false, err)
 		return nil
 	}
-	isProjectAuthor, err := IsProjectAuthor(AID.(int), projectID, cnf.DatabaseReader)
+	isProjectAuthor, err := IsProjectAuthor(UID.(int), projectID, cnf.DatabaseReader)
 	if err != nil {
 		api.SendBeseResponse(w, false, err)
 		return nil

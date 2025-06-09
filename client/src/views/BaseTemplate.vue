@@ -81,11 +81,11 @@ onBeforeUnmount(() => {
             <div class="hn-count">{{ notificationCount }}</div>
           </a>
           <Separator :vertical="true" />
-          <router-link class="header-profile" :to="`/profile/${profileData.Id}`">
+          <router-link class="header-profile" :to="`/profile/${profileData.UserId}`">
             <div class="hp-avatar">
               <img :src="profileData.Avatar" alt="" />
             </div>
-            <div class="hp-username">{{ profileData.User.Username }}</div>
+            <div class="hp-username">{{ profileData.User?.Username }}</div>
           </router-link>
         </div>
       </div>

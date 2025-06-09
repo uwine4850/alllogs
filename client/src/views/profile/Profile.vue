@@ -6,6 +6,7 @@ import deleteIcon from '@/assets/svg/delete.svg'
 import { onMounted } from 'vue'
 import type { ProfileMessage } from '@/dto/profile'
 import { deleteToken, generateTokenForm, getProfileData } from '@/services/profile'
+import { logout } from '@/services/auth'
 </script>
 
 <script setup lang="ts">
@@ -43,8 +44,13 @@ onMounted(async () => {
   const logoutBtn = document.getElementById('logout-btn')
   if (logoutBtn) {
     logoutBtn.onclick = function () {
-      sessionStorage.removeItem('authJWT')
-      sessionStorage.removeItem('profile')
+      if(profileDataRef.value?.User?.Id){
+        try{
+          logout(profileDataRef.value.User.Id)
+        } catch (e) {
+          errorStore.setText(String(e))
+        }
+      }
       router.go(0)
     }
   }
@@ -72,7 +78,7 @@ onMounted(async () => {
             class="pbtn"
             :icon="updateIcon"
             text="Update"
-            :link="`/profile/update/${profileDataRef?.Id}`"
+            :link="`/profile/update/${profileDataRef?.UserId}`"
           />
           <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
         </div>

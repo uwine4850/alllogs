@@ -32,7 +32,7 @@ const route = useRoute()
 const profileDataRef = ref<ProfileMessage | null>(null)
 
 const formData = ref<ProfileUpdateMessage>({
-  PID: 0,
+  UID: 0,
   Description: '',
   Avatar: null,
   OldAvatarPath: '',
@@ -58,7 +58,7 @@ const saveChanges = async () => {
   })
 
   const data = new FormData()
-  data.append('PID', String(formData.value.PID))
+  data.append('UID', String(formData.value.UID))
   data.append('Description', formData.value.Description)
   if (formData.value.Avatar) {
     data.append('Avatar', formData.value.Avatar)
@@ -80,7 +80,7 @@ onMounted(() => {
 
 watch(profileDataRef, (profile) => {
   if (profile) {
-    formData.value.PID = profile.Id
+    formData.value.UID = profile.UserId
     formData.value.Description = profile.Description || ''
     formData.value.DelAvatar = false
     formData.value.OldAvatarPath = profile.Avatar

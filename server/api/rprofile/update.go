@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 
 	"github.com/uwine4850/alllogs/api"
@@ -15,11 +16,11 @@ import (
 )
 
 type UpdateForm struct {
-	PID           []string        `form:"PID"`
-	Description   []string        `form:"Description" nil:"-skip"`
-	Avatar        []form.FormFile `form:"Avatar" nil:"-skip"`
-	OldAvatarPath []string        `form:"OldAvatarPath" nil:"-skip"`
-	DelAvatar     []string        `form:"DelAvatar"`
+	UID           string        `form:"UID"`
+	Description   string        `form:"Description" nil:"-skip"`
+	Avatar        form.FormFile `form:"Avatar" nil:"-skip"`
+	OldAvatarPath string        `form:"OldAvatarPath" nil:"-skip"`
+	DelAvatar     string        `form:"DelAvatar"`
 }
 
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
@@ -34,11 +35,11 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		return nil
 	}
 	var oldRelativeAvatarPath string
-	if updateForm.OldAvatarPath != nil {
-		if updateForm.OldAvatarPath[0] == cnf.DEFAULT_AVATAR_PATH {
-			oldRelativeAvatarPath = updateForm.OldAvatarPath[0]
+	if updateForm.OldAvatarPath != "" {
+		if updateForm.OldAvatarPath == cnf.DEFAULT_AVATAR_PATH {
+			oldRelativeAvatarPath = updateForm.OldAvatarPath
 		} else {
-			oldRelativeAvatarPath = filepath.Join("../client/public/", updateForm.OldAvatarPath[0])
+			oldRelativeAvatarPath = filepath.Join("../client/public/", updateForm.OldAvatarPath)
 		}
 	}
 
@@ -49,8 +50,8 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	}
 
 	var description string
-	if updateForm.Description != nil {
-		description = updateForm.Description[0]
+	if updateForm.Description != "" {
+		description = updateForm.Description
 	}
 	if err := saveUpdate(description, newAvatarPath, &updateForm); err != nil {
 		api.SendBeseResponse(w, false, err)
@@ -61,12 +62,12 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 }
 
 func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.IManager) error {
-	isDelAvatar, err := strconv.ParseBool(updateForm.DelAvatar[0])
+	isDelAvatar, err := strconv.ParseBool(updateForm.DelAvatar)
 	if err != nil {
 		return err
 	}
-	if !isDelAvatar && updateForm.Avatar != nil && oldRelativeAvatarPath != "nil" {
-		avatar := updateForm.Avatar[0]
+	if !isDelAvatar && !reflect.DeepEqual(updateForm.Avatar, form.FormFile{}) && oldRelativeAvatarPath != "" {
+		avatar := updateForm.Avatar
 		if oldRelativeAvatarPath == cnf.DEFAULT_AVATAR_PATH {
 			if err := form.SaveFile(avatar.Header, "../client/public/storage/avatars", newAvatarPath, manager); err != nil {
 				return err
@@ -96,7 +97,7 @@ func saveUpdate(description string, newAvatarPath string, updateForm *UpdateForm
 		updateArgs["avatar"] = filepath.Join(cnf.STORAGE_AVATAR_PATH, filepath.Base(newAvatarPath))
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Update(cnf.DBT_PROFILE, updateArgs).Where(qb.Compare("id", qb.EQUAL, updateForm.PID[0]))
+	newQB.Update(cnf.DBT_PROFILE, updateArgs).Where(qb.Compare("user_id", qb.EQUAL, updateForm.UID))
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {

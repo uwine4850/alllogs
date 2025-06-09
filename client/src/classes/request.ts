@@ -1,4 +1,5 @@
 import { isLoginResponseMessage, type LoginResponseMessage } from '@/dto/auth'
+import { isClientErrorMessage, type ClientErrorMessage } from '@/dto/common'
 import router from '@/router'
 import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
@@ -105,17 +106,10 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   public onResponse(fn: (response: AxiosResponse) => void) {
     this.onResponseFn = async () => {
       if (this.response) {
+        console.log(this.response)
         if (isLoginResponseMessage(this.response.data)) {
           const loginResponse = this.response.data as LoginResponseMessage
-          if (loginResponse.Error != '') {
-            sessionStorage.removeItem('authJWT')
-            sessionStorage.removeItem('profile')
-            router.push('/login')
-            if (this.onErrorFn) {
-              this.onErrorFn(loginResponse.Error)
-            }
-            return
-          } else if (loginResponse.JWT != '') {
+          if (loginResponse.JWT != '') {
             sessionStorage.setItem('authJWT', loginResponse.JWT)
             this.updateAuthToken()
             if (this.currentRequest) {
@@ -124,8 +118,22 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
             return
           }
         }
+        if (isClientErrorMessage(this.response.data)) {
+          const response = this.response.data as ClientErrorMessage
+          catchClientError(response)
+          return
+        }
         fn(this.response)
       }
     }
+  }
+}
+
+function catchClientError(data: ClientErrorMessage){
+  switch (data.Code){
+    case 401:
+      sessionStorage.removeItem('authJWT')
+      sessionStorage.removeItem('profile')
+      router.push('/login')
   }
 }

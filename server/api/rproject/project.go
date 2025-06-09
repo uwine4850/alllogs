@@ -18,7 +18,7 @@ type ProjectForm struct {
 }
 
 func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	AID, ok := manager.OneTimeData().GetUserContext("AID")
+	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		api.SendBeseResponse(w, false, errors.New("user ID not found"))
 		return nil
@@ -37,7 +37,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT,
 		map[string]any{
-			"user_id": AID, "name": projectForm.Name[0], "description": projectForm.Description[0],
+			"user_id": UID, "name": projectForm.Name[0], "description": projectForm.Description[0],
 		})
 	newQB.Merge()
 	_, err := newQB.Exec()
@@ -49,9 +49,9 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 	return nil
 }
 
-func IsProjectAuthor(AID int, projectId int, dbRead interfaces.IReadDatabase) (bool, error) {
+func IsProjectAuthor(UID int, projectId int, dbRead interfaces.IReadDatabase) (bool, error) {
 	newQB := qb.NewSyncQB(dbRead.SyncQ())
 	return qb.SelectExists(newQB, cnf.DBT_PROJECT,
 		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
-		qb.Compare("user_id", qb.EQUAL, AID))
+		qb.Compare("user_id", qb.EQUAL, UID))
 }

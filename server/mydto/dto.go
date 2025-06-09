@@ -60,16 +60,26 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "mydto",
 		Name:    "ProjectLogGroupMessage",
 	},
+	{
+		Package: "mydto",
+		Name:    "ClientErrorMessage",
+	},
+	{
+		Package: "mydto",
+		Name:    "LogoutMessage",
+	},
 }
 
 var TSGenMessages = map[string][]irest.IMessage{
 	"../client/src/dto/common.ts": {
 		BaseResponseMessage{},
+		ClientErrorMessage{},
 	},
 	"../client/src/dto/auth.ts": {
 		RegisterMessage{},
 		LoginMessage{},
 		LoginResponseMessage{},
+		LogoutMessage{},
 	},
 	"../client/src/dto/profile.ts": {
 		ProfileMessage{},

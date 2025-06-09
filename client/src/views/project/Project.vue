@@ -26,27 +26,6 @@ const errorStore = useErrorStore()
 const projectRef = ref<ProjectMessage | null>(null)
 const logGroupsRef = ref<ProjectLogGroupMessage[]>()
 
-// const getProject = () => {
-//   const req = new AsyncRequestWithAuthorization(
-//     `http://localhost:8000/project/${route.params.id}`,
-//     {
-//       withCredentials: true,
-//     },
-//   )
-//   req.onResponse(async (response: AxiosResponse) => {
-//     const projectMessage = response.data as ProjectMessage
-//     if (projectMessage.Error != '') {
-//       errorStore.setText(projectMessage.Error)
-//     } else {
-//       projectRef.value = projectMessage
-//     }
-//   })
-//   req.onError((error: unknown) => {
-//     errorStore.setText(String(error))
-//   })
-//   req.get()
-// }
-
 const getLogGroups = (project_id: number) => {
   const req = new AsyncRequestWithAuthorization(
     `http://localhost:8000/all-log-groups/${project_id}`,
@@ -56,10 +35,12 @@ const getLogGroups = (project_id: number) => {
   )
   req.onResponse(async (response: AxiosResponse) => {
     const projectMessages = response.data as ProjectLogGroupMessage[]
-    if (projectMessages[0].Error != '') {
-      errorStore.setText(projectMessages[0].Error)
-    } else {
-      logGroupsRef.value = projectMessages
+    if (projectMessages && projectMessages.length != 0) {
+      if (projectMessages[0].Error != '') {
+        errorStore.setText(projectMessages[0].Error)
+      } else {
+        logGroupsRef.value = projectMessages
+      }
     }
   })
   req.onError((error: unknown) => {
@@ -92,7 +73,7 @@ watch(projectRef, (project) => {
       <Separator />
       <div class="info-line">
         <Separator class="info-sep" :vertical="true" />
-        <router-link class="author-info" :to="`/profile/${projectRef?.Author?.PID}`">
+        <router-link class="author-info" :to="`/profile/${projectRef?.Author?.UID}`">
           <div class="ai-avatar">
             <img :src="projectRef?.Author?.Avatar" alt="" />
           </div>
