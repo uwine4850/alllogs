@@ -2,7 +2,7 @@
 import deleteIcon from '@/assets/svg/delete.svg'
 import checkboxIcon from '@/assets/svg/checkbox.svg'
 import profileIcon from '@/assets/svg/user.svg'
-import { h, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { ProfileMessage, ProfileUpdateMessage } from '@/dto/profile'
 import { getProfileData } from '@/services/profile'
 import { useRoute, useRouter } from 'vue-router'
@@ -11,7 +11,6 @@ import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
 import AlertPanelTemplate, { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
-import AlertPanelText from '@/components/alertpanel/AlertPanelText.vue'
 </script>
 
 <script setup lang="ts">
@@ -65,9 +64,9 @@ const saveChanges = async () => {
   }
   data.append('OldAvatarPath', formData.value.OldAvatarPath)
   data.append('DelAvatar', formData.value.DelAvatar ? 'true' : 'false')
-  req.setData(data)
 
-  req.put()
+  req.setData(data)
+  req.patch()
 }
 
 const showDeleteAlert = () => {
@@ -76,19 +75,21 @@ const showDeleteAlert = () => {
 
 onMounted(() => {
   getProfileData(profileDataRef, null, route.params.id as string, errorStore)
-  let profileData: ProfileMessage
-  const profileJsonData = sessionStorage.getItem('profile')
-  if (profileJsonData) {
-    profileData = JSON.parse(profileJsonData) as ProfileMessage
-    if (profileDataRef.value?.UserId != profileData.UserId){
-      router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
-      return
-    }
-  }
 })
 
 watch(profileDataRef, (profile) => {
   if (profile) {
+    let profileData: ProfileMessage
+    const profileJsonData = sessionStorage.getItem('profile')
+    if (profileJsonData) {
+      profileData = JSON.parse(profileJsonData) as ProfileMessage
+      console.log(profileDataRef.value?.UserId, profileData.UserId)
+      if (profileDataRef.value?.UserId != profileData.UserId){
+        router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
+        return
+      }
+    }
+
     formData.value.UID = profile.UserId
     formData.value.Description = profile.Description || ''
     formData.value.DelAvatar = false

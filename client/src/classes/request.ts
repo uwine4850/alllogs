@@ -100,13 +100,27 @@ export class AsyncRequest<D = any> {
       }
     }
   }
+  
+  public async patch() {
+    this.currentRequest = this.patch.bind(this)
+    try {
+      const response = await axios.patch(this.url, this.data, this.config)
+      this.response = response
+      if (this.onResponseFn) {
+        this.onResponseFn(response)
+      }
+    } catch (error) {
+      if (this.onErrorFn) {
+        this.onErrorFn(error)
+      }
+    }
+  }
 }
 
 export class AsyncRequestWithAuthorization extends AsyncRequest {
   public onResponse(fn: (response: AxiosResponse) => void) {
     this.onResponseFn = async () => {
       if (this.response) {
-        console.log(this.response)
         if (isLoginResponseMessage(this.response.data)) {
           const loginResponse = this.response.data as LoginResponseMessage
           if (loginResponse.JWT != '') {

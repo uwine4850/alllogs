@@ -27,10 +27,7 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 			"DELETE": {"/del-token": rprofile.DeleteToken},
 		},
 		{
-			"GET": {"/profile/update/1": rprofile.JsonProfileObjectView(database)},
-		},
-		{
-			"PUT": {"/profile/update": rprofile.Update},
+			"PATCH": {"/profile/update": rprofile.Update},
 		},
 		{
 			"DELETE": {"/profile/del": rprofile.Delete},
@@ -58,6 +55,9 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 		},
 		{
 			"POST": {"/logout": rauth.Logout},
+		},
+		{
+			"PATCH": {"/project": rproject.Update},
 		},
 	}
 }

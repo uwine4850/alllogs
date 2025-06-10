@@ -43,11 +43,6 @@ func Login() router.Handler {
 			return nil
 		}
 
-		// profileId, err := getProfileIdByUserId(cnf.DatabaseReader, authUser.Id)
-		// if err != nil {
-		// 	SendLoginResponse(w, "", 0, err.Error())
-		// 	return nil
-		// }
 		authClaims := auth.JWTClaims{
 			Id: authUser.Id,
 		}
@@ -83,20 +78,3 @@ func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) 
 		api.SendServerError("DTO error", http.StatusInternalServerError, w)
 	}
 }
-
-// func getProfileIdByUserId(dbRead interfaces.IReadDatabase, id int) (int, error) {
-// 	newQB := qb.NewSyncQB(dbRead.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, id))
-// 	newQB.Merge()
-// 	profileId, err := newQB.Query()
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	if len(profileId) != 1 {
-// 		return 0, errors.New("user not found")
-// 	}
-// 	intProfileId, err := dbutils.ParseInt(profileId[0]["id"])
-// 	if err != nil {
-// 		return 0, err
-// 	}
-// 	return intProfileId, nil
-// }

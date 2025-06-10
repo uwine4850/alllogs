@@ -1,10 +1,18 @@
 <script setup lang="ts">
+import { AsyncRequestWithAuthorization } from '@/classes/request';
 import ProjectForm from '@/components/project/ProjectForm.vue';
+import type { BaseResponseMessage } from '@/dto/common';
+import type { ProfileMessage } from '@/dto/profile';
 import { type ProjectMessage } from '@/dto/project';
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { getProject } from '@/services/project';
+import { useErrorStore } from '@/stores/error';
+import type { AxiosResponse } from 'axios';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 var route = useRoute();
+var router = useRouter();
+var errorStore = useErrorStore();
 
 const formData = ref<ProjectMessage>({
   Id: 0,
@@ -15,8 +23,36 @@ const formData = ref<ProjectMessage>({
   Author: undefined,
 })
 
+const projectRef = ref<ProjectMessage | null>(null)
+onMounted(() => {
+  getProject(route.params.id, projectRef, errorStore);
+})
+watch(projectRef, (project) => {
+  if(project){
+    formData.value.Id = project.Id;
+    formData.value.Name = project.Name;
+    formData.value.Description = project.Description;
+  }
+});
+
+
 const submitForm = () => {
-  // formData.value.UserId = parseInt(route.params.id.toString());
+  const req = new AsyncRequestWithAuthorization('http://localhost:8000/project', {
+    withCredentials: true,
+  })
+  req.onResponse(async (response: AxiosResponse) => {
+    const baseResponse = response.data as BaseResponseMessage
+    if (!baseResponse.Ok) {
+      errorStore.setText(baseResponse.Error)
+    } else {
+      router.push("/project/" + route.params.id)
+    }
+  })
+  req.onError((error: unknown) => {
+    errorStore.setText(String(error))
+  })
+  req.setData(formData.value);
+  req.patch();
 }
 </script>
 
