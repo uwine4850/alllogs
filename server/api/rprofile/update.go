@@ -27,22 +27,18 @@ type UpdateForm struct {
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	updateForm := UpdateForm{}
 	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	hasPermission, err := permission(manager, updateForm.UID)
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	if !hasPermission {
-		api.SendClientError(w, http.StatusForbidden, "no access for user profile updates")
-		return nil
+		return api.NewClientError(http.StatusForbidden, "no access for user profile updates")
 	}
 	var oldRelativeAvatarPath string
 	if updateForm.OldAvatarPath != "" {
@@ -55,8 +51,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 
 	var newAvatarPath string
 	if err := updateAvatar(&newAvatarPath, oldRelativeAvatarPath, &updateForm, manager); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 
 	var description string
@@ -64,8 +59,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		description = updateForm.Description
 	}
 	if err := saveUpdate(description, newAvatarPath, &updateForm); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil

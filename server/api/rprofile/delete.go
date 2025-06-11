@@ -1,7 +1,6 @@
 package rprofile
 
 import (
-	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,32 +14,27 @@ import (
 func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
-		api.SendBeseResponse(w, false, errors.New("user ID not found"))
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
 	profile, err := GetProfileByAID(cnf.DatabaseReader, UID.(int))
 	if err != nil {
-		panic(err)
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	transaction := cnf.DatabaseReader.NewTransaction()
 	newQB := qb.NewSyncQB(transaction.SyncQ()).Delete(cnf.DBT_AUTH).Where(qb.Compare("id", qb.EQUAL, profile.UserId))
 	newQB.Merge()
 	_, err = newQB.Exec()
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	if err := deleteAvatar(profile); err != nil {
 		if err := transaction.RollBackTransaction(); err != nil {
-			api.SendBeseResponse(w, false, err)
-			return nil
+			return api.NewServerError(http.StatusInternalServerError, err.Error())
 		}
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	if err := transaction.CommitTransaction(); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil

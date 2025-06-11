@@ -2,7 +2,6 @@ package rauth
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
@@ -13,19 +12,16 @@ import (
 func Logout(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	logoutForm := mydto.LogoutMessage{}
 	if err := json.NewDecoder(r.Body).Decode(&logoutForm); err != nil {
-		SendLoginResponse(w, "", 0, err.Error())
-		return nil
+		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
 
 	_aid, ok := manager.OneTimeData().GetUserContext("AID")
 	if !ok {
-		api.SendBeseResponse(w, false, errors.New("account logout error"))
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, "AID not exists")
 	}
 	AID := _aid.(int)
 	if AID != logoutForm.UID {
-		api.SendBeseResponse(w, false, errors.New("account logout error"))
-		return nil
+		return api.NewClientError(http.StatusConflict, "id dont match")
 	} else {
 		api.SendBeseResponse(w, true, nil)
 		return nil

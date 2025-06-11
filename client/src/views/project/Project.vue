@@ -7,7 +7,7 @@ import exportIcon from '@/assets/svg/upload.svg'
 import updateIcon from '@/assets/svg/update.svg'
 import { useRoute } from 'vue-router'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { onMounted, ref, watch } from 'vue'
@@ -43,9 +43,9 @@ const getLogGroups = (project_id: number) => {
       }
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.get()
 }
 

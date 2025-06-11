@@ -2,7 +2,7 @@
 import projectIcon from '@/assets/svg/project.svg'
 import groupIcon from '@/assets/svg/group.svg'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import type { ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
@@ -15,6 +15,7 @@ import PanelTitle from '../components/PanelTitle.vue'
 import PanelItem from '@/components/PanelItem.vue'
 
 const projectsRef = ref<ProjectMessage[]>()
+const errorStore = useErrorStore()
 
 const req = new AsyncRequestWithAuthorization('http://localhost:8000/all-projects', {
   withCredentials: true,
@@ -27,9 +28,9 @@ req.onResponse(async (response: AxiosResponse) => {
     projectsRef.value = projectMessages
   }
 })
-req.onError((error: unknown) => {
-  console.log('Error: ', error)
-})
+req.onError((error: AxiosError) => {
+  errorStore.setText("unexpected error: " + error.message)
+}, errorStore)
 req.get()
 </script>
 

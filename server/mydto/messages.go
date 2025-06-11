@@ -30,3 +30,18 @@ func NewClientErrorMessage(code int, text string) *ClientErrorMessage {
 		Text: text,
 	}
 }
+
+// 500 - 511
+type ServerErrorMessage struct {
+	rest.ImplementDTOMessage
+	TypServerErrorMessage rest.TypeId `dto:"-typeid"`
+	Code                  int         `dto:"Code"`
+	Text                  string      `dto:"Text"`
+}
+
+func NewServerErrorMessage(code int, text string) *ServerErrorMessage {
+	return &ServerErrorMessage{
+		Code: code,
+		Text: text,
+	}
+}

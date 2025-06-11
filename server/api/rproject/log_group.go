@@ -1,7 +1,6 @@
 package rproject
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -22,34 +21,28 @@ type LogGroupForm struct {
 func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
-		api.SendBeseResponse(w, false, errors.New("user ID not found"))
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
 
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	var logGroupForm LogGroupForm
 	if err := mapper.FillStructFromForm(frm, &logGroupForm); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	// Database
 	projectID, err := strconv.Atoi(logGroupForm.ProjectId[0])
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	isProjectAuthor, err := IsProjectAuthor(UID.(int), projectID, cnf.DatabaseReader)
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	if !isProjectAuthor {
-		api.SendBeseResponse(w, false, errors.New("permission dained"))
-		return nil
+		return api.NewClientError(http.StatusBadRequest, "permission dained")
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT_LOG_GROUP,
 		map[string]any{
@@ -58,8 +51,7 @@ func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	newQB.Merge()
 	_, err = newQB.Exec()
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil

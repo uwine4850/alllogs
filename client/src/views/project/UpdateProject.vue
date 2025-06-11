@@ -6,7 +6,7 @@ import type { ProfileMessage } from '@/dto/profile';
 import { type ProjectMessage } from '@/dto/project';
 import { getProject } from '@/services/project';
 import { useErrorStore } from '@/stores/error';
-import type { AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -48,9 +48,9 @@ const submitForm = () => {
       router.push("/project/" + route.params.id)
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.setData(formData.value);
   req.patch();
 }

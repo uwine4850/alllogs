@@ -15,3 +15,11 @@ export interface ClientErrorMessage {
 export function isClientErrorMessage(obj: any): obj is ClientErrorMessage {
     return typeof obj === 'object' && obj !== null && 'TypClientErrorMessage' in obj;
 }
+export interface ServerErrorMessage {
+    TypServerErrorMessage?: unknown;
+    Code: number;
+    Text: string;
+}
+export function isServerErrorMessage(obj: any): obj is ServerErrorMessage {
+    return typeof obj === 'object' && obj !== null && 'TypServerErrorMessage' in obj;
+}

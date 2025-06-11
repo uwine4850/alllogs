@@ -6,7 +6,7 @@ import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import { useErrorStore } from '@/stores/error'
 import { useRoute, useRouter } from 'vue-router'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
 </script>
 
@@ -47,9 +47,9 @@ const submitForm = () => {
       router.push('/')
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   console.log(formData.value)
   req.setData(formData.value)
   req.post()

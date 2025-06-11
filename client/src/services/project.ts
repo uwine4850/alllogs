@@ -1,6 +1,6 @@
 import { AsyncRequestWithAuthorization } from "@/classes/request"
 import type { ProjectMessage } from "@/dto/project"
-import type { AxiosResponse } from "axios"
+import type { AxiosError, AxiosResponse } from "axios"
 import { useErrorStore } from '@/stores/error'
 import { type Ref } from "vue"
 
@@ -19,8 +19,8 @@ export function getProject(id: any, projectRef: Ref<ProjectMessage | null>, erro
       projectRef.value = projectMessage
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.get()
 }

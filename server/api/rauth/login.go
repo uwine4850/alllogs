@@ -2,6 +2,7 @@ package rauth
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -24,23 +25,23 @@ type LoginJWTClaims struct {
 
 func Login() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-		// Parse and validate form.
-
 		loginForm := mydto.LoginMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
-			SendLoginResponse(w, "", 0, err.Error())
-			return nil
+			return api.NewClientError(http.StatusBadRequest, err.Error())
 		}
 
 		db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 		if err != nil {
-			return err
+			return api.NewServerError(http.StatusInternalServerError, err.Error())
 		}
 		myauth := auth.NewAuth(w, auth.NewMysqlAuthQuery(db, namelib.AUTH.AUTH_TABLE), manager)
 		authUser, err := myauth.LoginUser(loginForm.Username, loginForm.Password)
 		if err != nil {
-			SendLoginResponse(w, "", 0, err.Error())
-			return nil
+			if errors.As(err, &auth.ErrUserNotExist{}) || errors.As(err, &auth.ErrPasswordsDontMatch{}) {
+				return api.NewClientError(http.StatusConflict, err.Error())
+			} else {
+				return api.NewServerError(http.StatusInternalServerError, err.Error())
+			}
 		}
 
 		authClaims := auth.JWTClaims{
@@ -48,8 +49,7 @@ func Login() router.Handler {
 		}
 		tokenString, err := secure.NewHmacJwtWithClaims(authClaims, manager)
 		if err != nil {
-			SendLoginResponse(w, "", 0, err.Error())
-			return nil
+			return api.NewServerError(http.StatusInternalServerError, err.Error())
 		}
 		SendLoginResponse(w, tokenString, authUser.Id, "")
 		return nil
@@ -74,7 +74,7 @@ func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) 
 		UID:   UID,
 		Error: _err,
 	}
-	if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-		api.SendServerError("DTO error", http.StatusInternalServerError, w)
+	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+		api.SendServerError(w, http.StatusInternalServerError, "DTO error")
 	}
 }

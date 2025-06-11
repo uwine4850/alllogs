@@ -1,7 +1,7 @@
 <script lang="ts">
 import checkboxIcon from '@/assets/svg/checkbox.svg'
 import { useRouter } from 'vue-router'
-import { AsyncRequest } from '@/classes/request'
+import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
 </script>
 
 <script setup lang="ts">
@@ -14,8 +14,8 @@ import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
 import type { RegisterMessage } from '@/dto/auth'
-import type { BaseResponseMessage } from '@/dto/common'
-import axios, { type AxiosResponse } from 'axios'
+import { isClientErrorMessage, isServerErrorMessage, type BaseResponseMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
+import axios, { AxiosError, type AxiosResponse } from 'axios'
 
 const errorStore = useErrorStore()
 const router = useRouter()
@@ -40,8 +40,14 @@ const submitForm = async () => {
       router.push('/login')
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
+  req.onError((error: AxiosError) => {
+    if(error.response?.data, isClientErrorMessage(error.response?.data)){
+      catchClientError(error.response?.data as ClientErrorMessage, errorStore)
+    } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
+      catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+    } else {
+      errorStore.setText("unexpected error: " + error.message)
+    }
   })
   req.setData(formData.value)
   req.post()

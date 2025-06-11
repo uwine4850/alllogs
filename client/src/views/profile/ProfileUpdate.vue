@@ -8,7 +8,7 @@ import { getProfileData } from '@/services/profile'
 import { useRoute, useRouter } from 'vue-router'
 import { useErrorStore } from '@/stores/error'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
 import AlertPanelTemplate, { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 </script>
@@ -52,9 +52,9 @@ const saveChanges = async () => {
       router.push('/')
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
 
   const data = new FormData()
   data.append('UID', String(formData.value.UID))

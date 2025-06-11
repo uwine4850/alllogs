@@ -1,7 +1,6 @@
 package mddlauth
 
 import (
-	"errors"
 	"net/http"
 	"slices"
 
@@ -24,7 +23,7 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 			if tokenStr == "" {
 				authJWT := r.URL.Query().Get("authJWT")
 				if authJWT == "" {
-					return "", errors.New("no auth JWT")
+					return "", api.NewClientError(http.StatusBadRequest, "no auth JWT")
 				} else {
 					return authJWT, nil
 				}
@@ -38,26 +37,6 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error {
 			manager.OneTimeData().SetUserContext("UID", AID)
-			// connName := config.LoadedConfig().Default.Database.MainConnectionPoolName
-			// _, ok := profileIDs.Load(AID)
-			// if ok {
-
-			// }
-			// connection, err := manager.Database().ConnectionPool(connName)
-			// if err != nil {
-			// 	return err
-			// }
-			// newQB := qb.NewSyncQB(connection.SyncQ()).SelectFrom("id", cnf.DBT_PROFILE).Where(
-			// 	qb.Compare("user_id", qb.EQUAL, AID),
-			// )
-			// newQB.Merge()
-			// res, err := newQB.Query()
-			// if err != nil {
-			// 	return err
-			// }
-			// if len(res) == 0 {
-			// 	return errors.New("PID retrieval error")
-			// }
 			return nil
 		},
 		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {

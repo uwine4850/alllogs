@@ -1,7 +1,8 @@
 import { isLoginResponseMessage, type LoginResponseMessage } from '@/dto/auth'
-import { isClientErrorMessage, type ClientErrorMessage } from '@/dto/common'
+import { isClientErrorMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
 import router from '@/router'
-import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { useErrorStore } from '@/stores/error'
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
 
 export class AsyncRequest<D = any> {
@@ -11,7 +12,7 @@ export class AsyncRequest<D = any> {
   protected data: D | undefined
   protected currentRequest: (() => Promise<void>) | undefined
   protected onResponseFn: ((response: AxiosResponse) => void) | undefined
-  protected onErrorFn: ((error: unknown) => void) | undefined
+  protected onErrorFn: ((error: AxiosError) => void) | undefined
   constructor(url: string, config: AxiosRequestConfig) {
     this.url = url
     this.config = config
@@ -35,7 +36,7 @@ export class AsyncRequest<D = any> {
     this.onResponseFn = fn
   }
 
-  public onError(fn: (error: unknown) => void) {
+  public onError(fn: (error: AxiosError) => void) {
     this.onErrorFn = fn
   }
 
@@ -47,7 +48,7 @@ export class AsyncRequest<D = any> {
       if (this.onResponseFn) {
         this.onResponseFn(response)
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.onErrorFn) {
         this.onErrorFn(error)
       }
@@ -62,7 +63,7 @@ export class AsyncRequest<D = any> {
       if (this.onResponseFn) {
         this.onResponseFn(response)
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.onErrorFn) {
         this.onErrorFn(error)
       }
@@ -79,7 +80,7 @@ export class AsyncRequest<D = any> {
       if (this.onResponseFn) {
         this.onResponseFn(response)
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.onErrorFn) {
         this.onErrorFn(error)
       }
@@ -94,7 +95,7 @@ export class AsyncRequest<D = any> {
       if (this.onResponseFn) {
         this.onResponseFn(response)
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.onErrorFn) {
         this.onErrorFn(error)
       }
@@ -109,7 +110,7 @@ export class AsyncRequest<D = any> {
       if (this.onResponseFn) {
         this.onResponseFn(response)
       }
-    } catch (error) {
+    } catch (error: any) {
       if (this.onErrorFn) {
         this.onErrorFn(error)
       }
@@ -132,19 +133,29 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
             return
           }
         }
-        if (isClientErrorMessage(this.response.data)) {
-          const response = this.response.data as ClientErrorMessage
-          catchClientError(response)
+        fn(this.response)
+      }
+    }
+  }
+  public override onError(fn: (error: AxiosError) => void, errorStore?: ReturnType<typeof useErrorStore>) {
+    this.onErrorFn = async (error: AxiosError) => {
+      if(error) {
+        if (error.response?.data && isClientErrorMessage(error.response.data)) {
+          const clientErrorMessage = error.response.data as ClientErrorMessage
+          catchClientError(clientErrorMessage, errorStore)
           return
         }
-        fn(this.response)
+        fn(error)
       }
     }
   }
 }
 
-function catchClientError(data: ClientErrorMessage){
+export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnType<typeof useErrorStore>){
   switch (data.Code){
+    case 400:
+      errorStore?.setText(data.Text)
+      break;
     case 401:
       sessionStorage.removeItem('authJWT')
       sessionStorage.removeItem('profile')
@@ -153,5 +164,12 @@ function catchClientError(data: ClientErrorMessage){
     case 403:
       router.push(`/error?code=${"403 Forbidden"}&text=${data.Text}`)
       break;
+    case 409:
+      errorStore?.setText(data.Text)
+      break;
   }
+}
+
+export function catchServerError(data: ServerErrorMessage, errorStore?: ReturnType<typeof useErrorStore>){
+  errorStore?.setText(data.Text)
 }

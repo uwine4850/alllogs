@@ -3,11 +3,11 @@ package rproject
 import (
 	"net/http"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
-	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
 
@@ -16,10 +16,7 @@ type LogGroupView struct {
 }
 
 func (v *LogGroupView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	msg := mydto.ProjectLogGroupMessage{}
-	msg.Error = err.Error()
-	out := map[string]any{"log": msg}
-	router.SendJson(out, w)
+	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
 func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {

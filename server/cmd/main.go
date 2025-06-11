@@ -59,7 +59,16 @@ func main() {
 	newMiddleware.PreMiddleware(0, mddlauth.CheckJWT)
 	newAdapter := router.NewAdapter(newManager, newMiddleware)
 	newAdapter.SetOnErrorFunc(func(w http.ResponseWriter, r *http.Request, err error) {
-		api.SendServerError(err.Error(), http.StatusInternalServerError, w)
+		var clientErrortarget *api.ClientError
+		if errors.As(err, &clientErrortarget) {
+			clientError := err.(*api.ClientError)
+			api.SendClientError(w, clientError.Code, clientError.Text)
+		}
+		var serverErrorTarget *api.ServerError
+		if errors.As(err, &serverErrorTarget) {
+			serverError := err.(*api.ServerError)
+			api.SendServerError(w, serverError.Code, serverError.Text)
+		}
 	})
 	newRouter := router.NewRouter(newAdapter)
 

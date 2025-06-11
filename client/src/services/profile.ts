@@ -1,7 +1,7 @@
 import type { GenTokenMessage, ProfileMessage, TokenResponse } from '@/dto/profile'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { BaseResponseMessage } from '@/dto/common'
-import { type AxiosResponse } from 'axios'
+import { AxiosError, type AxiosResponse } from 'axios'
 import { ref, type Ref } from 'vue'
 import { useErrorStore } from '@/stores/error'
 
@@ -28,9 +28,9 @@ export const getProfileData = async (
       }
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   await req.get()
 }
 
@@ -60,9 +60,9 @@ export const generateTokenForm = async (
       _tokenRef.value = tokenResponse.Token
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.setData(formData.value)
   req.post()
 }
@@ -89,8 +89,8 @@ export const deleteToken = async (
       _tokenRef.value = ''
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.delete()
 }

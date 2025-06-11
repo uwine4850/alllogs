@@ -4,13 +4,13 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/object"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type ProjectView struct {
@@ -18,9 +18,7 @@ type ProjectView struct {
 }
 
 func (v *ProjectView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	msg := mydto.ProjectMessage{}
-	msg.Error = err.Error()
-	mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(&msg))
+	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
 func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {

@@ -3,6 +3,7 @@ package rprofile
 import (
 	"net/http"
 
+	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
@@ -10,7 +11,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/object"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 type ProfileDBView struct {
@@ -26,9 +26,7 @@ type JsonProfileObject struct {
 }
 
 func (v *JsonProfileObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
-	msg := mydto.ProfileMessage{}
-	msg.Error = err.Error()
-	mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(&msg))
+	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
 func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {

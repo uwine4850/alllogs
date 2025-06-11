@@ -1,7 +1,6 @@
 package rproject
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
@@ -20,19 +19,16 @@ type ProjectForm struct {
 func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
-		api.SendBeseResponse(w, false, errors.New("user ID not found"))
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
 
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	var projectForm ProjectForm
 	if err := mapper.FillStructFromForm(frm, &projectForm); err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT,
@@ -42,8 +38,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 	newQB.Merge()
 	_, err := newQB.Exec()
 	if err != nil {
-		api.SendBeseResponse(w, false, err)
-		return nil
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil

@@ -2,7 +2,6 @@ package rauth
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strings"
 
@@ -13,10 +12,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
-	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
 func Register() router.Handler {
@@ -24,34 +21,27 @@ func Register() router.Handler {
 		// Parse and validate form.
 		registerForm := mydto.RegisterMessage{}
 		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
-			api.SendBeseResponse(w, false, err)
-			return nil
+			return api.NewClientError(http.StatusBadRequest, err.Error())
 		}
 		if strings.Trim(registerForm.Password, "") != strings.Trim(registerForm.RepeatPassword, "") {
-			api.SendBeseResponse(w, false, errors.New("passwords don`t match"))
-			return nil
+			return api.NewClientError(http.StatusConflict, "passwords don`t match")
 		}
 
 		// Database operation.
 		db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)
 		if err != nil {
-			return err
+			return api.NewServerError(http.StatusInternalServerError, err.Error())
 		}
 		myauth := auth.NewAuth(w, auth.NewMysqlAuthQuery(db, namelib.AUTH.AUTH_TABLE), manager)
 		regUserId, err := myauth.RegisterUser(registerForm.Username, registerForm.Password)
 		if err != nil {
-			api.SendBeseResponse(w, false, err)
-			return nil
+			return api.NewClientError(http.StatusConflict, err.Error())
 		}
 		// Create profile in database.
 		if err := createProfile(cnf.DatabaseReader, regUserId); err != nil {
-			api.SendBeseResponse(w, false, err)
-			return nil
+			return api.NewServerError(http.StatusInternalServerError, err.Error())
 		}
-		resp := mydto.NewBaseResponse(true, "")
-		if err := mapper.SendSafeJsonDTOMessage(w, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
-			api.SendServerError("DTO error", http.StatusInternalServerError, w)
-		}
+		api.SendBeseResponse(w, true, nil)
 		return nil
 	}
 }

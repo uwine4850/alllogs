@@ -9,10 +9,11 @@ import PasswordInp from '@/components/input/InputPassword.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
-import axios, { type AxiosResponse } from 'axios'
+import axios, { AxiosError, type AxiosResponse } from 'axios'
 import Error from '@/components/Error.vue'
-import { AsyncRequest } from '@/classes/request'
+import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
 import type { ProfileMessage } from '@/dto/profile'
+import { isClientErrorMessage, isServerErrorMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
 </script>
 
 <script setup lang="ts">
@@ -55,14 +56,26 @@ const submitForm = async () => {
           router.push('/')
         }
       })
-      req.onError((error: unknown) => {
-        errorStore.setText(loginResponse.Error)
+      req.onError((error: AxiosError) => {
+        if(error.response?.data, isClientErrorMessage(error.response?.data)){
+          catchClientError(error.response?.data as ClientErrorMessage, errorStore)
+        } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
+          catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+        } else {
+          errorStore.setText("unexpected error: " + error.message)
+        }
       })
       req.get()
     }
   })
-  loginReq.onError((error: unknown) => {
-    errorStore.setText(String(error))
+  loginReq.onError((error: AxiosError) => {
+    if(error.response?.data, isClientErrorMessage(error.response?.data)){
+      catchClientError(error.response?.data as ClientErrorMessage, errorStore)
+    } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
+      catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+    } else {
+      errorStore.setText("unexpected error: " + error.message)
+    }
   })
   loginReq.setData(formData.value)
   loginReq.post()
