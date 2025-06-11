@@ -28,7 +28,7 @@ const formData = ref<LoginMessage>({
 const submitForm = async () => {
   const loginReq = new AsyncRequest('http://localhost:8000/login', {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     withCredentials: true,
   })

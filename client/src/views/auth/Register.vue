@@ -29,7 +29,7 @@ const formData = ref<RegisterMessage>({
 const submitForm = async () => {
   const req = new AsyncRequest('http://localhost:8000/register', {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   })
   req.onResponse((response: AxiosResponse) => {

@@ -27,7 +27,7 @@ export function isLoginResponseMessage(obj: any): obj is LoginResponseMessage {
 }
 export interface LogoutMessage {
     TypLogoutMessage?: unknown;
-    AID: number;
+    UID: number;
 }
 export function isLogoutMessage(obj: any): obj is LogoutMessage {
     return typeof obj === 'object' && obj !== null && 'TypLogoutMessage' in obj;

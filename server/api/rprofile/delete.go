@@ -16,11 +16,14 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
-	profile, err := GetProfileByAID(cnf.DatabaseReader, UID.(int))
+	profile, err := GetProfileByUID(cnf.DatabaseReader, UID.(int))
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	transaction := cnf.DatabaseReader.NewTransaction()
+	if err := transaction.BeginTransaction(); err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	}
 	newQB := qb.NewSyncQB(transaction.SyncQ()).Delete(cnf.DBT_AUTH).Where(qb.Compare("id", qb.EQUAL, profile.UserId))
 	newQB.Merge()
 	_, err = newQB.Exec()

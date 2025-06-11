@@ -17,11 +17,11 @@ import (
 )
 
 type UpdateForm struct {
-	UID           int           `form:"UID"`
-	Description   string        `form:"Description" nil:"-skip"`
-	Avatar        form.FormFile `form:"Avatar" nil:"-skip"`
-	OldAvatarPath string        `form:"OldAvatarPath" nil:"-skip"`
-	DelAvatar     string        `form:"DelAvatar"`
+	UID           int           `form:"UID" empty:"-err"`
+	Description   string        `form:"Description" nil:"-skip" empty:"-err"`
+	Avatar        form.FormFile `form:"Avatar" nil:"-skip" empty:"-err"`
+	OldAvatarPath string        `form:"OldAvatarPath" nil:"-skip" empty:"-err"`
+	DelAvatar     string        `form:"DelAvatar" empty:"-err"`
 }
 
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

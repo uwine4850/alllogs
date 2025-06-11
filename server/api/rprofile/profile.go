@@ -14,7 +14,6 @@ import (
 )
 
 type ProfileDBView struct {
-	// Id          int    `db:"id"`
 	UserId      int    `db:"user_id"`
 	Description string `db:"description"`
 	Avatar      string `db:"avatar"`

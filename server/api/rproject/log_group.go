@@ -13,9 +13,9 @@ import (
 )
 
 type LogGroupForm struct {
-	ProjectId   []string `form:"ProjectId" empty:"-err"`
-	Name        []string `form:"Name" empty:"-err"`
-	Description []string `form:"Description" empty:"-err"`
+	ProjectId   string `form:"ProjectId" empty:"-err"`
+	Name        string `form:"Name" empty:"-err"`
+	Description string `form:"Description" empty:"-err"`
 }
 
 func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
@@ -33,7 +33,7 @@ func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	// Database
-	projectID, err := strconv.Atoi(logGroupForm.ProjectId[0])
+	projectID, err := strconv.Atoi(logGroupForm.ProjectId)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
@@ -46,7 +46,7 @@ func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT_LOG_GROUP,
 		map[string]any{
-			"project_id": logGroupForm.ProjectId[0], "name": logGroupForm.Name[0], "description": logGroupForm.Description[0],
+			"project_id": logGroupForm.ProjectId, "name": logGroupForm.Name, "description": logGroupForm.Description,
 		})
 	newQB.Merge()
 	_, err = newQB.Exec()

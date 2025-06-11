@@ -48,7 +48,7 @@ export const generateTokenForm = async (
 
   const req = new AsyncRequestWithAuthorization('http://localhost:8000/gen-token', {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     withCredentials: true,
   })

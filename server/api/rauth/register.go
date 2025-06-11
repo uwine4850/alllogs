@@ -1,28 +1,38 @@
 package rauth
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/config"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/form"
 )
+
+type RegisterForm struct {
+	Username       string `form:"Username" nil:"-err" emty:"-err"`
+	Password       string `form:"Password" nil:"-err" emty:"-err"`
+	RepeatPassword string `form:"RepeatPassword" nil:"-err" emty:"-err"`
+}
 
 func Register() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-		// Parse and validate form.
-		registerForm := mydto.RegisterMessage{}
-		if err := json.NewDecoder(r.Body).Decode(&registerForm); err != nil {
+		frm := form.NewForm(r)
+		if err := frm.Parse(); err != nil {
 			return api.NewClientError(http.StatusBadRequest, err.Error())
 		}
+		var registerForm RegisterForm
+		if err := mapper.FillStructFromForm(frm, &registerForm); err != nil {
+			return api.NewClientError(http.StatusBadRequest, err.Error())
+		}
+
 		if strings.Trim(registerForm.Password, "") != strings.Trim(registerForm.RepeatPassword, "") {
 			return api.NewClientError(http.StatusConflict, "passwords don`t match")
 		}

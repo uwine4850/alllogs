@@ -3,7 +3,6 @@ package rprofile
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
@@ -13,20 +12,29 @@ import (
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
+	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
+type TokenForm struct {
+	UserId int `form:"UserId" empty:"-err" nil:"-err"`
+}
+
 func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	genTokenRequestMessage := mydto.GenTokenMessage{}
-	if err := json.NewDecoder(r.Body).Decode(&genTokenRequestMessage); err != nil {
-		return api.NewClientError(http.StatusBadRequest, err.Error())
+	frm := form.NewForm(r)
+	if err := frm.Parse(); err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	}
+	var tokenForm TokenForm
+	if err := mapper.FillStructFromForm(frm, &tokenForm); err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	token, err := newToken(cnf.DatabaseReader)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Update(cnf.DBT_PROFILE, map[string]any{"token": token}).
-		Where(qb.Compare("user_id", qb.EQUAL, genTokenRequestMessage.UserId))
+		Where(qb.Compare("user_id", qb.EQUAL, tokenForm.UserId))
 	newQB.Merge()
 	if _, err := newQB.Exec(); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())

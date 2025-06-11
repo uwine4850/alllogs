@@ -12,8 +12,8 @@ import (
 )
 
 type ProjectForm struct {
-	Name        []string `form:"Name" empty:"-err"`
-	Description []string `form:"Description" empty:"-err"`
+	Name        string `form:"Name" empty:"-err"`
+	Description string `form:"Description" empty:"-err"`
 }
 
 func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
@@ -33,7 +33,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).Insert(cnf.DBT_PROJECT,
 		map[string]any{
-			"user_id": UID, "name": projectForm.Name[0], "description": projectForm.Description[0],
+			"user_id": UID, "name": projectForm.Name, "description": projectForm.Description,
 		})
 	newQB.Merge()
 	_, err := newQB.Exec()

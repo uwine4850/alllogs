@@ -2,9 +2,8 @@
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import Button from '@/components/Button.vue'
 import deleteIcon from '@/assets/svg/delete.svg'
-import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { AxiosResponse } from 'axios'
+import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
 import Error from '@/components/Error.vue'
@@ -34,9 +33,9 @@ const deleteUser = () => {
       router.push('/login')
     }
   })
-  req.onError((error: unknown) => {
-    errorStore.setText(String(error))
-  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
   req.delete()
 }
 </script>

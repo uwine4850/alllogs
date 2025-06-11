@@ -1,5 +1,5 @@
 import { isLoginResponseMessage, type LoginResponseMessage } from '@/dto/auth'
-import { isClientErrorMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
+import { isClientErrorMessage, isServerErrorMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
 import router from '@/router'
 import type { useErrorStore } from '@/stores/error'
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
@@ -143,6 +143,11 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
         if (error.response?.data && isClientErrorMessage(error.response.data)) {
           const clientErrorMessage = error.response.data as ClientErrorMessage
           catchClientError(clientErrorMessage, errorStore)
+          return
+        }
+        if (error.response?.data && isServerErrorMessage(error.response.data)) {
+          const serverErrorMessage = error.response.data as ServerErrorMessage
+          catchServerError(serverErrorMessage, errorStore)
           return
         }
         fn(error)

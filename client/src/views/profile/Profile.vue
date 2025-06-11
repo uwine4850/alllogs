@@ -15,13 +15,12 @@ import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
 import InputPassword from '@/components/input/InputPassword.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, type Ref } from 'vue'
 import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 
 const errorStore = useErrorStore()
-const router = useRouter()
 const route = useRoute()
 
 const profileDataRef = ref<ProfileMessage | null>(null)
@@ -51,7 +50,6 @@ onMounted(async () => {
           errorStore.setText(String(e))
         }
       }
-      router.go(0)
     }
   }
 })

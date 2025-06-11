@@ -1,7 +1,6 @@
 package rauth
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -23,11 +23,20 @@ type LoginJWTClaims struct {
 	jwt.RegisteredClaims
 }
 
+type LoginForm struct {
+	Username string `form:"Username" nil:"-err" empty:"-err"`
+	Password string `form:"Password" nil:"-err" empty:"-err"`
+}
+
 func Login() router.Handler {
 	return func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-		loginForm := mydto.LoginMessage{}
-		if err := json.NewDecoder(r.Body).Decode(&loginForm); err != nil {
-			return api.NewClientError(http.StatusBadRequest, err.Error())
+		frm := form.NewForm(r)
+		if err := frm.Parse(); err != nil {
+			return api.NewServerError(http.StatusBadRequest, err.Error())
+		}
+		var loginForm LoginForm
+		if err := mapper.FillStructFromForm(frm, &loginForm); err != nil {
+			return api.NewServerError(http.StatusBadRequest, err.Error())
 		}
 
 		db, err := manager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)

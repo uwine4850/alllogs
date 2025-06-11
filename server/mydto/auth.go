@@ -28,5 +28,5 @@ type LoginResponseMessage struct {
 type LogoutMessage struct {
 	rest.ImplementDTOMessage
 	TypLogoutMessage rest.TypeId `dto:"-typeid"`
-	UID              int         `dto:"AID"`
+	UID              int         `dto:"UID"`
 }
