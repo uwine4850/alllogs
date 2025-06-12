@@ -1,13 +1,7 @@
-<script lang="ts">
-import addIcon from '@/assets/svg/add.svg'
-import groupIcon from '@/assets/svg/group.svg'
-import type { ProfileMessage } from '@/dto/profile'
-import { getSocket, MyWebsocket, type SockedMessage } from '@/classes/websocket'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { NotiicationType } from '@/services/nofications'
-</script>
-
 <script setup lang="ts">
+import type { ProfileMessage } from '@/dto/profile'
+import { MyWebsocket } from '@/classes/websocket'
+import { onBeforeUnmount, ref } from 'vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 
@@ -56,15 +50,15 @@ onBeforeUnmount(() => {
         <Separator />
         <div class="partition">
           <div class="partition-title">menu</div>
-          <Button class="partition-button" :icon="addIcon" text="New project" link="/new-project" />
-          <Button class="partition-button" :icon="addIcon" text="New group" link="/new-group" />
+          <Button class="partition-button" icon="add" text="New project" link="/new-project" />
+          <Button class="partition-button" icon="add" text="New group" link="/new-group" />
         </div>
         <Separator />
         <div class="partition">
           <div class="partition-title">projects</div>
           <Button
             class="partition-button"
-            :icon="groupIcon"
+            icon="group"
             text="Group owner"
             link="/my-own-groups"
           />

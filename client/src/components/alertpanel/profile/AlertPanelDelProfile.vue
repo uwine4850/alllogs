@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import Button from '@/components/Button.vue'
-import deleteIcon from '@/assets/svg/delete.svg'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
@@ -49,10 +48,10 @@ const deleteUser = () => {
         @click="deleteUser"
         type="button"
         class="_btn"
-        :icon="deleteIcon"
+        icon="delete"
         text="Delete profile"
       />
-      <Button @click="cancelButton" type="button" class="_btn" :icon="deleteIcon" text="Cancel" />
+      <Button @click="cancelButton" type="button" class="_btn" icon="delete" text="Cancel" />
     </div>
   </AlertPanelTemplate>
 </template>

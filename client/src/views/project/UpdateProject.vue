@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request';
-import ProjectForm from '@/components/project/ProjectForm.vue';
 import type { BaseResponseMessage } from '@/dto/common';
-import type { ProfileMessage } from '@/dto/profile';
+import projectIcon from '@/assets/svg/project.svg'
+import checkBoxIcon from '@/assets/svg/checkbox.svg'
 import { type ProjectMessage } from '@/dto/project';
 import { getProject } from '@/services/project';
 import { useErrorStore } from '@/stores/error';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import BaseTemplate from '@/views/BaseTemplate.vue';
+import MiddlePanel from '@/views/MiddlePanel.vue';
+import Error from '@/components/Error.vue';
+import PanelTitle from '@/components/PanelTitle.vue';
+import Separator from '@/components/Separator.vue';
+import Button from '@/components/Button.vue';
+import { InputText, InputTextarea } from '@/components/input/index';
 
 var route = useRoute();
 var router = useRouter();
@@ -57,9 +64,40 @@ const submitForm = () => {
 </script>
 
 <template>
-  <ProjectForm 
-  v-model:model-value-name="formData.Name"
-  v-model:model-value-description="formData.Description"
-  :onSubmit="submitForm"
-  />
+  <BaseTemplate :title="`Update project - ${formData.Name}`">
+    <MiddlePanel>
+      <Error />
+      <PanelTitle :icon="projectIcon" :text="`Update project - ${formData.Name}`" :sep="false" />
+      
+      <InputText
+        v-model="formData.Name"
+        text="Name"
+        name="name"
+      />
+      
+      <InputTextarea
+        v-model="formData.Description"
+        text="Description"
+        name="description"
+      />
+
+      <Separator />
+        <slot id="extra"></slot>
+      <Button
+        @click="submitForm"
+        type="button"
+        class="create-btn"
+        :icon="checkBoxIcon"
+        text="Update"
+      />
+    </MiddlePanel>
+  </BaseTemplate>
 </template>
+
+<style scoped lang="scss">
+.create-btn {
+  margin: 10px;
+  width: 200px;
+  margin-left: auto;
+}
+</style>

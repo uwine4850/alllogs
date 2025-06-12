@@ -20,7 +20,10 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	transaction := cnf.DatabaseReader.NewTransaction()
+	transaction, err := cnf.DatabaseReader.NewTransaction()
+	if err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	}
 	if err := transaction.BeginTransaction(); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}

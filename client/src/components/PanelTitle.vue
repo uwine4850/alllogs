@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import Separator from '@/components/Separator.vue'
+import SvgIcon from './icons/SvgIcon.vue';
 
-defineProps({
+const props = defineProps({
   icon: {
     type: String,
     required: true,
@@ -19,10 +20,10 @@ defineProps({
 
 <template>
   <div class="content">
-    <img :src="icon" alt="icon" />
-    <p>{{ text }}</p>
+    <SvgIcon :name="props.icon" class="icon" />
+    <p>{{ props.text }}</p>
   </div>
-  <Separator v-if="sep" />
+  <Separator v-if="props.sep" />
 </template>
 
 <style scoped lang="scss">
@@ -32,8 +33,11 @@ defineProps({
   background-color: transparent;
   display: flex;
   padding: 10px;
-  img {
-    background-color: transparent;
+  display: flex;
+  .icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: auto 0;
   }
   p {
     background-color: transparent;

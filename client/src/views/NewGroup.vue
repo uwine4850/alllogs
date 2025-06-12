@@ -16,11 +16,11 @@ import Separator from '@/components/Separator.vue'
 <template>
   <BaseTemplate title="New group">
     <MiddlePanel>
-      <PanelTitle :icon="groupIcon" text="new group" :sep="false" />
+      <PanelTitle icon="group" text="new group" :sep="false" />
       <InputText text="Name" name="name" />
       <InputTextarea text="Description" name="description" />
       <Separator />
-      <Button class="create-btn" :icon="checkBoxIcon" text="Create" />
+      <Button class="create-btn" icon="checkbox" text="Create" />
     </MiddlePanel>
   </BaseTemplate>
 </template>

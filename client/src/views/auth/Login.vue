@@ -1,5 +1,4 @@
 <script lang="ts">
-import checkboxIcon from '@/assets/svg/checkbox.svg'
 import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
 import type { LoginMessage, LoginResponseMessage } from '@/dto/auth'
@@ -9,7 +8,7 @@ import PasswordInp from '@/components/input/InputPassword.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
-import axios, { AxiosError, type AxiosResponse } from 'axios'
+import { AxiosError, type AxiosResponse } from 'axios'
 import Error from '@/components/Error.vue'
 import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
 import type { ProfileMessage } from '@/dto/profile'
@@ -93,7 +92,7 @@ const submitForm = async () => {
       <PasswordInp v-model="formData.Password" text="Password" name="password" />
       <Separator />
       <router-link class="link" to="/register">Register</router-link>
-      <Button type="submit" class="button" text="Log in" :icon="checkboxIcon" />
+      <Button type="submit" class="button" text="Log in" icon="checkbox" />
     </form>
   </MiddlePanel>
 </template>

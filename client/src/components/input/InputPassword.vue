@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
-import eyeIcon from '@/assets/svg/eye.svg'
+import SvgIcon from '../icons/SvgIcon.vue'
 
 const props = defineProps({
   text: {
@@ -57,7 +57,7 @@ const updateValue = (event: Event) => {
       @input="updateValue"
     />
     <button ref="togglePasswordButton" type="button" class="p-toggle">
-      <img :src="eyeIcon" />
+      <SvgIcon name="eye" class="icon" />
     </button>
   </InputTemplate>
 </template>
@@ -100,9 +100,9 @@ function toggle(togglePasswordButton: HTMLButtonElement, passwordInput: HTMLInpu
     cursor: pointer;
     filter: brightness(90%);
   }
-  img {
-    background-color: transparent;
-    margin: auto auto;
+  .icon {
+    box-sizing: border-box;
+    padding: 10px;
   }
 }
 </style>

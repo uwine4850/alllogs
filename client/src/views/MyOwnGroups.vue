@@ -1,7 +1,3 @@
-<script lang="ts">
-import groupIcon from '@/assets/svg/group.svg'
-</script>
-
 <script setup lang="ts">
 import BaseTemplate from './BaseTemplate.vue'
 import MiddlePanel from './MiddlePanel.vue'
@@ -12,7 +8,7 @@ import PanelItem from '@/components/PanelItem.vue'
 <template>
   <BaseTemplate title="My own groups">
     <MiddlePanel class="groups">
-      <PanelTitle :icon="groupIcon" text="my own groups" />
+      <PanelTitle icon="group" text="my own groups" />
       <div class="group-list">
         <PanelItem class="group-item" title="Project name" descr="DESCR" link="/group" />
         <PanelItem class="group-item" title="Project name" descr="DESCR" link="/group" />

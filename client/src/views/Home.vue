@@ -1,14 +1,9 @@
-<script lang="ts">
-import projectIcon from '@/assets/svg/project.svg'
-import groupIcon from '@/assets/svg/group.svg'
+<script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
-</script>
-
-<script setup lang="ts">
 import BaseTemplate from '../views/BaseTemplate.vue'
 import Panel from '../components/Panel.vue'
 import PanelTitle from '../components/PanelTitle.vue'
@@ -38,7 +33,7 @@ req.get()
   <BaseTemplate title="Home">
     <div class="home-content">
       <Panel class="panel">
-        <PanelTitle :icon="projectIcon" text="my projects" />
+        <PanelTitle icon="project" text="my projects" />
         <div class="panel-content-wrapper">
           <PanelItem
             v-for="project in projectsRef"
@@ -50,7 +45,7 @@ req.get()
         </div>
       </Panel>
       <Panel class="panel">
-        <PanelTitle :icon="groupIcon" text="my groups" />
+        <PanelTitle icon="group" text="my groups" />
         <div class="panel-content-wrapper">
           <PanelItem title="Group name" descr="DESCR" link="#" />
         </div>

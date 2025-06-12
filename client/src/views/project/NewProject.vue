@@ -1,4 +1,4 @@
-<script lang="ts">
+<script setup lang="ts">
 import type { ProjectMessage } from '@/dto/project'
 import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
@@ -6,9 +6,6 @@ import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
-</script>
-
-<script setup lang="ts">
 import ProjectForm from '@/components/project/ProjectForm.vue'
 
 const errorStore = useErrorStore()

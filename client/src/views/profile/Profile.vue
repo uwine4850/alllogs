@@ -1,15 +1,8 @@
-<script lang="ts">
-import updateIcon from '@/assets/svg/update.svg'
-import logoutIcon from '@/assets/svg/log_out.svg'
-import refreshIcon from '@/assets/svg/refresh.svg'
-import deleteIcon from '@/assets/svg/delete.svg'
+<script setup lang="ts">
 import { onMounted } from 'vue'
 import type { ProfileMessage } from '@/dto/profile'
 import { deleteToken, generateTokenForm, getProfileData } from '@/services/profile'
 import { logout } from '@/services/auth'
-</script>
-
-<script setup lang="ts">
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
@@ -74,11 +67,11 @@ onMounted(async () => {
         <div class="profile-btns">
           <Button
             class="pbtn"
-            :icon="updateIcon"
+            icon="update"
             text="Update"
             :link="`/profile/update/${profileDataRef?.UserId}`"
           />
-          <Button id="logout-btn" class="pbtn" :icon="logoutIcon" text="Log out" />
+          <Button id="logout-btn" class="pbtn" icon="log_out" text="Log out" />
         </div>
       </div>
       <InputPassword text="Token" name="token" :readonly="true" v-model="tokenRef" />
@@ -86,14 +79,14 @@ onMounted(async () => {
         <Button
           @click="handleGenerateTokenForm"
           class="tbtn"
-          :icon="refreshIcon"
+          icon="refresh"
           text="Regenerate token"
         />
         <Separator class="tsep" :vertical="true" />
         <Button
           @click="handleDeleteToken"
           class="tbtn tbtn-delete"
-          :icon="deleteIcon"
+          icon="delete"
           text="Delete token"
         />
       </div>

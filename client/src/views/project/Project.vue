@@ -1,10 +1,4 @@
-<script lang="ts">
-import projectIcon from '@/assets/svg/project.svg'
-import addIcon from '@/assets/svg/add.svg'
-import groupIcon from '@/assets/svg/group.svg'
-import userIcon from '@/assets/svg/user.svg'
-import exportIcon from '@/assets/svg/upload.svg'
-import updateIcon from '@/assets/svg/update.svg'
+<script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
@@ -12,9 +6,6 @@ import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { onMounted, ref, watch } from 'vue'
 import { getProject } from '@/services/project'
-</script>
-
-<script setup lang="ts">
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Button from '@/components/Button.vue'
 import Separator from '@/components/Separator.vue'
@@ -81,7 +72,7 @@ watch(projectRef, (project) => {
         </router-link>
       </div>
       <Separator />
-      <PanelTitle :icon="groupIcon" text="log groups" />
+      <PanelTitle icon="group" text="log groups" />
       <div class="log-group-list">
         <router-link
           v-for="group in logGroupsRef"
@@ -93,21 +84,21 @@ watch(projectRef, (project) => {
       </div>
     </template>
     <template #panel-menu>
-      <PanelTitle :icon="projectIcon" text="project management" />
+      <PanelTitle icon="project" text="project management" />
       <div class="pm-wrapper">
         <Button
           class="pm-button"
-          :icon="addIcon"
+          icon="add"
           text="New log group"
           :link="`/project/${projectRef?.Id}/new-log-group`"
         />
-        <Button class="pm-button" :icon="addIcon" text="Add group" link="#" />
+        <Button class="pm-button" icon="add" text="Add group" link="#" />
       </div>
       <Separator />
       <div class="pm-wrapper">
-        <Button class="pm-button" :icon="userIcon" text="Users" link="#" />
-        <Button class="pm-button" :icon="updateIcon" text="Update" :link="`/project/${ projectRef?.Id }/update`" />
-        <Button class="pm-button" :icon="exportIcon" text="Export all as JSON" />
+        <Button class="pm-button" icon="user" text="Users" link="#" />
+        <Button class="pm-button" icon="update" text="Update" :link="`/project/${ projectRef?.Id }/update`" />
+        <Button class="pm-button" icon="upload" text="Export all as JSON" />
       </div>
     </template>
   </ProjectTemplate>

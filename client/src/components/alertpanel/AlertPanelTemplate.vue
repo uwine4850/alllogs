@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { clearHTMLElement } from '@/utils/component'
 import Panel from '@/components/Panel.vue'
 
 onMounted(() => {

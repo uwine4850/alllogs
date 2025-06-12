@@ -1,6 +1,4 @@
-<script lang="ts">
-import projectIcon from '@/assets/svg/project.svg'
-import checkBoxIcon from '@/assets/svg/checkbox.svg'
+<script setup lang="ts">
 import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
@@ -8,9 +6,6 @@ import { useErrorStore } from '@/stores/error'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
-</script>
-
-<script setup lang="ts">
 import BaseTemplate from '@/views/BaseTemplate.vue'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import PanelTitle from '@/components/PanelTitle.vue'
@@ -60,7 +55,7 @@ const submitForm = () => {
   <BaseTemplate title="New log group">
     <MiddlePanel>
       <Error />
-      <PanelTitle :icon="projectIcon" text="new log group" :sep="false" />
+      <PanelTitle icon="project" text="new log group" :sep="false" />
       <InputText v-model="formData.Name" text="Name" name="name" />
       <InputTextarea v-model="formData.Description" text="Description" name="description" />
       <Separator />
@@ -68,7 +63,7 @@ const submitForm = () => {
         @click="submitForm"
         type="button"
         class="create-btn"
-        :icon="checkBoxIcon"
+        icon="checkbox"
         text="Create"
       />
     </MiddlePanel>

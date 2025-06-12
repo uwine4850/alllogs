@@ -1,10 +1,6 @@
-<script lang="ts">
-import checkboxIcon from '@/assets/svg/checkbox.svg'
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
-</script>
-
-<script setup lang="ts">
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
 import PasswordInp from '@/components/input/InputPassword.vue'
@@ -15,7 +11,7 @@ import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
 import type { RegisterMessage } from '@/dto/auth'
 import { isClientErrorMessage, isServerErrorMessage, type BaseResponseMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
-import axios, { AxiosError, type AxiosResponse } from 'axios'
+import { AxiosError, type AxiosResponse } from 'axios'
 
 const errorStore = useErrorStore()
 const router = useRouter()
@@ -70,7 +66,7 @@ const submitForm = async () => {
       />
       <Separator />
       <router-link class="link" to="/login">Log in</router-link>
-      <Button type="submit" class="button" text="Register" :icon="checkboxIcon" />
+      <Button type="submit" class="button" text="Register" icon="checkbox" />
     </form>
   </MiddlePanel>
 </template>

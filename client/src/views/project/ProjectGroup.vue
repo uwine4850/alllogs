@@ -1,23 +1,10 @@
-<script lang="ts">
-import filterIcon from '@/assets/svg/filter.svg'
-import projectIcon from '@/assets/svg/project.svg'
-import infoIcon from '@/assets/svg/info.svg'
-import tagIcon from '@/assets/svg/tag.svg'
-import calendarIcon from '@/assets/svg/calendar.svg'
-import textIcon from '@/assets/svg/text.svg'
-import uploadIcon from '@/assets/svg/upload.svg'
-import updateIcon from '@/assets/svg/update.svg'
-import clearIcon from '@/assets/svg/clear.svg'
-import bellIcon from '@/assets/svg/bell.svg'
+<script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
-</script>
-
-<script setup lang="ts">
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
@@ -25,6 +12,7 @@ import PanelTitle from '@/components/PanelTitle.vue'
 import AlertFilter from '@/components/project_group/AlertFilter.vue'
 import { addComponent } from '@/utils/component'
 import Error from '@/components/Error.vue'
+import SvgIcon from '@/components/icons/SvgIcon.vue'
 
 const route = useRoute()
 const errorStore = useErrorStore()
@@ -84,12 +72,12 @@ onMounted(() => {
           id="filter-btn1"
           @click="addComponent('alert-container', AlertFilter)"
         >
-          <img :src="filterIcon" alt="filter" />
+          <SvgIcon name="filter" class="icon" />
           <p>filters</p>
         </button>
         <Separator :vertical="true" />
         <router-link class="il-button" :to="`/project/${projectRef?.Id}`">
-          <img :src="projectIcon" alt="project" />
+          <SvgIcon name="project" class="icon" />
           <p>{{ projectRef?.Name }}</p>
         </router-link>
       </div>
@@ -97,22 +85,22 @@ onMounted(() => {
 
       <div class="row row-header">
         <div class="cell c-type cell-header">
-          <img :src="infoIcon" alt="inf" />
+          <SvgIcon name="info" />
           <p>type</p>
         </div>
         <Separator :vertical="true" />
         <div class="cell c-tag cell-header">
-          <img :src="tagIcon" alt="tag" />
+          <SvgIcon name="tag" />
           <p>tag</p>
         </div>
         <Separator :vertical="true" />
         <div class="cell c-time cell-header">
-          <img :src="calendarIcon" alt="cldr" />
+          <SvgIcon name="calendar" />
           <p>time</p>
         </div>
         <Separator :vertical="true" />
         <div class="cell c-text cell-header">
-          <img :src="textIcon" alt="txt" />
+          <SvgIcon name="text" />
           <p>text</p>
         </div>
       </div>
@@ -151,12 +139,12 @@ onMounted(() => {
       </div>
     </template>
     <template #panel-menu>
-      <PanelTitle :icon="projectIcon" text="log group management" />
+      <PanelTitle icon="project" text="log group management" />
       <div class="pm-wrapper">
-        <Button class="pm-button" :icon="uploadIcon" text="Export as JSON" link="" />
-        <Button class="pm-button" :icon="updateIcon" text="Update" link="" />
-        <Button class="pm-button" :icon="clearIcon" text="Clear" link="" />
-        <Button class="pm-button" :icon="bellIcon" text="Sutup notfications" link="" />
+        <Button class="pm-button" icon="upload" text="Export as JSON" link="" />
+        <Button class="pm-button" icon="update" text="Update" link="" />
+        <Button class="pm-button" icon="clear" text="Clear" link="" />
+        <Button class="pm-button" icon="bell" text="Sutup notfications" link="" />
       </div>
     </template>
   </ProjectTemplate>
@@ -230,7 +218,8 @@ onMounted(() => {
       cursor: pointer;
       filter: brightness(90%);
     }
-    img {
+    .icon {
+      width: 20px;
       margin: auto 0;
       background-color: transparent;
     }

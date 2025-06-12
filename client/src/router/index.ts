@@ -12,7 +12,7 @@ import Group from '@/views/Group.vue'
 import ProfileUpdate from '@/views/profile/ProfileUpdate.vue'
 import NewLogGroup from '@/views/project/NewLogGroup.vue'
 import UpdateProject from '@/views/project/UpdateProject.vue'
-import Error from '../views/Error.vue'
+import Err from '@/views/Err.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -98,7 +98,7 @@ export const router = createRouter({
     {
       path: '/error',
       name: 'error',
-      component: Error,
+      component: Err,
       meta: { authorized: true },
     },
   ],

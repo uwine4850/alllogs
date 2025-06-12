@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps({
+import SvgIcon from './icons/SvgIcon.vue';
+
+const props = defineProps({
   icon: {
     type: String,
     required: true,
@@ -16,12 +18,12 @@ defineEmits(['click'])
 </script>
 
 <template>
-  <div v-if="link">
-    <router-link class="wrapper" :to="link">
+  <div v-if="props.link">
+    <router-link class="wrapper" :to="props.link">
       <button class="btn" v-bind="$attrs" @click="$emit('click')">
         <div class="content">
-          <img class="icon" :src="icon" alt="icon" />
-          <p class="text">{{ text }}</p>
+          <SvgIcon :name="props.icon" class="icon" />
+          <p class="text">{{ props.text }}</p>
         </div>
       </button>
     </router-link>
@@ -31,8 +33,8 @@ defineEmits(['click'])
     <span class="wrapper">
       <button class="btn" v-bind="$attrs" @click="$emit('click')">
         <div class="content">
-          <img class="icon" :src="icon" alt="icon" />
-          <p class="text">{{ text }}</p>
+          <SvgIcon :name="props.icon" class="icon" />
+          <p class="text">{{ props.text }}</p>
         </div>
       </button>
     </span>

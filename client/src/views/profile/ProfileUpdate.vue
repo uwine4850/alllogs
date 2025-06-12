@@ -1,7 +1,4 @@
-<script lang="ts">
-import deleteIcon from '@/assets/svg/delete.svg'
-import checkboxIcon from '@/assets/svg/checkbox.svg'
-import profileIcon from '@/assets/svg/user.svg'
+<script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import type { ProfileMessage, ProfileUpdateMessage } from '@/dto/profile'
 import { getProfileData } from '@/services/profile'
@@ -10,10 +7,7 @@ import { useErrorStore } from '@/stores/error'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
-import AlertPanelTemplate, { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
-</script>
-
-<script setup lang="ts">
+import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
 import PanelTitle from '@/components/PanelTitle.vue'
@@ -103,7 +97,7 @@ watch(profileDataRef, (profile) => {
     <AlertPanelDelProfile />
     <MiddlePanel>
       <Error />
-      <PanelTitle :icon="profileIcon" text="Profile update" :sep="false" />
+      <PanelTitle icon="user" text="Profile update" :sep="false" />
       <form @submit.prevent="saveChanges">
         <InputTextarea v-model="formData.Description" text="Description" name="description" />
         <InputFile v-model="formData.Avatar" text="Avatar" />
@@ -114,10 +108,10 @@ watch(profileDataRef, (profile) => {
             @click="showDeleteAlert"
             type="button"
             class="btn btn-delete"
-            :icon="deleteIcon"
+            icon="delete"
             text="Delete user"
           />
-          <Button type="submit" class="btn" :icon="checkboxIcon" text="Save" />
+          <Button type="submit" class="btn" icon="checkbox" text="Save" />
         </div>
       </form>
     </MiddlePanel>

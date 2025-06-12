@@ -1,9 +1,3 @@
-<script lang="ts">
-import groupIcon from '@/assets/svg/group.svg'
-import updateIcon from '@/assets/svg/update.svg'
-import addUserIcon from '@/assets/svg/add-user.svg'
-</script>
-
 <script setup lang="ts">
 import ProjectTemplate from './project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
@@ -81,10 +75,10 @@ import Button from '@/components/Button.vue'
       </div>
     </template>
     <template #panel-menu>
-      <PanelTitle :icon="groupIcon" text="Group management" />
+      <PanelTitle icon="group" text="Group management" />
       <div class="group-management-btns">
-        <Button :icon="updateIcon" text="Update" />
-        <Button :icon="addUserIcon" text="Add user" />
+        <Button icon="update" text="Update" />
+        <Button icon="add-user" text="Add user" />
       </div>
     </template>
   </ProjectTemplate>
