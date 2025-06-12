@@ -6,7 +6,13 @@ import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
-import ProjectForm from '@/components/project/ProjectForm.vue'
+import BaseTemplate from '@/views/BaseTemplate.vue';
+import MiddlePanel from '@/views/MiddlePanel.vue';
+import Error from '@/components/Error.vue';
+import PanelTitle from '@/components/PanelTitle.vue';
+import Separator from '@/components/Separator.vue';
+import Button from '@/components/Button.vue';
+import { InputText, InputTextarea } from '@/components/input/index';
 
 const errorStore = useErrorStore()
 const router = useRouter()
@@ -44,9 +50,39 @@ const submitForm = () => {
 </script>
 
 <template>
-  <ProjectForm 
-  v-model:model-value-name="formData.Name"
-  v-model:model-value-description="formData.Description"
-  :onSubmit="submitForm"
-  />
+  <BaseTemplate title="New project">
+    <MiddlePanel>
+      <Error />
+      <PanelTitle icon="project" text="new project" :sep="false" />
+      
+      <InputText
+        v-model="formData.Name"
+        text="Name"
+        name="name"
+      />
+      
+      <InputTextarea
+        v-model="formData.Description"
+        text="Description"
+        name="description"
+      />
+
+      <Separator />
+      <Button
+        @click="submitForm"
+        type="button"
+        class="create-btn"
+        icon="checkbox"
+        text="Create"
+      />
+    </MiddlePanel>
+  </BaseTemplate>
 </template>
+
+<style scoped lang="scss">
+.create-btn {
+  margin: 10px;
+  width: 200px;
+  margin-left: auto;
+}
+</style>

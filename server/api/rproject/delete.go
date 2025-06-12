@@ -2,35 +2,29 @@ package rproject
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/router/form"
 )
 
-type updateForm struct {
-	Id          int    `form:"Id"`
-	Name        string `form:"Name"`
-	Description string `form:"Description"`
-}
-
-func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
-	frm := form.NewForm(r)
-	if err := frm.Parse(); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+
+	idSlug, ok := manager.OneTimeData().GetSlugParams("id")
+	if !ok {
+		return api.NewClientError(http.StatusBadRequest, "project id not found")
 	}
-	updateForm := updateForm{}
-	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	projectId, err := strconv.Atoi(idSlug)
+	if err != nil {
+		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
-	hasPermission, err := changeProjectPermissions(updateForm.Id, UID)
+	hasPermission, err := changeProjectPermissions(projectId, UID)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
@@ -38,14 +32,10 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		return api.NewClientError(http.StatusForbidden, "forbidden")
 	}
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Update(cnf.DBT_PROJECT, map[string]any{
-		"name":        updateForm.Name,
-		"description": updateForm.Description,
-	}).Where(
-		qb.Compare("id", qb.EQUAL, updateForm.Id), qb.AND,
+	newQB.Delete(cnf.DBT_PROJECT).Where(
+		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
 		qb.Compare("user_id", qb.EQUAL, UID),
-	)
-	newQB.Merge()
+	).Merge()
 	res, err := newQB.Exec()
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())

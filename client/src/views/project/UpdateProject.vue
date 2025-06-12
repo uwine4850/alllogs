@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request';
 import type { BaseResponseMessage } from '@/dto/common';
-import projectIcon from '@/assets/svg/project.svg'
-import checkBoxIcon from '@/assets/svg/checkbox.svg'
 import { type ProjectMessage } from '@/dto/project';
 import { getProject } from '@/services/project';
 import { useErrorStore } from '@/stores/error';
@@ -16,6 +14,8 @@ import PanelTitle from '@/components/PanelTitle.vue';
 import Separator from '@/components/Separator.vue';
 import Button from '@/components/Button.vue';
 import { InputText, InputTextarea } from '@/components/input/index';
+import AlertPanelDelProject from '@/components/alertpanel/project/AlertPanelDelProject.vue';
+import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue';
 
 var route = useRoute();
 var router = useRouter();
@@ -42,9 +42,15 @@ watch(projectRef, (project) => {
   }
 });
 
+const showDeleteAlert = () => {
+  openAlertPanel()
+}
 
 const submitForm = () => {
   const req = new AsyncRequestWithAuthorization('http://localhost:8000/project', {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
@@ -65,9 +71,10 @@ const submitForm = () => {
 
 <template>
   <BaseTemplate :title="`Update project - ${formData.Name}`">
+    <AlertPanelDelProject />
     <MiddlePanel>
       <Error />
-      <PanelTitle :icon="projectIcon" :text="`Update project - ${formData.Name}`" :sep="false" />
+      <PanelTitle icon="project" :text="`Update project - ${formData.Name}`" :sep="false" />
       
       <InputText
         v-model="formData.Name"
@@ -82,22 +89,47 @@ const submitForm = () => {
       />
 
       <Separator />
-        <slot id="extra"></slot>
-      <Button
-        @click="submitForm"
-        type="button"
-        class="create-btn"
-        :icon="checkBoxIcon"
-        text="Update"
-      />
+      <div class="buttons">
+        <Button
+          @click="openAlertPanel"
+          type="button"
+          class="lbutton delete-btn"
+          icon="delete"
+          text="Delete"
+        />
+        <Button
+          @click="submitForm"
+          type="button"
+          class="lbutton"
+          icon="checkbox"
+          text="Update"
+        />
+      </div>
     </MiddlePanel>
   </BaseTemplate>
 </template>
 
 <style scoped lang="scss">
-.create-btn {
-  margin: 10px;
-  width: 200px;
+@use '@/assets/style/global_vars.scss' as vars;
+
+.buttons{
+  display: flex;
+  padding: 10px;
+  gap: 10px;
+}
+.lbutton {
+  width: 100%;
   margin-left: auto;
+}
+.delete-btn{
+  :deep(.btn){
+    background-color: vars.$color-red;
+    &:hover {
+      background-color: vars.$color-red;
+      cursor: pointer;
+      transition: 0.2s;
+      filter: brightness(90%);
+    }
+  }
 }
 </style>

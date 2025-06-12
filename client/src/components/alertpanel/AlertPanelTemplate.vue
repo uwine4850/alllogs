@@ -2,6 +2,12 @@
 import { onMounted } from 'vue'
 import Panel from '@/components/Panel.vue'
 
+const props = defineProps({
+  width: {
+    type: String,
+  },
+});
+
 onMounted(() => {
   const alertPanel = document.getElementById('alert-panel')
   if (alertPanel) {
@@ -29,10 +35,19 @@ export function closeAlertPanel() {
 </script>
 
 <template>
-  <div id="alert-panel" class="hide">
-    <Panel class="alert-inner-panel" @click.stop>
-      <slot></slot>
-    </Panel>
+  <div v-if="props.width">
+    <div id="alert-panel" class="hide">
+      <Panel :style="{width: props.width}" class="alert-inner-panel" @click.stop>
+        <slot></slot>
+      </Panel>
+    </div>
+  </div>
+  <div v-else>
+    <div id="alert-panel" class="hide">
+      <Panel class="alert-inner-panel" @click.stop>
+        <slot></slot>
+      </Panel>
+    </div>
   </div>
 </template>
 

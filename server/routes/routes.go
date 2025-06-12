@@ -59,5 +59,8 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 		{
 			"PATCH": {"/project": rproject.Update},
 		},
+		{
+			"DELETE": {"/project/:id": rproject.Delete},
+		},
 	}
 }
