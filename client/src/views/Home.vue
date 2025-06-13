@@ -8,11 +8,18 @@ import BaseTemplate from '../views/BaseTemplate.vue'
 import Panel from '../components/Panel.vue'
 import PanelTitle from '../components/PanelTitle.vue'
 import PanelItem from '@/components/PanelItem.vue'
+import type { ProfileMessage } from '@/dto/profile'
 
 const projectsRef = ref<ProjectMessage[]>()
 const errorStore = useErrorStore()
 
-const req = new AsyncRequestWithAuthorization('http://localhost:8000/all-projects', {
+let profileData: ProfileMessage
+const profileJsonData = sessionStorage.getItem('profile')
+if (profileJsonData) {
+  profileData = JSON.parse(profileJsonData) as ProfileMessage
+}
+
+const req = new AsyncRequestWithAuthorization(`http://localhost:8000/all-projects/${profileData!.UserId}`, {
   withCredentials: true,
 })
 req.onResponse(async (response: AxiosResponse) => {

@@ -16,6 +16,7 @@ import Button from '@/components/Button.vue';
 import { InputText, InputTextarea } from '@/components/input/index';
 import AlertPanelDelProject from '@/components/alertpanel/project/AlertPanelDelProject.vue';
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue';
+import type { ProfileMessage } from '@/dto/profile';
 
 var route = useRoute();
 var router = useRouter();
@@ -36,15 +37,21 @@ onMounted(() => {
 })
 watch(projectRef, (project) => {
   if(project){
+    let profileData: ProfileMessage
+    const profileJsonData = sessionStorage.getItem('profile')
+    if (profileJsonData) {
+      profileData = JSON.parse(profileJsonData) as ProfileMessage
+      if (projectRef.value?.UserId != profileData.UserId){
+        router.replace("/error?code=403 Forbidden&text=no access for project updates")
+        return
+      }
+    }
+
     formData.value.Id = project.Id;
     formData.value.Name = project.Name;
     formData.value.Description = project.Description;
   }
 });
-
-const showDeleteAlert = () => {
-  openAlertPanel()
-}
 
 const submitForm = () => {
   const req = new AsyncRequestWithAuthorization('http://localhost:8000/project', {

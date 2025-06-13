@@ -10,17 +10,21 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func LogGroupDelete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
 
-	idSlug, ok := manager.OneTimeData().GetSlugParams("id")
+	projectIdSlug, ok := manager.OneTimeData().GetSlugParams("projId")
 	if !ok {
 		return api.NewClientError(http.StatusBadRequest, "project id not found")
 	}
-	projectId, err := strconv.Atoi(idSlug)
+	logIdSlug, ok := manager.OneTimeData().GetSlugParams("logId")
+	if !ok {
+		return api.NewClientError(http.StatusBadRequest, "log group id not found")
+	}
+	projectId, err := strconv.Atoi(projectIdSlug)
 	if err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
@@ -29,12 +33,12 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
 	if !hasPermission {
-		return api.NewClientError(http.StatusForbidden, "no access to delete the project")
+		return api.NewClientError(http.StatusForbidden, "no access to delete the log group")
 	}
+
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Delete(cnf.DBT_PROJECT).Where(
-		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
-		qb.Compare("user_id", qb.EQUAL, UID),
+	newQB.Delete(cnf.DBT_PROJECT_LOG_GROUP).Where(
+		qb.Compare("id", qb.EQUAL, logIdSlug),
 	).Merge()
 	res, err := newQB.Exec()
 	if err != nil {

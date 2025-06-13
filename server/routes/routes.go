@@ -48,7 +48,7 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 			"GET": {"/project-detail/:projID/log-group/:logID": rproject.LogGroupObjectView(database)},
 		},
 		{
-			"GET": {"/all-projects": rproject.ProjectsAllView(database)},
+			"GET": {"/all-projects/:user_id": rproject.ProjectsAllView(database)},
 		},
 		{
 			"GET": {"/all-log-groups/:project_id": rproject.LogGroupsAllView(database)},
@@ -61,6 +61,12 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 		},
 		{
 			"DELETE": {"/project/:id": rproject.Delete},
+		},
+		{
+			"PATCH": {"/log-group": rproject.UpdateLogGroup},
+		},
+		{
+			"DELETE": {"project/:projId/log-group/:logId": rproject.LogGroupDelete},
 		},
 	}
 }

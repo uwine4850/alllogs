@@ -17,7 +17,7 @@ import (
 )
 
 type TokenForm struct {
-	UserId int `form:"UserId" empty:"-err" nil:"-err"`
+	UserId int `form:"UserId" empty:"-err"`
 }
 
 func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

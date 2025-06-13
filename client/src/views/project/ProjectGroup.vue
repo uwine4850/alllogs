@@ -13,42 +13,15 @@ import AlertFilter from '@/components/project_group/AlertFilter.vue'
 import { addComponent } from '@/utils/component'
 import Error from '@/components/Error.vue'
 import SvgIcon from '@/components/icons/SvgIcon.vue'
+import { getProjectLogGroup } from '@/services/project'
 
 const route = useRoute()
 const errorStore = useErrorStore()
 const projectRef = ref<ProjectMessage | null>(null)
 const logRef = ref<ProjectLogGroupMessage | null>(null)
 
-const getProject = () => {
-  const req = new AsyncRequestWithAuthorization(
-    `http://localhost:8000/project-detail/${route.params.projID}/log-group/${route.params.logID}`,
-    {
-      withCredentials: true,
-    },
-  )
-  req.onResponse(async (response: AxiosResponse) => {
-    const _project = response.data['project']
-    const _log = response.data['log']
-    if (_log) {
-      const log = _log as ProjectLogGroupMessage
-      if (log.Error != '') {
-        errorStore.setText(log.Error)
-      } else {
-        if (_project) {
-          projectRef.value = _project as ProjectMessage
-        }
-        logRef.value = log
-      }
-    }
-  })
-  req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
-  }, errorStore)
-  req.get()
-}
-
 onMounted(() => {
-  getProject()
+  getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
 })
 </script>
 
@@ -142,7 +115,7 @@ onMounted(() => {
       <PanelTitle icon="project" text="log group management" />
       <div class="pm-wrapper">
         <Button class="pm-button" icon="upload" text="Export as JSON" link="" />
-        <Button class="pm-button" icon="update" text="Update" link="" />
+        <Button class="pm-button" icon="update" text="Update" :link="`/project/${projectRef?.Id}/log-group/${logRef?.Id}/update`" />
         <Button class="pm-button" icon="clear" text="Clear" link="" />
         <Button class="pm-button" icon="bell" text="Sutup notfications" link="" />
       </div>

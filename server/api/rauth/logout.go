@@ -10,7 +10,7 @@ import (
 )
 
 type LogoutForm struct {
-	UID int `form:"UID" nil:"-err" empty:"-err"`
+	UID int `form:"UID" empty:"-err"`
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

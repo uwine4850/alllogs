@@ -11,41 +11,42 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/form"
 )
 
-type updateForm struct {
+type UpdateLogGroupForm struct {
 	Id          int    `form:"Id" empty:"-err"`
+	ProjectId   int    `form:"ProjectId" empty:"-err"`
 	Name        string `form:"Name" empty:"-err"`
 	Description string `form:"Description"`
 }
 
-func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	UID, ok := manager.OneTimeData().GetUserContext("UID")
+func UpdateLogGroup(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+	UID, ok := m.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
 	frm := form.NewForm(r)
 	if err := frm.Parse(); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
-	updateForm := updateForm{}
-	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	var updateLogGroupForm UpdateLogGroupForm
+	if err := mapper.FillStructFromForm(frm, &updateLogGroupForm); err != nil {
+		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
-	hasPermission, err := changeProjectPermissions(updateForm.Id, UID)
+	hasPermissions, err := changeProjectPermissions(updateLogGroupForm.ProjectId, UID)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	if !hasPermission {
-		return api.NewClientError(http.StatusForbidden, "no access to update the project")
+	if !hasPermissions {
+		return api.NewClientError(http.StatusForbidden, "no access to update the log group")
 	}
+
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Update(cnf.DBT_PROJECT, map[string]any{
-		"name":        updateForm.Name,
-		"description": updateForm.Description,
+	newQB.Update(cnf.DBT_PROJECT_LOG_GROUP, map[string]any{
+		"name":        updateLogGroupForm.Name,
+		"description": updateLogGroupForm.Description,
 	}).Where(
-		qb.Compare("id", qb.EQUAL, updateForm.Id), qb.AND,
-		qb.Compare("user_id", qb.EQUAL, UID),
-	)
-	newQB.Merge()
+		qb.Compare("id", qb.EQUAL, updateLogGroupForm.Id), qb.AND,
+		qb.Compare("project_id", qb.EQUAL, updateLogGroupForm.ProjectId),
+	).Merge()
 	res, err := newQB.Exec()
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())

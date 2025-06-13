@@ -17,9 +17,9 @@ import (
 )
 
 type RegisterForm struct {
-	Username       string `form:"Username" nil:"-err" emty:"-err"`
-	Password       string `form:"Password" nil:"-err" emty:"-err"`
-	RepeatPassword string `form:"RepeatPassword" nil:"-err" emty:"-err"`
+	Username       string `form:"Username" emty:"-err"`
+	Password       string `form:"Password" emty:"-err"`
+	RepeatPassword string `form:"RepeatPassword" emty:"-err"`
 }
 
 func Register() router.Handler {

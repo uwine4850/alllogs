@@ -24,8 +24,8 @@ type LoginJWTClaims struct {
 }
 
 type LoginForm struct {
-	Username string `form:"Username" nil:"-err" empty:"-err"`
-	Password string `form:"Password" nil:"-err" empty:"-err"`
+	Username string `form:"Username" empty:"-err"`
+	Password string `form:"Password" empty:"-err"`
 }
 
 func Login() router.Handler {

@@ -77,7 +77,6 @@ watch(profileDataRef, (profile) => {
     const profileJsonData = sessionStorage.getItem('profile')
     if (profileJsonData) {
       profileData = JSON.parse(profileJsonData) as ProfileMessage
-      console.log(profileDataRef.value?.UserId, profileData.UserId)
       if (profileDataRef.value?.UserId != profileData.UserId){
         router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
         return
