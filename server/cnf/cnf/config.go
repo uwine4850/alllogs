@@ -3,7 +3,10 @@ package cnf
 import (
 	"github.com/uwine4850/foozy/pkg/database"
 	"github.com/uwine4850/foozy/pkg/interfaces"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 )
+
+var DTO = rest.NewDTO()
 
 var DATABASE_ARGS = database.DbArgs{
 	Username:     "root",

@@ -5,11 +5,21 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router/object"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 )
+
+type ProjectLogGroupMessage struct {
+	rest.ImplementDTOMessage
+	TypProjectLogGroupMessage rest.TypeId `dto:"-typeid"`
+	Id                        int         `dto:"Id" db:"id"`
+	ProjectId                 int         `dto:"ProjectId" db:"project_id"`
+	Name                      string      `dto:"Name" db:"name"`
+	Description               string      `dto:"Description" db:"description"`
+	Error                     string      `dto:"Error"`
+}
 
 type LogGroupView struct {
 	object.MultipleObjectView
@@ -34,22 +44,22 @@ func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWrite
 						TaleName:   cnf.DBT_PROJECT,
 						SlugName:   "projID",
 						SlugField:  "id",
-						FillStruct: mydto.ProjectMessage{},
+						FillStruct: ProjectMessage{},
 					},
 					{
 						Name:       "log",
 						TaleName:   cnf.DBT_PROJECT_LOG_GROUP,
 						SlugName:   "logID",
 						SlugField:  "id",
-						FillStruct: mydto.ProjectLogGroupMessage{},
+						FillStruct: ProjectLogGroupMessage{},
 					},
 				},
 			},
 		},
-		DTO: mydto.DTO,
+		DTO: cnf.DTO,
 		Messages: map[string]irest.IMessage{
-			"project": mydto.ProjectMessage{},
-			"log":     mydto.ProjectLogGroupMessage{},
+			"project": ProjectMessage{},
+			"log":     ProjectLogGroupMessage{},
 		},
 	}
 	return view.Call

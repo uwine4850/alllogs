@@ -14,7 +14,16 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 )
+
+type RegisterMessage struct {
+	rest.ImplementDTOMessage
+	TypRegisterMessage rest.TypeId `dto:"-typeid"`
+	Username           string      `dto:"Username"`
+	Password           string      `dto:"Password"`
+	RepeatPassword     string      `dto:"RepeatPassword"`
+}
 
 type RegisterForm struct {
 	Username       string `form:"Username" emty:"-err"`

@@ -5,7 +5,6 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
@@ -30,11 +29,11 @@ func ProjectsAllView(database object.IViewDatabase) func(w http.ResponseWriter, 
 				TableName:  cnf.DBT_PROJECT,
 				Database:   database,
 				Slug:       "user_id",
-				FillStruct: mydto.ProjectMessage{},
+				FillStruct: ProjectMessage{},
 			},
 		},
-		DTO:     mydto.DTO,
-		Message: mydto.ProjectMessage{},
+		DTO:     cnf.DTO,
+		Message: ProjectMessage{},
 	}
 	return view.Call
 }

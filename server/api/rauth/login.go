@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/uwine4850/alllogs/api"
-	"github.com/uwine4850/alllogs/mydto"
+	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/config"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -14,9 +14,25 @@ import (
 	"github.com/uwine4850/foozy/pkg/namelib"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/secure"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+type LoginMessage struct {
+	rest.ImplementDTOMessage
+	TypLoginMessage rest.TypeId `dto:"-typeid"`
+	Username        string      `dto:"Username"`
+	Password        string      `dto:"Password"`
+}
+
+type LoginResponseMessage struct {
+	rest.ImplementDTOMessage
+	TypLoginResponseMessage rest.TypeId `dto:"-typeid"`
+	JWT                     string      `dto:"JWT"`
+	UID                     int         `dto:"UID"`
+	Error                   string      `dto:"Error"`
+}
 
 type LoginJWTClaims struct {
 	Id int `json:"id"`
@@ -78,12 +94,12 @@ func NewLoginJWT(uid int, manager interfaces.IManager) (string, error) {
 }
 
 func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) {
-	resp := &mydto.LoginResponseMessage{
+	resp := &LoginResponseMessage{
 		JWT:   jwt,
 		UID:   UID,
 		Error: _err,
 	}
-	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, cnf.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 		api.SendServerError(w, http.StatusInternalServerError, "DTO error")
 	}
 }

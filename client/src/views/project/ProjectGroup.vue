@@ -3,7 +3,7 @@ import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
@@ -14,6 +14,7 @@ import { addComponent } from '@/utils/component'
 import Error from '@/components/Error.vue'
 import SvgIcon from '@/components/icons/SvgIcon.vue'
 import { getProjectLogGroup } from '@/services/project'
+import { MyWebsocket } from '@/classes/websocket'
 
 const route = useRoute()
 const errorStore = useErrorStore()
@@ -23,6 +24,40 @@ const logRef = ref<ProjectLogGroupMessage | null>(null)
 onMounted(() => {
   getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
 })
+
+interface LogSockedMessage {
+  Type: number
+  Token: string 
+  Payload: any
+}
+
+const d: LogSockedMessage = {
+  Type: 1,
+  Token: "tok1",
+  Payload : "",
+}
+
+const socket = new MyWebsocket<LogSockedMessage>(
+  'log_item',
+  `ws://localhost:8000/logitem?token=tok1`,
+)
+socket.OnOpen(() => {
+  console.log('CLIENT log connected')
+  socket.Send(d)
+})
+socket.OnClose(() => {
+  console.log('CLIENT log webSocket closed')
+})
+socket.OnMessage((event: MessageEvent) => {
+  const data = JSON.parse(event.data)
+  console.log('CLIENT log message from server:', data)
+})
+socket.Watch()
+
+onBeforeUnmount(() => {
+  socket.Close()
+})
+
 </script>
 
 <template>
@@ -185,6 +220,7 @@ onMounted(() => {
     outline: none;
     text-decoration: none;
     position: relative;
+    text-wrap: nowrap;
     @include ps.inner-shadow-panel;
     &:hover {
       transition: 0.2s;

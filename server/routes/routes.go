@@ -66,7 +66,10 @@ func Get(database object.IViewDatabase) []map[string]map[string]router.Handler {
 			"PATCH": {"/log-group": rproject.UpdateLogGroup},
 		},
 		{
-			"DELETE": {"project/:projId/log-group/:logId": rproject.LogGroupDelete},
+			"DELETE": {"/project/:projId/log-group/:logId": rproject.LogGroupDelete},
+		},
+		{
+			"GET": {"/logitem": rproject.LogClientSocket},
 		},
 	}
 }

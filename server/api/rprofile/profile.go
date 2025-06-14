@@ -5,13 +5,31 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/object"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 )
+
+type ProfileMessage struct {
+	rest.ImplementDTOMessage
+	TypProfileMessage rest.TypeId `dto:"-typeid"`
+	User              UserMessage `dto:"User"`
+	UserId            int         `dto:"UserId"`
+	Description       string      `dto:"Description"`
+	Avatar            string      `dto:"Avatar"`
+	Token             string      `dto:"Token"`
+	Error             string      `dto:"Error"`
+}
+
+type UserMessage struct {
+	rest.ImplementDTOMessage
+	TypUserMessage rest.TypeId `dto:"-typeid"`
+	Id             int         `dto:"Id"`
+	Username       string      `dto:"Username"`
+}
 
 type ProfileDBView struct {
 	UserId      int    `db:"user_id"`
@@ -43,11 +61,11 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 				Slug:       "user_id",
 			},
 		},
-		DTO:     mydto.DTO,
-		Message: mydto.ProfileMessage{},
+		DTO:     cnf.DTO,
+		Message: ProfileMessage{},
 	}
 	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
-		profileMessage := message.(*mydto.ProfileMessage)
+		profileMessage := message.(*ProfileMessage)
 		querybuild := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).SelectFrom("id, username", cnf.DBT_AUTH).
 			Where(qb.Compare("id", qb.EQUAL, profileMessage.UserId))
 		querybuild.Merge()
@@ -63,7 +81,7 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 		}
 
 		if len(authUser) == 1 {
-			userMessage := mydto.UserMessage{
+			userMessage := UserMessage{
 				Id:       authUser[0].Id,
 				Username: authUser[0].Username,
 			}

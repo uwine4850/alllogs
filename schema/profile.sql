@@ -1,7 +1,7 @@
 USE alllogs;
 
 CREATE TABLE IF NOT EXISTS `alllogs`.`profile` (
-    `user_id` INT NOT NULL,
+    `user_id` INT NOT NULL UNIQUE,
     `description` TEXT NULL,
     `avatar` TEXT NULL,
     `token` VARCHAR(300) NULL,

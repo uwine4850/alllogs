@@ -1,105 +1,118 @@
 package mydto
 
 import (
+	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/notifications"
+	"github.com/uwine4850/alllogs/api/rauth"
+	"github.com/uwine4850/alllogs/api/rprofile"
+	"github.com/uwine4850/alllogs/api/rproject"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-var DTO = rest.NewDTO()
-
 var AllowMessages = []rest.AllowMessage{
 	{
-		Package: "mydto",
+		Package: "rauth",
 		Name:    "RegisterMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rauth",
 		Name:    "LoginMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rauth",
 		Name:    "LoginResponseMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "api",
 		Name:    "BaseResponseMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rprofile",
 		Name:    "ProfileMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rprofile",
 		Name:    "UserMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rprofile",
 		Name:    "GenTokenMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rprofile",
 		Name:    "TokenResponse",
 	},
 	{
-		Package: "mydto",
+		Package: "rprofile",
 		Name:    "ProfileUpdateMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "notifications",
 		Name:    "NotificationInfoMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rproject",
 		Name:    "ProjectMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rproject",
 		Name:    "ProjectAuthor",
 	},
 	{
-		Package: "mydto",
+		Package: "rproject",
 		Name:    "ProjectLogGroupMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "api",
 		Name:    "ClientErrorMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "rauth",
 		Name:    "LogoutMessage",
 	},
 	{
-		Package: "mydto",
+		Package: "api",
 		Name:    "ServerErrorMessage",
+	},
+	{
+		Package: "rproject",
+		Name:    "LogItemMessage",
+	},
+	{
+		Package: "rproject",
+		Name:    "LogItemPayload",
 	},
 }
 
 var TSGenMessages = map[string][]irest.IMessage{
 	"../client/src/dto/common.ts": {
-		BaseResponseMessage{},
-		ClientErrorMessage{},
-		ServerErrorMessage{},
+		api.BaseResponseMessage{},
+		api.ClientErrorMessage{},
+		api.ServerErrorMessage{},
 	},
 	"../client/src/dto/auth.ts": {
-		RegisterMessage{},
-		LoginMessage{},
-		LoginResponseMessage{},
-		LogoutMessage{},
+		rauth.RegisterMessage{},
+		rauth.LoginMessage{},
+		rauth.LoginResponseMessage{},
+		rauth.LogoutMessage{},
 	},
 	"../client/src/dto/profile.ts": {
-		ProfileMessage{},
-		UserMessage{},
-		GenTokenMessage{},
-		TokenResponse{},
-		ProfileUpdateMessage{},
+		rprofile.ProfileMessage{},
+		rprofile.UserMessage{},
+		rprofile.GenTokenMessage{},
+		rprofile.TokenResponse{},
+		rprofile.ProfileUpdateMessage{},
 	},
 	"../client/src/dto/notifications.ts": {
-		NotificationInfoMessage{},
+		notifications.NotificationInfoMessage{},
 	},
 	"../client/src/dto/project.ts": {
-		ProjectMessage{},
-		ProjectAuthor{},
-		ProjectLogGroupMessage{},
+		rproject.ProjectMessage{},
+		rproject.ProjectAuthor{},
+		rproject.ProjectLogGroupMessage{},
+		rproject.LogItemMessage{},
+		rproject.LogItemPayload{},
 	},
 }
 

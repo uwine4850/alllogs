@@ -31,3 +31,25 @@ export interface ProjectLogGroupMessage {
 export function isProjectLogGroupMessage(obj: any): obj is ProjectLogGroupMessage {
     return typeof obj === 'object' && obj !== null && 'TypProjectLogGroupMessage' in obj;
 }
+export interface LogItemMessage {
+    TypLogItemMessage?: unknown;
+    Type: number;
+    Token: string;
+    Error: string;
+    Payload: LogItemPayload | undefined;
+}
+export function isLogItemMessage(obj: any): obj is LogItemMessage {
+    return typeof obj === 'object' && obj !== null && 'TypLogItemMessage' in obj;
+}
+export interface LogItemPayload {
+    TypLogItemPayload?: unknown;
+    Id: number;
+    LogGroupId: number;
+    Text: string;
+    Type: string;
+    Tag: string;
+    Datetime: string;
+}
+export function isLogItemPayload(obj: any): obj is LogItemPayload {
+    return typeof obj === 'object' && obj !== null && 'TypLogItemPayload' in obj;
+}

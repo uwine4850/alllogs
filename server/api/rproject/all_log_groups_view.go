@@ -5,7 +5,6 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
@@ -30,11 +29,11 @@ func LogGroupsAllView(database object.IViewDatabase) func(w http.ResponseWriter,
 				TableName:  cnf.DBT_PROJECT_LOG_GROUP,
 				Database:   database,
 				Slug:       "project_id",
-				FillStruct: mydto.ProjectLogGroupMessage{},
+				FillStruct: ProjectLogGroupMessage{},
 			},
 		},
-		DTO:     mydto.DTO,
-		Message: mydto.ProjectLogGroupMessage{},
+		DTO:     cnf.DTO,
+		Message: ProjectLogGroupMessage{},
 	}
 	return view.Call
 }

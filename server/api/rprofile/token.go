@@ -7,14 +7,27 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/form"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+type GenTokenMessage struct {
+	rest.ImplementDTOMessage
+	TypGenTokenMessage rest.TypeId `dto:"-typeid"`
+	UserId             int         `dto:"UserId"`
+}
+
+type TokenResponse struct {
+	rest.ImplementDTOMessage
+	TypTokenResponse rest.TypeId `dto:"-typeid"`
+	Token            string      `dto:"Token"`
+	Error            string      `dto:"Error"`
+}
 
 type TokenForm struct {
 	UserId int `form:"UserId" empty:"-err"`
@@ -98,11 +111,11 @@ func tokenExists(dbRead interfaces.IReadDatabase, token string) (bool, error) {
 }
 
 func sendToken(w http.ResponseWriter, token string, _err string) {
-	resp := &mydto.TokenResponse{
+	resp := &TokenResponse{
 		Token: token,
 		Error: _err,
 	}
-	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, cnf.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 		api.SendServerError(w, http.StatusInternalServerError, "DTO error")
 	}
 }

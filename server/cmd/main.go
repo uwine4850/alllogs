@@ -27,8 +27,8 @@ import (
 func main() {
 	initcnf.InitCnf()
 
-	mydto.SetUpMessages(mydto.DTO)
-	if err := mydto.DTO.Generate(); err != nil {
+	mydto.SetUpMessages(cnf.DTO)
+	if err := cnf.DTO.Generate(); err != nil {
 		panic(err)
 	}
 

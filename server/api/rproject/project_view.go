@@ -6,7 +6,6 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/alllogs/mydto"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
@@ -32,15 +31,15 @@ func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter
 				Name:       "object",
 				TableName:  cnf.DBT_PROJECT,
 				Database:   database,
-				FillStruct: mydto.ProjectMessage{},
+				FillStruct: ProjectMessage{},
 				Slug:       "id",
 			},
 		},
-		DTO:     mydto.DTO,
-		Message: mydto.ProjectMessage{},
+		DTO:     cnf.DTO,
+		Message: ProjectMessage{},
 	}
 	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
-		msg, ok := message.(*mydto.ProjectMessage)
+		msg, ok := message.(*ProjectMessage)
 		if !ok {
 			return errors.New(("error converting a filled message"))
 		}
@@ -54,7 +53,7 @@ func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter
 			return err
 		}
 
-		author := make([]mydto.ProjectAuthor, len(res))
+		author := make([]ProjectAuthor, len(res))
 		err = mapper.FillStructSliceFromDb(&author, &res)
 		if err != nil {
 			return err

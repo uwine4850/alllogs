@@ -4,11 +4,56 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/uwine4850/alllogs/mydto"
+	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/mapper"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+type BaseResponseMessage struct {
+	rest.ImplementDTOMessage
+	TypBaseResponseMessage rest.TypeId `dto:"-typeid"`
+	Ok                     bool        `dto:"Ok"`
+	Error                  string      `dto:"Error"`
+}
+
+func NewBaseResponse(ok bool, error string) *BaseResponseMessage {
+	return &BaseResponseMessage{
+		Ok:    ok,
+		Error: error,
+	}
+}
+
+// 400 - 499
+type ClientErrorMessage struct {
+	rest.ImplementDTOMessage
+	TypClientErrorMessage rest.TypeId `dto:"-typeid"`
+	Code                  int         `dto:"Code"`
+	Text                  string      `dto:"Text"`
+}
+
+func NewClientErrorMessage(code int, text string) *ClientErrorMessage {
+	return &ClientErrorMessage{
+		Code: code,
+		Text: text,
+	}
+}
+
+// 500 - 511
+type ServerErrorMessage struct {
+	rest.ImplementDTOMessage
+	TypServerErrorMessage rest.TypeId `dto:"-typeid"`
+	Code                  int         `dto:"Code"`
+	Text                  string      `dto:"Text"`
+}
+
+func NewServerErrorMessage(code int, text string) *ServerErrorMessage {
+	return &ServerErrorMessage{
+		Code: code,
+		Text: text,
+	}
+}
 
 func sendUntypeServerError(_error string, code int, w http.ResponseWriter) {
 	w.WriteHeader(code)
@@ -22,25 +67,25 @@ func SendBeseResponse(w http.ResponseWriter, ok bool, _err error) {
 	} else {
 		errValue = ""
 	}
-	resp := mydto.NewBaseResponse(ok, errValue)
-	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, mydto.DTO, typeopr.Ptr{}.New(resp)); err != nil {
+	resp := NewBaseResponse(ok, errValue)
+	if err := mapper.SendSafeJsonDTOMessage(w, http.StatusOK, cnf.DTO, typeopr.Ptr{}.New(resp)); err != nil {
 		sendUntypeServerError("DTO error", http.StatusInternalServerError, w)
 	}
 }
 
 func SendAnyMessage(message irest.IMessage, w http.ResponseWriter, code int) {
-	if err := mapper.SendSafeJsonDTOMessage(w, code, mydto.DTO, typeopr.Ptr{}.New(message)); err != nil {
+	if err := mapper.SendSafeJsonDTOMessage(w, code, cnf.DTO, typeopr.Ptr{}.New(message)); err != nil {
 		sendUntypeServerError("DTO error", http.StatusInternalServerError, w)
 	}
 }
 
 func SendClientError(w http.ResponseWriter, code int, text string) {
-	resp := mydto.NewClientErrorMessage(code, text)
+	resp := NewClientErrorMessage(code, text)
 	SendAnyMessage(resp, w, code)
 }
 
 func SendServerError(w http.ResponseWriter, code int, text string) {
-	resp := mydto.NewServerErrorMessage(code, text)
+	resp := NewServerErrorMessage(code, text)
 	SendAnyMessage(resp, w, code)
 }
 

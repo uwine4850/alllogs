@@ -11,7 +11,15 @@ import (
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 )
+
+type NotificationInfoMessage struct {
+	rest.ImplementDTOMessage
+	TypNotificationInfoMessage rest.TypeId `dto:"-typeid"`
+	PID                        string      `dto:"PID"`
+	Text                       string      `dto:"Text"`
+}
 
 const (
 	TYPE_ERROR = iota

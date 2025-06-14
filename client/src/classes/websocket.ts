@@ -12,7 +12,7 @@ export interface SockedMessage {
   Payload: any
 }
 
-export class MyWebsocket {
+export class MyWebsocket<msg = any> {
   public socket: WebSocket
   private onOpen: () => void = () => {}
   private onClose: () => void = () => {}
@@ -42,7 +42,7 @@ export class MyWebsocket {
     }
   }
 
-  public Send(data: SockedMessage) {
+  public Send(data: msg) {
     if (this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(data))
     }
