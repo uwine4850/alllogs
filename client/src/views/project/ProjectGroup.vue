@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { AxiosError, AxiosResponse } from 'axios'
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { isLogItemMessage, type LogItemMessage, type LogItemPayload, type ProjectLogGroupMessage, type ProjectMessage } from '@/dto/project'
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
@@ -21,41 +19,75 @@ const errorStore = useErrorStore()
 const projectRef = ref<ProjectMessage | null>(null)
 const logRef = ref<ProjectLogGroupMessage | null>(null)
 
+enum LogMessageType {
+  TYPE_ERROR = 0,
+  TYPE_LOGITEM = 1,
+}
+
 onMounted(() => {
   getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
 })
 
-interface LogSockedMessage {
-  Type: number
-  Token: string 
-  Payload: any
+var socket: MyWebsocket
+var items = ref<LogItemPayload[]>([])
+
+var isWARN = false
+var isERROR = false
+var isINFO = false
+
+function switchLogType(typ: string){
+  switch (typ){
+    case "WARN":
+      isWARN = true
+      isERROR = false
+      isINFO = false
+      break;
+    case "ERROR":
+      isWARN = false
+      isERROR = true
+      isINFO = false
+      break;
+    case "INFO":
+      isWARN = false
+      isERROR = false
+      isINFO = true
+      break;
+  }
 }
 
-const d: LogSockedMessage = {
-  Type: 1,
-  Token: "tok1",
-  Payload : "",
-}
-
-const socket = new MyWebsocket<LogSockedMessage>(
+watch(logRef, (log) => {
+  socket = new MyWebsocket<LogItemMessage>(
   'log_item',
-  `ws://localhost:8000/logitem?token=tok1`,
-)
-socket.OnOpen(() => {
-  console.log('CLIENT log connected')
-  socket.Send(d)
+  `ws://localhost:8000/logitem?token=${logRef.value!.AuthorToken}`,
+  )
+  socket.OnOpen(() => {
+    console.log('CLIENT log connected')
+  })
+  socket.OnClose(() => {
+    console.log('CLIENT log webSocket closed')
+  })
+
+  socket.OnMessage((event: MessageEvent) => {
+    const data = JSON.parse(event.data)
+    if (data && isLogItemMessage(data)){
+      if (data.Type == LogMessageType.TYPE_ERROR){
+        errorStore.setText(data.Error)
+        return
+      }
+      if(data.Payload && data.Type == LogMessageType.TYPE_LOGITEM){
+        switchLogType(data.Payload.Type)
+        items.value.unshift(data.Payload)
+      }
+    }
+  })
+
+  socket.Watch()
 })
-socket.OnClose(() => {
-  console.log('CLIENT log webSocket closed')
-})
-socket.OnMessage((event: MessageEvent) => {
-  const data = JSON.parse(event.data)
-  console.log('CLIENT log message from server:', data)
-})
-socket.Watch()
 
 onBeforeUnmount(() => {
-  socket.Close()
+  if(socket){
+    socket.Close()
+  }
 })
 
 </script>
@@ -67,6 +99,11 @@ onBeforeUnmount(() => {
       <div class="base-info-view">
         <div class="biv-name">{{ logRef?.Name }}</div>
         <div class="biv-description">{{ logRef?.Description }}</div>
+      </div>
+      <Separator />
+      <div class="log-group-id">
+        <span>Log group id: </span>
+        <div>{{ logRef?.Id }}</div>
       </div>
       <Separator />
       <div class="info-line">
@@ -114,36 +151,20 @@ onBeforeUnmount(() => {
       </div>
       <Separator />
       <div class="table">
-        <div class="row">
-          <div class="cell c-type c-type-warn">WARN</div>
-          <Separator :vertical="true" />
-          <div class="cell c-tag">tag</div>
-          <Separator :vertical="true" />
-          <div class="cell c-time">time</div>
-          <Separator :vertical="true" />
-          <div class="cell c-text">text</div>
+        <div v-for="(item, index) in items" :key="item.Id">
+          <div class="row">
+            <div class="cell c-type" :class="{'c-type-warn': isWARN, 'c-type-error': isERROR, 'c-type-info': isINFO}">
+              {{ item.Type }}
+            </div>
+            <Separator :vertical="true" />
+            <div class="cell c-tag" :title="item.Tag">{{ item.Tag }}</div>
+            <Separator :vertical="true" />
+            <div class="cell c-time">{{ item.Datetime }}</div>
+            <Separator :vertical="true" />
+            <div class="cell c-text" :title="item.Text">{{ item.Text }}</div>
+          </div>
+          <Separator />
         </div>
-        <Separator />
-        <div class="row">
-          <div class="cell c-type c-type-error">ERROR</div>
-          <Separator :vertical="true" />
-          <div class="cell c-tag">tag</div>
-          <Separator :vertical="true" />
-          <div class="cell c-time">time</div>
-          <Separator :vertical="true" />
-          <div class="cell c-text">text</div>
-        </div>
-        <Separator />
-        <div class="row">
-          <div class="cell c-type c-type-info">INFO</div>
-          <Separator :vertical="true" />
-          <div class="cell c-tag">tag</div>
-          <Separator :vertical="true" />
-          <div class="cell c-time">time</div>
-          <Separator :vertical="true" />
-          <div class="cell c-text">text</div>
-        </div>
-        <Separator />
       </div>
     </template>
     <template #panel-menu>
@@ -175,6 +196,14 @@ onBeforeUnmount(() => {
     background-color: transparent;
     font-size: 1.1rem;
     font-family: vars.$fnt-hint-madurai;
+  }
+}
+.log-group-id{
+  display: flex;
+  font-size: 1.1rem;
+  padding: 5px 10px;
+  span{
+    margin-right: 5px;
   }
 }
 .info-line {
@@ -302,9 +331,12 @@ onBeforeUnmount(() => {
   }
   .c-tag {
     width: 100px;
+    text-wrap: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .c-time {
-    width: 100px;
+    width: 150px;
   }
   .c-text {
     flex: 1;

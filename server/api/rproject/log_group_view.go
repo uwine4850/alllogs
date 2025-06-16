@@ -5,6 +5,8 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
+	"github.com/uwine4850/foozy/pkg/database/dbutils"
+	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/interfaces/irest"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -19,6 +21,7 @@ type ProjectLogGroupMessage struct {
 	Name                      string      `dto:"Name" db:"name"`
 	Description               string      `dto:"Description" db:"description"`
 	Error                     string      `dto:"Error"`
+	AuthorToken               string      `dto:"AuthorToken"`
 }
 
 type LogGroupView struct {
@@ -62,5 +65,26 @@ func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWrite
 			"log":     ProjectLogGroupMessage{},
 		},
 	}
+	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
+		logGroupMessage, ok := message.(*ProjectLogGroupMessage)
+		if !ok {
+			return nil
+		}
+
+		newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
+		newQB.SelectFrom(cnf.DBT_PROFILE+".token", cnf.DBT_PROFILE).
+			InnerJoin(cnf.DBT_PROJECT, qb.Compare(cnf.DBT_PROJECT+".id", qb.EQUAL, logGroupMessage.ProjectId)).
+			Where(qb.NoArgsCompare(cnf.DBT_PROFILE+".user_id", qb.EQUAL, cnf.DBT_PROJECT+".user_id")).Merge()
+		res, err := newQB.Query()
+		if err != nil {
+			return err
+		}
+		if len(res) == 0 {
+			return object.ErrNoData{}
+		}
+		token := dbutils.ParseString(res[0]["token"])
+		logGroupMessage.AuthorToken = token
+		return nil
+	})
 	return view.Call
 }

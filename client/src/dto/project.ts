@@ -27,6 +27,7 @@ export interface ProjectLogGroupMessage {
     Name: string;
     Description: string;
     Error: string;
+    AuthorToken: string;
 }
 export function isProjectLogGroupMessage(obj: any): obj is ProjectLogGroupMessage {
     return typeof obj === 'object' && obj !== null && 'TypProjectLogGroupMessage' in obj;

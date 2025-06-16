@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `alllogs`.`log_item`(
     `text` VARCHAR(200) NOT NULL,
     type ENUM('INFO', 'WARN', 'ERROR') NOT NULL,
     `tag` VARCHAR(200) NULL,
-    `datatime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `datetime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     FOREIGN KEY (log_group_id) REFERENCES `project_log_group`(id) ON DELETE CASCADE
 );
