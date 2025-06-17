@@ -1,5 +1,5 @@
 import { AsyncRequestWithAuthorization } from "@/classes/request"
-import type { ProjectLogGroupMessage, ProjectMessage } from "@/dto/project"
+import type { LogItemMessage, LogItemPayload, ProjectLogGroupMessage, ProjectMessage } from "@/dto/project"
 import type { AxiosError, AxiosResponse } from "axios"
 import { useErrorStore } from '@/stores/error'
 import { type Ref } from "vue"
@@ -51,6 +51,37 @@ export function getProjectLogGroup(
         }
         groupRef.value = log
       }
+    }
+  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
+  req.get()
+}
+
+export function getLogGroupItems(
+  logGroupId: any,
+  startId: any,
+  count: any,
+  logItemRef: Ref<LogItemPayload[] | null>,
+  isLastLogs: Ref<boolean>,
+  errorStore: ReturnType<typeof useErrorStore>
+  ){
+  const req = new AsyncRequestWithAuthorization(
+    `http://localhost:8000/log-items/${logGroupId}/${startId}/${count}`,
+    {
+      withCredentials: true,
+    },
+  )
+  req.onResponse(async (response: AxiosResponse) => {
+    const logs = response.data as LogItemPayload[]
+    if (logs.length != count){
+      isLastLogs.value = true
+    }
+    if (logItemRef.value){
+      logItemRef.value.push(...logs)
+    } else {
+      logItemRef.value = logs
     }
   })
   req.onError((error: AxiosError) => {

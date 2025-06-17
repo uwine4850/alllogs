@@ -11,54 +11,53 @@ import AlertFilter from '@/components/project_group/AlertFilter.vue'
 import { addComponent } from '@/utils/component'
 import Error from '@/components/Error.vue'
 import SvgIcon from '@/components/icons/SvgIcon.vue'
-import { getProjectLogGroup } from '@/services/project'
+import { getLogGroupItems, getProjectLogGroup } from '@/services/project'
 import { MyWebsocket } from '@/classes/websocket'
+import { WrappedObserver } from '@/classes/observer'
 
 const route = useRoute()
 const errorStore = useErrorStore()
 const projectRef = ref<ProjectMessage | null>(null)
 const logRef = ref<ProjectLogGroupMessage | null>(null)
+const logItemsPayloadRef = ref<LogItemPayload[] | null>(null)
+const isLastLogs = ref<boolean>(false)
 
 enum LogMessageType {
   TYPE_ERROR = 0,
   TYPE_LOGITEM = 1,
 }
 
+let wrappedObserver: WrappedObserver
+
 onMounted(() => {
   getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
+  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, isLastLogs, errorStore);
+  const CLASS_NAME = 'lastlog'
+  wrappedObserver = new WrappedObserver(CLASS_NAME)
+  wrappedObserver.onTrigger((el: HTMLElement) => {
+    if(isLastLogs.value){
+      wrappedObserver.intersectionObserver?.disconnect()
+      return
+    }
+    el.classList.remove(CLASS_NAME)
+    const lastLogID = el.getAttribute("data-logID")
+    getLogGroupItems(route.params.logID, lastLogID, 10, logItemsPayloadRef, isLastLogs, errorStore);
+  })
+  wrappedObserver.watch()
+
+  const initialEl = document.querySelector<HTMLElement>(`.${CLASS_NAME}`)
+  if (initialEl) {
+    wrappedObserver.observeNow(initialEl)
+  }
 })
 
 var socket: MyWebsocket
 var items = ref<LogItemPayload[]>([])
 
-var isWARN = false
-var isERROR = false
-var isINFO = false
-
-function switchLogType(typ: string){
-  switch (typ){
-    case "WARN":
-      isWARN = true
-      isERROR = false
-      isINFO = false
-      break;
-    case "ERROR":
-      isWARN = false
-      isERROR = true
-      isINFO = false
-      break;
-    case "INFO":
-      isWARN = false
-      isERROR = false
-      isINFO = true
-      break;
-  }
-}
-
 watch(logRef, (log) => {
   socket = new MyWebsocket<LogItemMessage>(
   'log_item',
-  `ws://localhost:8000/logitem?token=${logRef.value!.AuthorToken}`,
+  `ws://localhost:8000/logitem?token=${log?.AuthorToken}`,
   )
   socket.OnOpen(() => {
     console.log('CLIENT log connected')
@@ -75,7 +74,6 @@ watch(logRef, (log) => {
         return
       }
       if(data.Payload && data.Type == LogMessageType.TYPE_LOGITEM){
-        switchLogType(data.Payload.Type)
         items.value.unshift(data.Payload)
       }
     }
@@ -85,9 +83,9 @@ watch(logRef, (log) => {
 })
 
 onBeforeUnmount(() => {
-  if(socket){
-    socket.Close()
-  }
+  socket?.Close()
+  wrappedObserver.mutationObserver?.disconnect()
+  wrappedObserver.intersectionObserver?.disconnect()
 })
 
 </script>
@@ -151,9 +149,9 @@ onBeforeUnmount(() => {
       </div>
       <Separator />
       <div class="table">
-        <div v-for="(item, index) in items" :key="item.Id">
+        <div v-for="item in items" :key="item.Id">
           <div class="row">
-            <div class="cell c-type" :class="{'c-type-warn': isWARN, 'c-type-error': isERROR, 'c-type-info': isINFO}">
+            <div class="cell c-type" :class="`c-type-${item.Type}`">
               {{ item.Type }}
             </div>
             <Separator :vertical="true" />
@@ -162,6 +160,20 @@ onBeforeUnmount(() => {
             <div class="cell c-time">{{ item.Datetime }}</div>
             <Separator :vertical="true" />
             <div class="cell c-text" :title="item.Text">{{ item.Text }}</div>
+          </div>
+          <Separator />
+        </div>
+        <div v-for="(log, index) in logItemsPayloadRef" :key="log.Id">
+          <div class="row" :class="{'lastlog': index == Object.keys(logItemsPayloadRef!).length-1 && !isLastLogs}" :data-logID="log.Id">
+            <div class="cell c-type" :class="`c-type-${log.Type}`">
+              {{ log.Type }}
+            </div>
+            <Separator :vertical="true" />
+            <div class="cell c-tag" :title="log.Tag">{{ log.Tag }}</div>
+            <Separator :vertical="true" />
+            <div class="cell c-time">{{ log.Datetime }}</div>
+            <Separator :vertical="true" />
+            <div class="cell c-text" :title="log.Text">{{ log.Text }}</div>
           </div>
           <Separator />
         </div>
@@ -320,13 +332,13 @@ onBeforeUnmount(() => {
     width: 80px;
     font-family: vars.$fnt-gabarito;
   }
-  .c-type-error {
+  .c-type-ERROR {
     color: #d80000;
   }
-  .c-type-warn {
+  .c-type-WARN {
     color: #dddd00;
   }
-  .c-type-info {
+  .c-type-INFO {
     color: #8294d3;
   }
   .c-tag {

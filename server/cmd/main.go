@@ -18,7 +18,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/manager"
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
-	"github.com/uwine4850/foozy/pkg/router/object"
 	"github.com/uwine4850/foozy/pkg/router/tmlengine"
 	"github.com/uwine4850/foozy/pkg/server"
 	"github.com/uwine4850/foozy/pkg/server/globalflow"
@@ -72,7 +71,7 @@ func main() {
 	})
 	newRouter := router.NewRouter(newAdapter)
 
-	newRouter.HandlerSet(routes.Get(object.NewViewMysqlDatabase(gDB)))
+	newRouter.HandlerSet(routes.Get(gDB))
 
 	serv := server.NewServer(":8000", newRouter, &cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
