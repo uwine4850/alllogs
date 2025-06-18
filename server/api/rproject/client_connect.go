@@ -42,7 +42,7 @@ type LogItemPayload struct {
 	Text              string      `dto:"Text" db:"text"`
 	Type              string      `dto:"Type" db:"type"`
 	Tag               string      `dto:"Tag" db:"tag"`
-	Datetime          string      `dto:"Datetime" db:"datatime"`
+	Datetime          string      `dto:"Datetime" db:"datetime"`
 }
 
 var connections = map[string][]*websocket.Conn{}

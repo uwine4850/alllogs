@@ -1,5 +1,5 @@
 import { AsyncRequestWithAuthorization } from "@/classes/request"
-import type { LogItemMessage, LogItemPayload, ProjectLogGroupMessage, ProjectMessage } from "@/dto/project"
+import type { LogItemMessage, LogItemPayload, LogItemsFilterMessage, ProjectLogGroupMessage, ProjectMessage } from "@/dto/project"
 import type { AxiosError, AxiosResponse } from "axios"
 import { useErrorStore } from '@/stores/error'
 import { type Ref } from "vue"
@@ -64,17 +64,34 @@ export function getLogGroupItems(
   startId: any,
   count: any,
   logItemRef: Ref<LogItemPayload[] | null>,
+  filterRef: Ref<LogItemsFilterMessage | null>,
   isLastLogs: Ref<boolean>,
   errorStore: ReturnType<typeof useErrorStore>
   ){
+  let queryParams = ""
+  if (filterRef.value){
+    let isFirst = true
+    for (const [key, value] of Object.entries(filterRef.value)) {
+      if (!value) continue
+      if (isFirst) {
+        isFirst = false
+        queryParams += `${key}=${value}`
+      } else {
+        queryParams += `&${key}=${value}`
+      }
+    }
+  }
   const req = new AsyncRequestWithAuthorization(
-    `http://localhost:8000/log-items/${logGroupId}/${startId}/${count}`,
+    `http://localhost:8000/log-items/${logGroupId}/${startId}/${count}?${queryParams}`,
     {
       withCredentials: true,
     },
   )
   req.onResponse(async (response: AxiosResponse) => {
     const logs = response.data as LogItemPayload[]
+    if (!logs){
+      return
+    }
     if (logs.length != count){
       isLastLogs.value = true
     }

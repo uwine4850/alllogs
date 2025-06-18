@@ -2,18 +2,18 @@
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { isLogItemMessage, type LogItemMessage, type LogItemPayload, type ProjectLogGroupMessage, type ProjectMessage } from '@/dto/project'
+import { isLogItemMessage, type LogItemMessage, type LogItemPayload, type LogItemsFilterMessage, type ProjectLogGroupMessage, type ProjectMessage } from '@/dto/project'
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
 import PanelTitle from '@/components/PanelTitle.vue'
-import AlertFilter from '@/components/project_group/AlertFilter.vue'
-import { addComponent } from '@/utils/component'
+import AlertFilter from '@/components/alertpanel/project/AlertFilter.vue'
 import Error from '@/components/Error.vue'
 import SvgIcon from '@/components/icons/SvgIcon.vue'
 import { getLogGroupItems, getProjectLogGroup } from '@/services/project'
 import { MyWebsocket } from '@/classes/websocket'
 import { WrappedObserver } from '@/classes/observer'
+import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 
 const route = useRoute()
 const errorStore = useErrorStore()
@@ -27,11 +27,16 @@ enum LogMessageType {
   TYPE_LOGITEM = 1,
 }
 
-let wrappedObserver: WrappedObserver
+let filterFormRef = ref<LogItemsFilterMessage>({
+  Type: "",
+  Tag: "",
+  DateTime: "",
+})
 
+let wrappedObserver: WrappedObserver
 onMounted(() => {
   getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
-  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, isLastLogs, errorStore);
+  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
   const CLASS_NAME = 'lastlog'
   wrappedObserver = new WrappedObserver(CLASS_NAME)
   wrappedObserver.onTrigger((el: HTMLElement) => {
@@ -41,7 +46,7 @@ onMounted(() => {
     }
     el.classList.remove(CLASS_NAME)
     const lastLogID = el.getAttribute("data-logID")
-    getLogGroupItems(route.params.logID, lastLogID, 10, logItemsPayloadRef, isLastLogs, errorStore);
+    getLogGroupItems(route.params.logID, lastLogID, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
   })
   wrappedObserver.watch()
 
@@ -88,9 +93,21 @@ onBeforeUnmount(() => {
   wrappedObserver.intersectionObserver?.disconnect()
 })
 
+function searchLogs() {
+  logItemsPayloadRef.value = null
+  isLastLogs.value = false
+  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
+}
+defineExpose({ searchLogs })
 </script>
 
 <template>
+  <AlertFilter 
+    v-on:search="searchLogs" 
+    v-model:model-value-type="filterFormRef.Type" 
+    v-model:model-value-tag="filterFormRef.Tag" 
+    v-model:model-value-date-time="filterFormRef.DateTime"
+  />
   <ProjectTemplate title="Project group">
     <template #panel-project>
       <Error />
@@ -113,7 +130,7 @@ onBeforeUnmount(() => {
         <button
           class="il-button"
           id="filter-btn1"
-          @click="addComponent('alert-container', AlertFilter)"
+          @click="openAlertPanel"
         >
           <SvgIcon name="filter" class="icon" />
           <p>filters</p>

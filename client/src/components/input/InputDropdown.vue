@@ -19,19 +19,25 @@ const props = defineProps({
     type: Array as () => Option[],
     required: true,
   },
+  modelValue: {
+    type: String,
+  },
 })
 
 const selectElement = ref<HTMLElement | null>(null)
 
+
+const emit = defineEmits(['update:modelValue'])
+
 onMounted(() => {
   if (selectElement.value) {
-    dropdown(selectElement.value)
+    dropdown(selectElement.value, emit)
   }
 })
 </script>
 
 <script lang="ts">
-function dropdown(selectEl: HTMLElement | null) {
+function dropdown(selectEl: HTMLElement | null, emit: (event: 'update:modelValue', value: string) => void) {
   const selectButton = selectEl?.querySelector('#select-button') as HTMLElement
   const options = selectEl?.querySelectorAll('.option') as NodeListOf<HTMLElement>
   const selectInput = selectEl?.querySelector('#custom-select-input') as HTMLInputElement
@@ -49,6 +55,7 @@ function dropdown(selectEl: HTMLElement | null) {
       const selectedText = option.textContent?.trim() || 'empty'
       selectButton.textContent = selectedText
       selectInput.value = option.dataset.value || ''
+      emit('update:modelValue', selectInput.value)
       selectEl.classList.remove('open')
     }
   })

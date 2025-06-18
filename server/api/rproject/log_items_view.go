@@ -2,6 +2,7 @@ package rproject
 
 import (
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 
@@ -11,8 +12,17 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/object"
+	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
+
+type LogItemsFilterMessage struct {
+	rest.ImplementDTOMessage
+	TypLogItemsFilter rest.TypeId `dto:"-typeid"`
+	Type              string      `dto:"Type"`
+	Tag               string      `dto:"Tag"`
+	DateTime          string      `dto:"DateTime"`
+}
 
 type LogItemsView struct {
 	object.AllView
@@ -27,24 +37,22 @@ func (v *LogItemsView) OnError(w http.ResponseWriter, r *http.Request, m interfa
 }
 
 func (v *LogItemsView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+	singleQueryMap := parseSingleQuery(r.URL.Query())
+	var logItemsFilterMessage LogItemsFilterMessage
+	if err := mapper.JsonToDTOMessage(singleQueryMap, cnf.DTO, &logItemsFilterMessage); err != nil {
+		return nil, err
+	}
 	logGroupId, ok := manager.OneTimeData().GetSlugParams(v.LogGroupSlugId)
 	if !ok {
 		return nil, object.ErrNoSlug{SlugName: v.StartSlugId}
 	}
 
-	var startValue any
 	startSlug, ok := manager.OneTimeData().GetSlugParams(v.StartSlugId)
 	if !ok {
 		return nil, object.ErrNoSlug{SlugName: v.StartSlugId}
 	}
-	if startSlug == "-1" {
-		startValue = qb.SQ(true,
-			qb.NewNoDbQB().SelectFrom("MAX(id)", cnf.DBT_LOG_ITEM).
-				Where(qb.Compare("log_group_id", qb.EQUAL, logGroupId)),
-		)
-	} else {
-		startValue = startSlug
-	}
+	filterArgsValue := filterArgs(&logItemsFilterMessage)
+	whereArgsValue := whereArgs(startSlug, logGroupId, filterArgsValue)
 
 	countSlug, ok := manager.OneTimeData().GetSlugParams(v.CountSlug)
 	if !ok {
@@ -57,8 +65,8 @@ func (v *LogItemsView) Object(w http.ResponseWriter, r *http.Request, manager in
 	newQB := qb.NewSyncQB(v.Database.SyncQ())
 	newQB.SelectFrom("*", v.TableName).
 		Where(
-			qb.Compare("log_group_id", qb.EQUAL, logGroupId), qb.AND,
-			qb.Compare("id", "<=", startValue)).OrderBy(qb.DESC("id")).Limit(count).Merge()
+			whereArgsValue...,
+		).OrderBy(qb.DESC("id")).Limit(count).Merge()
 	res, err := newQB.Query()
 	if err != nil {
 		return nil, err
@@ -110,4 +118,62 @@ func LogItemsObjectView(database interfaces.IReadDatabase) func(w http.ResponseW
 		Message: LogItemPayload{},
 	}
 	return view.Call
+}
+
+func parseSingleQuery(values url.Values) map[string]interface{} {
+	out := map[string]interface{}{}
+	for key, sliceValue := range values {
+		if len(sliceValue) > 0 {
+			out[key] = sliceValue[0]
+		}
+	}
+	return out
+}
+
+func filterArgs(logItemsFilterMessage *LogItemsFilterMessage) []any {
+	filterValue := []any{}
+	if logItemsFilterMessage.Type != "" {
+		typeFilter := qb.Compare("type", qb.EQUAL, logItemsFilterMessage.Type)
+		filterValue = append(filterValue, typeFilter)
+	}
+	if logItemsFilterMessage.Tag != "" {
+		tagFilter := qb.NoArgsCompare("tag", qb.LIKE, "'%"+logItemsFilterMessage.Tag+"%'")
+		if len(filterValue) != 0 {
+			filterValue = append(filterValue, qb.AND)
+		}
+		filterValue = append(filterValue, tagFilter)
+	}
+	if logItemsFilterMessage.DateTime != "" {
+		dateTimeFilter := qb.Compare("datetime", qb.EQUAL, logItemsFilterMessage.DateTime)
+		if len(filterValue) != 0 {
+			filterValue = append(filterValue, qb.AND)
+		}
+		filterValue = append(filterValue, dateTimeFilter)
+	}
+	return filterValue
+}
+
+func whereArgs(startSlug string, logGroupId string, filterValue []any) []any {
+	whereArgs := []any{}
+	qq := qb.Compare("log_group_id", qb.EQUAL, logGroupId)
+	whereArgs = append(whereArgs, qq)
+
+	if startSlug == "-1" {
+		maxIdSQ := qb.SQ(true,
+			qb.NewNoDbQB().SelectFrom("MAX(id)", cnf.DBT_LOG_ITEM).
+				Where(qb.Compare("log_group_id", qb.EQUAL, logGroupId)),
+		)
+		idCompare := qb.Compare("id", "<=", maxIdSQ)
+		whereArgs = append(whereArgs, qb.AND)
+		whereArgs = append(whereArgs, idCompare)
+	} else {
+		idCompare := qb.Compare("id", "<=", startSlug)
+		whereArgs = append(whereArgs, qb.AND)
+		whereArgs = append(whereArgs, idCompare)
+	}
+	if len(filterValue) != 0 {
+		whereArgs = append(whereArgs, qb.AND)
+		whereArgs = append(whereArgs, filterValue...)
+	}
+	return whereArgs
 }

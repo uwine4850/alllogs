@@ -54,3 +54,12 @@ export interface LogItemPayload {
 export function isLogItemPayload(obj: any): obj is LogItemPayload {
     return typeof obj === 'object' && obj !== null && 'TypLogItemPayload' in obj;
 }
+export interface LogItemsFilterMessage {
+    TypLogItemsFilter?: unknown;
+    Type: string;
+    Tag: string;
+    DateTime: string;
+}
+export function isLogItemsFilterMessage(obj: any): obj is LogItemsFilterMessage {
+    return typeof obj === 'object' && obj !== null && 'TypLogItemsFilter' in obj;
+}

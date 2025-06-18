@@ -83,6 +83,10 @@ var AllowMessages = []rest.AllowMessage{
 		Package: "rproject",
 		Name:    "LogItemPayload",
 	},
+	{
+		Package: "rproject",
+		Name:    "LogItemsFilterMessage",
+	},
 }
 
 var TSGenMessages = map[string][]irest.IMessage{
@@ -113,6 +117,7 @@ var TSGenMessages = map[string][]irest.IMessage{
 		rproject.ProjectLogGroupMessage{},
 		rproject.LogItemMessage{},
 		rproject.LogItemPayload{},
+		rproject.LogItemsFilterMessage{},
 	},
 }
 
