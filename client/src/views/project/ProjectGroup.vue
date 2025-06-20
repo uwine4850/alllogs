@@ -28,6 +28,7 @@ enum LogMessageType {
 }
 
 let filterFormRef = ref<LogItemsFilterMessage>({
+  Text: "",
   Type: "",
   Tag: "",
   DateTime: "",
@@ -123,8 +124,8 @@ defineExpose({ searchLogs })
       <Separator />
       <div class="info-line">
         <form class="search-form">
-          <input type="text" placeholder="Search..." />
-          <button>Search</button>
+          <input v-model="filterFormRef.Text" type="text" placeholder="Search..." />
+          <button type="button" @click="searchLogs">Search</button>
         </form>
         <Separator :vertical="true" />
         <button

@@ -19,6 +19,7 @@ import (
 type LogItemsFilterMessage struct {
 	rest.ImplementDTOMessage
 	TypLogItemsFilter rest.TypeId `dto:"-typeid"`
+	Text              string      `dto:"Text"`
 	Type              string      `dto:"Type"`
 	Tag               string      `dto:"Tag"`
 	DateTime          string      `dto:"DateTime"`
@@ -132,8 +133,15 @@ func parseSingleQuery(values url.Values) map[string]interface{} {
 
 func filterArgs(logItemsFilterMessage *LogItemsFilterMessage) []any {
 	filterValue := []any{}
+	if logItemsFilterMessage.Text != "" {
+		typeText := qb.NoArgsCompare("text", qb.LIKE, "'%"+logItemsFilterMessage.Text+"%'")
+		filterValue = append(filterValue, typeText)
+	}
 	if logItemsFilterMessage.Type != "" {
 		typeFilter := qb.Compare("type", qb.EQUAL, logItemsFilterMessage.Type)
+		if len(filterValue) != 0 {
+			filterValue = append(filterValue, qb.AND)
+		}
 		filterValue = append(filterValue, typeFilter)
 	}
 	if logItemsFilterMessage.Tag != "" {
@@ -144,7 +152,7 @@ func filterArgs(logItemsFilterMessage *LogItemsFilterMessage) []any {
 		filterValue = append(filterValue, tagFilter)
 	}
 	if logItemsFilterMessage.DateTime != "" {
-		dateTimeFilter := qb.Compare("datetime", qb.EQUAL, logItemsFilterMessage.DateTime)
+		dateTimeFilter := qb.Compare("DATE(datetime)", qb.EQUAL, logItemsFilterMessage.DateTime)
 		if len(filterValue) != 0 {
 			filterValue = append(filterValue, qb.AND)
 		}

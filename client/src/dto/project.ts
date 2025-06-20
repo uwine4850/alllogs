@@ -56,6 +56,7 @@ export function isLogItemPayload(obj: any): obj is LogItemPayload {
 }
 export interface LogItemsFilterMessage {
     TypLogItemsFilter?: unknown;
+    Text: string;
     Type: string;
     Tag: string;
     DateTime: string;
