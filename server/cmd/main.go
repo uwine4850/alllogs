@@ -9,6 +9,7 @@ import (
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	initcnf "github.com/uwine4850/alllogs/cnf/init_cnf"
 	"github.com/uwine4850/alllogs/middlewares/mddlauth"
+	"github.com/uwine4850/alllogs/middlewares/securemddl"
 	"github.com/uwine4850/alllogs/mydto"
 	"github.com/uwine4850/alllogs/routes"
 	"github.com/uwine4850/foozy/pkg/builtin/auth"
@@ -55,18 +56,21 @@ func main() {
 
 	newManager.Key().Generate32BytesKeys()
 	newMiddleware := middlewares.NewMiddlewares()
-	newMiddleware.PreMiddleware(0, mddlauth.CheckJWT)
+	newMiddleware.PreMiddleware(0, securemddl.ValidateCSRFToken)
+	newMiddleware.PreMiddleware(1, mddlauth.CheckJWT)
 	newAdapter := router.NewAdapter(newManager, newMiddleware)
 	newAdapter.SetOnErrorFunc(func(w http.ResponseWriter, r *http.Request, err error) {
 		var clientErrortarget *api.ClientError
 		if errors.As(err, &clientErrortarget) {
 			clientError := err.(*api.ClientError)
 			api.SendClientError(w, clientError.Code, clientError.Text)
+			return
 		}
 		var serverErrorTarget *api.ServerError
 		if errors.As(err, &serverErrorTarget) {
 			serverError := err.(*api.ServerError)
 			api.SendServerError(w, serverError.Code, serverError.Text)
+			return
 		}
 	})
 	newRouter := router.NewRouter(newAdapter)
@@ -76,7 +80,7 @@ func main() {
 	serv := server.NewServer(":8000", newRouter, &cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-CSRF-TOKEN"},
 		AllowCredentials: true,
 	})
 

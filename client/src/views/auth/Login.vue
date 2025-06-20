@@ -33,9 +33,9 @@ const submitForm = async () => {
   })
   loginReq.onResponse((response: AxiosResponse) => {
     const loginResponse = response.data as LoginResponseMessage
-    if (loginResponse.Error != '') {
+    if (loginResponse && loginResponse.Error != '') {
       errorStore.setText(loginResponse.Error)
-    } else {
+    } else if(loginResponse) {
       sessionStorage.setItem('authJWT', loginResponse.JWT)
       // Get profile data.
       const req = new AsyncRequest('http://localhost:8000/profile/' + loginResponse.UID, {
@@ -46,8 +46,7 @@ const submitForm = async () => {
       })
       req.onResponse(function (response: AxiosResponse) {
         const profileResponse = response.data as ProfileMessage
-        if (profileResponse.Error != '') {
-          console.log(profileResponse.Error)
+        if (profileResponse.Error && profileResponse.Error != '') {
           errorStore.setText(profileResponse.Error)
           sessionStorage.remove('authJWT');
         } else {

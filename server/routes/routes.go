@@ -5,6 +5,7 @@ import (
 	"github.com/uwine4850/alllogs/api/rauth"
 	"github.com/uwine4850/alllogs/api/rprofile"
 	"github.com/uwine4850/alllogs/api/rproject"
+	"github.com/uwine4850/alllogs/api/security"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -75,6 +76,9 @@ func Get(database interfaces.IDatabase) []map[string]map[string]router.Handler {
 		},
 		{
 			"GET": {"/log-items/:logGroupId/:start/:count": rproject.LogItemsObjectView(database)},
+		},
+		{
+			"GET": {"/set-csrf": security.SetCSRFToken},
 		},
 	}
 }

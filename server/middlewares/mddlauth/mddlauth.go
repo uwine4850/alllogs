@@ -11,7 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/middlewares"
 )
 
-var skipUrl = []string{"/login", "/register", "/notifications", "/logitem"}
+var skipUrl = []string{"/login", "/register", "/notifications", "/logitem", "/set-csrf"}
 
 func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
 	if slices.Contains(skipUrl, r.URL.Path) {

@@ -25,6 +25,7 @@ const formData = ref<ProjectLogGroupMessage>({
   Name: '',
   Description: '',
   Error: '',
+  AuthorToken: ''
 })
 
 const submitForm = () => {
