@@ -36,7 +36,7 @@ type LogItemMessage struct {
 
 type LogItemPayload struct {
 	rest.ImplementDTOMessage
-	TypLogItemPayload rest.TypeId `dto:"-typeid"`
+	TypLogItemPayload rest.TypeId `dto:"-typeid" json:"-"`
 	Id                int         `dto:"Id" db:"id"`
 	LogGroupId        int         `dto:"LogGroupId" db:"log_group_id"`
 	Text              string      `dto:"Text" db:"text"`

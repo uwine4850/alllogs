@@ -44,14 +44,14 @@ func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWrite
 				MultipleObjects: []object.MultipleObject{
 					{
 						Name:       "project",
-						TaleName:   cnf.DBT_PROJECT,
+						TableName:  cnf.DBT_PROJECT,
 						SlugName:   "projID",
 						SlugField:  "id",
 						FillStruct: ProjectMessage{},
 					},
 					{
 						Name:       "log",
-						TaleName:   cnf.DBT_PROJECT_LOG_GROUP,
+						TableName:  cnf.DBT_PROJECT_LOG_GROUP,
 						SlugName:   "logID",
 						SlugField:  "id",
 						FillStruct: ProjectLogGroupMessage{},

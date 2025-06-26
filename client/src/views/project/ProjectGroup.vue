@@ -14,6 +14,8 @@ import { getLogGroupItems, getProjectLogGroup } from '@/services/project'
 import { MyWebsocket } from '@/classes/websocket'
 import { WrappedObserver } from '@/classes/observer'
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
+import { AsyncRequestWithAuthorization } from '@/classes/request'
+import type { AxiosError, AxiosResponse } from 'axios'
 
 const route = useRoute()
 const errorStore = useErrorStore()
@@ -93,6 +95,26 @@ onBeforeUnmount(() => {
   wrappedObserver.mutationObserver?.disconnect()
   wrappedObserver.intersectionObserver?.disconnect()
 })
+
+function exportJson(){
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/logs-export-json/${logRef.value?.Id}`, {
+      withCredentials: true,
+      responseType: "blob",
+    }
+  )
+  req.onResponse(async (response: AxiosResponse) => {
+    const blob = new Blob([response.data], {type: "application/json"})
+    const link = document.createElement("a")
+    link.href = window.URL.createObjectURL(blob)
+    link.download = `PJ-${projectRef.value?.Name}-LG-${logRef.value?.Name}-logs.json`
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  })
+  req.onError((error: AxiosError) => {
+    errorStore.setText("unexpected error: " + error.message)
+  }, errorStore)
+  req.get()
+}
 
 function searchLogs() {
   logItemsPayloadRef.value = null
@@ -200,10 +222,10 @@ defineExpose({ searchLogs })
     <template #panel-menu>
       <PanelTitle icon="project" text="log group management" />
       <div class="pm-wrapper">
-        <Button class="pm-button" icon="upload" text="Export as JSON" link="" />
+        <Button @click="exportJson" class="pm-button" icon="upload" text="Export as JSON" link="" />
         <Button class="pm-button" icon="update" text="Update" :link="`/project/${projectRef?.Id}/log-group/${logRef?.Id}/update`" />
         <Button class="pm-button" icon="clear" text="Clear" link="" />
-        <Button class="pm-button" icon="bell" text="Sutup notfications" link="" />
+        <Button class="pm-button" icon="bell" text="Setup notfications" link="" />
       </div>
     </template>
   </ProjectTemplate>
