@@ -174,17 +174,17 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
       }
     }
   }
-  public override onError(fn: (error: AxiosError) => void, errorStore?: ReturnType<typeof useErrorStore>) {
+  public override onError(fn: (error: AxiosError) => void, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string) {
     this.onErrorFn = async (error: AxiosError) => {
       if(error) {
         if (error.response?.data && isClientErrorMessage(error.response.data)) {
           const clientErrorMessage = error.response.data as ClientErrorMessage
-          catchClientError(clientErrorMessage, errorStore)
+          catchClientError(clientErrorMessage, errorStore, storeId)
           return
         }
         if (error.response?.data && isServerErrorMessage(error.response.data)) {
           const serverErrorMessage = error.response.data as ServerErrorMessage
-          catchServerError(serverErrorMessage, errorStore)
+          catchServerError(serverErrorMessage, errorStore, storeId)
           return
         }
         fn(error)
@@ -193,10 +193,10 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   }
 }
 
-export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnType<typeof useErrorStore>){
+export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
   switch (data.Code){
     case 400:
-      errorStore?.setText(data.Text)
+      errorStore?.setText(data.Text, storeId)
       break;
     case 401:
       sessionStorage.removeItem('authJWT')
@@ -207,13 +207,13 @@ export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnTy
       router.push(`/error?code=${"403 Forbidden"}&text=${data.Text}`)
       break;
     case 409:
-      errorStore?.setText(data.Text)
+      errorStore?.setText(data.Text, storeId)
       break;
   }
 }
 
-export function catchServerError(data: ServerErrorMessage, errorStore?: ReturnType<typeof useErrorStore>){
-  errorStore?.setText(data.Text)
+export function catchServerError(data: ServerErrorMessage, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
+  errorStore?.setText(data.Text, storeId)
 }
 
 export function getCookie(name: string): string | null {

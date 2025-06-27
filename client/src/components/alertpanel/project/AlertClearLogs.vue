@@ -6,21 +6,27 @@ import type { AxiosError, AxiosResponse } from 'axios'
 import type { BaseResponseMessage } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
 import Error from '@/components/Error.vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
+
+const props = defineProps({
+  customId: {
+    type: String,
+  },
+  logsContainerClass: {
+    type: String,
+    required: true,
+  },
+})
 
 const errorStore = useErrorStore()
-const router = useRouter()
 const route = useRoute()
 
 const cancelButton = () => {
-  closeAlertPanel()
+  closeAlertPanel(props.customId)
 }
 
-const deleteProject = () => {
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/project/' + route.params.id, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+const clearLogs = () => {
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/log-items/${route.params.logID}`, {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
@@ -28,27 +34,31 @@ const deleteProject = () => {
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {
-      router.push('/')
+      const logsContainer = document.getElementsByClassName(props.logsContainerClass)
+      if (logsContainer.length > 0){
+        logsContainer[0].innerHTML = ""
+        closeAlertPanel(props.customId)
+      }
     }
   })
   req.onError((error: AxiosError) => {
     errorStore.setText("unexpected error: " + error.message)
-  }, errorStore, "alertPanelDelProjectStoreId")
+  }, errorStore, "alertClearLogsStoreId")
   req.delete()
 }
 </script>
 
 <template>
-  <AlertPanelTemplate width="600px">
-    <Error store-id="alertPanelDelProjectStoreId" />
-    <div class="text">Delete current project?</div>
+  <AlertPanelTemplate width="600px" :custom-id="customId">
+    <Error store-id="alertClearLogsStoreId" />
+    <div class="text">Clear logs?</div>
     <div class="buttons">
       <Button
-				@click="deleteProject"
+		  @click="clearLogs"
         type="button"
         class="_btn"
         icon="delete"
-        text="Delete current project"
+        text="Clear logs"
       />
       <Button @click="cancelButton" type="button" class="_btn" icon="delete" text="Cancel" />
     </div>

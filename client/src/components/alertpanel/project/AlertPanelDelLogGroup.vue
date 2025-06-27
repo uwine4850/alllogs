@@ -33,14 +33,14 @@ const deleteProject = () => {
   })
   req.onError((error: AxiosError) => {
     errorStore.setText("unexpected error: " + error.message)
-  }, errorStore)
+  }, errorStore, "alertPanelDelLogGroupStoreId")
   req.delete()
 }
 </script>
 
 <template>
   <AlertPanelTemplate width="600px">
-    <Error />
+    <Error store-id="alertPanelDelLogGroupStoreId" />
     <div class="text">Delete current log group?</div>
     <div class="buttons">
       <Button

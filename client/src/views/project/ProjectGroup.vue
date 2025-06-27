@@ -16,6 +16,7 @@ import { WrappedObserver } from '@/classes/observer'
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
+import AlertClearLogs from '@/components/alertpanel/project/AlertClearLogs.vue'
 
 const route = useRoute()
 const errorStore = useErrorStore()
@@ -131,6 +132,7 @@ defineExpose({ searchLogs })
     v-model:model-value-tag="filterFormRef.Tag" 
     v-model:model-value-date-time="filterFormRef.DateTime"
   />
+  <AlertClearLogs custom-id="alert-clear-logs" logs-container-class="table" />
   <ProjectTemplate title="Project group">
     <template #panel-project>
       <Error />
@@ -153,7 +155,7 @@ defineExpose({ searchLogs })
         <button
           class="il-button"
           id="filter-btn1"
-          @click="openAlertPanel"
+          @click="openAlertPanel()"
         >
           <SvgIcon name="filter" class="icon" />
           <p>filters</p>
@@ -224,7 +226,7 @@ defineExpose({ searchLogs })
       <div class="pm-wrapper">
         <Button @click="exportJson" class="pm-button" icon="upload" text="Export as JSON" link="" />
         <Button class="pm-button" icon="update" text="Update" :link="`/project/${projectRef?.Id}/log-group/${logRef?.Id}/update`" />
-        <Button class="pm-button" icon="clear" text="Clear" link="" />
+        <Button class="pm-button" icon="clear" text="Clear" @click="openAlertPanel('alert-clear-logs')" />
         <Button class="pm-button" icon="bell" text="Setup notfications" link="" />
       </div>
     </template>

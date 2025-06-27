@@ -22,7 +22,7 @@ func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) e
 		return api.NewClientError(http.StatusBadRequest, "log group id not found")
 	}
 
-	hasPermission, err := exportLogsPermission(logGroupIdSlug, UID)
+	hasPermission, err := EditLogGroupPermission(logGroupIdSlug, UID)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
@@ -51,7 +51,7 @@ func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) e
 	return nil
 }
 
-func exportLogsPermission(logGroupId any, UID any) (bool, error) {
+func EditLogGroupPermission(logGroupId any, UID any) (bool, error) {
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Select(qb.Exists(qb.SQ(
 		false,

@@ -2,20 +2,26 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useErrorStore = defineStore('error', () => {
-  const errorEl = ref<HTMLElement | null>(null)
+  const errors = ref<Record<string, HTMLElement | null>>({})
+  const customErrorTextId = ref("text")
 
-  function setText(txt: string) {
-    if (errorEl.value) {
-      const textPlace = errorEl.value.querySelector('#text') as HTMLElement
+  function setCustomErrorTextId(idValue: string){
+    customErrorTextId.value = idValue
+  }
+
+  function setText(txt: string, id: string = "errorEl") {
+    if (errors.value[id]){
+      const errorElement = errors.value[id]
+      const textPlace = errorElement.querySelector('span') as HTMLElement
       if (textPlace) {
         textPlace.innerText = txt
-        errorEl.value.style.display = 'flex'
+        errorElement.style.display = 'flex'
       }
     }
   }
 
-  function setErrorElement(el: HTMLElement) {
-    errorEl.value = el
+  function setErrorElement(el: HTMLElement, id: string = "errorEl") {
+    errors.value[id] = el
   }
-  return { setText, setErrorElement }
+  return { setText, setErrorElement, setCustomErrorTextId }
 })

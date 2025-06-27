@@ -39,6 +39,7 @@ func Get(database interfaces.IDatabase) map[string][]map[string]router.Handler {
 			{"/profile/del": rprofile.Delete},
 			{"/project/:id": rproject.Delete},
 			{"/project/:projId/log-group/:logId": rproject.LogGroupDelete},
+			{"/log-items/:logGroupID": rproject.ClearLogs},
 		},
 		router.MethodPATCH: {
 			{"/profile/update": rprofile.Update},

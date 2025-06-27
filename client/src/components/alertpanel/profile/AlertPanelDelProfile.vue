@@ -34,14 +34,14 @@ const deleteUser = () => {
   })
   req.onError((error: AxiosError) => {
     errorStore.setText("unexpected error: " + error.message)
-  }, errorStore)
+  }, errorStore, "alertPanelDelProfileStoreId")
   req.delete()
 }
 </script>
 
 <template>
   <AlertPanelTemplate>
-    <Error />
+    <Error store-id="alertPanelDelProfileStoreId" />
     <div class="text">Delete profile?</div>
     <div class="buttons">
       <Button

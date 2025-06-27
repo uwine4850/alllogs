@@ -6,10 +6,13 @@ const props = defineProps({
   width: {
     type: String,
   },
+  customId: {
+    type: String,
+  },
 });
 
 onMounted(() => {
-  const alertPanel = document.getElementById('alert-panel')
+  const alertPanel = document.getElementById(props.customId || 'alert-panel')
   if (alertPanel) {
     alertPanel.onclick = function () {
       alertPanel.classList.add('hide')
@@ -19,15 +22,20 @@ onMounted(() => {
 </script>
 
 <script lang="ts">
-export function openAlertPanel() {
-  const alertPanel = document.getElementById('alert-panel')
+export function openAlertPanel(customId?: string) {
+  let alertPanel: HTMLElement | null
+  if (customId){
+    alertPanel = document.getElementById(customId)
+  } else {
+    alertPanel = document.getElementById('alert-panel')
+  }
   if (alertPanel) {
     alertPanel.classList.remove('hide')
   }
 }
 
-export function closeAlertPanel() {
-  const alertPanel = document.getElementById('alert-panel')
+export function closeAlertPanel(customId?: string) {
+  const alertPanel = document.getElementById(customId || 'alert-panel')
   if (alertPanel) {
     alertPanel.classList.add('hide')
   }
@@ -36,14 +44,14 @@ export function closeAlertPanel() {
 
 <template>
   <div v-if="props.width">
-    <div id="alert-panel" class="hide">
+    <div :id="props.customId || 'alert-panel'" class="alert-panel-c hide">
       <Panel :style="{width: props.width}" class="alert-inner-panel" @click.stop>
         <slot></slot>
       </Panel>
     </div>
   </div>
   <div v-else>
-    <div id="alert-panel" class="hide">
+    <div :id="props.customId || 'alert-panel'" class="alert-panel-c hide">
       <Panel class="alert-inner-panel" @click.stop>
         <slot></slot>
       </Panel>
@@ -54,7 +62,7 @@ export function closeAlertPanel() {
 <style scoped lang="scss">
 @use '@/assets/style/global_vars.scss' as vars;
 
-#alert-panel {
+.alert-panel-c {
   top: 0;
   left: 0;
   position: absolute;
