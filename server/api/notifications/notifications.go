@@ -14,7 +14,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type NotificationInfoMessage struct {
+type MsgNotificationInfo struct {
 	rest.ImplementDTOMessage
 	TypNotificationInfoMessage rest.TypeId `dto:"-typeid"`
 	PID                        string      `dto:"PID"`

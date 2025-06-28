@@ -11,45 +11,45 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type BaseResponseMessage struct {
+type MsgBaseResponse struct {
 	rest.ImplementDTOMessage
 	TypBaseResponseMessage rest.TypeId `dto:"-typeid"`
 	Ok                     bool        `dto:"Ok"`
 	Error                  string      `dto:"Error"`
 }
 
-func NewBaseResponse(ok bool, error string) *BaseResponseMessage {
-	return &BaseResponseMessage{
+func NewBaseResponse(ok bool, error string) *MsgBaseResponse {
+	return &MsgBaseResponse{
 		Ok:    ok,
 		Error: error,
 	}
 }
 
 // 400 - 499
-type ClientErrorMessage struct {
+type MsgClientError struct {
 	rest.ImplementDTOMessage
 	TypClientErrorMessage rest.TypeId `dto:"-typeid"`
 	Code                  int         `dto:"Code"`
 	Text                  string      `dto:"Text"`
 }
 
-func NewClientErrorMessage(code int, text string) *ClientErrorMessage {
-	return &ClientErrorMessage{
+func NewClientErrorMessage(code int, text string) *MsgClientError {
+	return &MsgClientError{
 		Code: code,
 		Text: text,
 	}
 }
 
 // 500 - 511
-type ServerErrorMessage struct {
+type MsgServerError struct {
 	rest.ImplementDTOMessage
 	TypServerErrorMessage rest.TypeId `dto:"-typeid"`
 	Code                  int         `dto:"Code"`
 	Text                  string      `dto:"Text"`
 }
 
-func NewServerErrorMessage(code int, text string) *ServerErrorMessage {
-	return &ServerErrorMessage{
+func NewServerErrorMessage(code int, text string) *MsgServerError {
+	return &MsgServerError{
 		Code: code,
 		Text: text,
 	}

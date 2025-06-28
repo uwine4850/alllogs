@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type LogoutMessage struct {
+type MsgLogout struct {
 	rest.ImplementDTOMessage
 	TypLogoutMessage rest.TypeId `dto:"-typeid"`
 	UID              int         `dto:"UID"`

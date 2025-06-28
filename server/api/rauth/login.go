@@ -19,14 +19,14 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type LoginMessage struct {
+type MsgLogin struct {
 	rest.ImplementDTOMessage
 	TypLoginMessage rest.TypeId `dto:"-typeid"`
 	Username        string      `dto:"Username"`
 	Password        string      `dto:"Password"`
 }
 
-type LoginResponseMessage struct {
+type MsgLoginResponse struct {
 	rest.ImplementDTOMessage
 	TypLoginResponseMessage rest.TypeId `dto:"-typeid"`
 	JWT                     string      `dto:"JWT"`
@@ -94,7 +94,7 @@ func NewLoginJWT(uid int, manager interfaces.IManager) (string, error) {
 }
 
 func SendLoginResponse(w http.ResponseWriter, jwt string, UID int, _err string) {
-	resp := &LoginResponseMessage{
+	resp := &MsgLoginResponse{
 		JWT:   jwt,
 		UID:   UID,
 		Error: _err,

@@ -13,7 +13,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type ProjectLogGroupMessage struct {
+type MsgProjectLogGroup struct {
 	rest.ImplementDTOMessage
 	TypProjectLogGroupMessage rest.TypeId `dto:"-typeid"`
 	Id                        int         `dto:"Id" db:"id"`
@@ -47,26 +47,26 @@ func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWrite
 						TableName:  cnf.DBT_PROJECT,
 						SlugName:   "projID",
 						SlugField:  "id",
-						FillStruct: ProjectMessage{},
+						FillStruct: MsgProject{},
 					},
 					{
 						Name:       "log",
 						TableName:  cnf.DBT_PROJECT_LOG_GROUP,
 						SlugName:   "logID",
 						SlugField:  "id",
-						FillStruct: ProjectLogGroupMessage{},
+						FillStruct: MsgProjectLogGroup{},
 					},
 				},
 			},
 		},
 		DTO: cnf.DTO,
 		Messages: map[string]irest.IMessage{
-			"project": ProjectMessage{},
-			"log":     ProjectLogGroupMessage{},
+			"project": MsgProject{},
+			"log":     MsgProjectLogGroup{},
 		},
 	}
 	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
-		logGroupMessage, ok := message.(*ProjectLogGroupMessage)
+		logGroupMessage, ok := message.(*MsgProjectLogGroup)
 		if !ok {
 			return nil
 		}

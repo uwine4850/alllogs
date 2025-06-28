@@ -16,13 +16,13 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type GenTokenMessage struct {
+type MsgGenToken struct {
 	rest.ImplementDTOMessage
 	TypGenTokenMessage rest.TypeId `dto:"-typeid"`
 	UserId             int         `dto:"UserId"`
 }
 
-type TokenResponse struct {
+type MsgTokenResponse struct {
 	rest.ImplementDTOMessage
 	TypTokenResponse rest.TypeId `dto:"-typeid"`
 	Token            string      `dto:"Token"`
@@ -111,7 +111,7 @@ func tokenExists(dbRead interfaces.IReadDatabase, token string) (bool, error) {
 }
 
 func sendToken(w http.ResponseWriter, token string, _err string) {
-	resp := &TokenResponse{
+	resp := &MsgTokenResponse{
 		Token: token,
 		Error: _err,
 	}

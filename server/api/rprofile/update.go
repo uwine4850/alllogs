@@ -17,7 +17,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type ProfileUpdateMessage struct {
+type MsgProfileUpdate struct {
 	rest.ImplementDTOMessage
 	TypProfileUpdateMessage rest.TypeId   `dto:"-typeid"`
 	UID                     int           `dto:"UID"`

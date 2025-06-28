@@ -13,10 +13,10 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type ProfileMessage struct {
+type MsgProfile struct {
 	rest.ImplementDTOMessage
 	TypProfileMessage rest.TypeId `dto:"-typeid"`
-	User              UserMessage `dto:"User"`
+	User              MsgUser     `dto:"User"`
 	UserId            int         `dto:"UserId"`
 	Description       string      `dto:"Description"`
 	Avatar            string      `dto:"Avatar"`
@@ -24,7 +24,7 @@ type ProfileMessage struct {
 	Error             string      `dto:"Error"`
 }
 
-type UserMessage struct {
+type MsgUser struct {
 	rest.ImplementDTOMessage
 	TypUserMessage rest.TypeId `dto:"-typeid"`
 	Id             int         `dto:"Id"`
@@ -62,10 +62,10 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 			},
 		},
 		DTO:     cnf.DTO,
-		Message: ProfileMessage{},
+		Message: MsgProfile{},
 	}
 	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
-		profileMessage := message.(*ProfileMessage)
+		profileMessage := message.(*MsgProfile)
 		querybuild := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).SelectFrom("id, username", cnf.DBT_AUTH).
 			Where(qb.Compare("id", qb.EQUAL, profileMessage.UserId))
 		querybuild.Merge()
@@ -81,7 +81,7 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 		}
 
 		if len(authUser) == 1 {
-			userMessage := UserMessage{
+			userMessage := MsgUser{
 				Id:       authUser[0].Id,
 				Username: authUser[0].Username,
 			}

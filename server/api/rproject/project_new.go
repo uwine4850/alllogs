@@ -12,7 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type ProjectAuthor struct {
+type MsgProjectAuthor struct {
 	rest.ImplementDTOMessage
 	TypProjectAuthor rest.TypeId `dto:"-typeid"`
 	UID              int         `dto:"UID" db:"user_id"`
@@ -20,15 +20,15 @@ type ProjectAuthor struct {
 	Avatar           string      `dto:"Avatar" db:"avatar"`
 }
 
-type ProjectMessage struct {
+type MsgProject struct {
 	rest.ImplementDTOMessage
-	TypProjectMessage rest.TypeId   `dto:"-typeid"`
-	Author            ProjectAuthor `dto:"Author"`
-	Id                int           `dto:"Id" db:"id"`
-	UserId            int           `dto:"UserId" db:"user_id"`
-	Name              string        `dto:"Name" db:"name"`
-	Description       string        `dto:"Description" db:"description"`
-	Error             string        `dto:"Error"`
+	TypProjectMessage rest.TypeId      `dto:"-typeid"`
+	Author            MsgProjectAuthor `dto:"Author"`
+	Id                int              `dto:"Id" db:"id"`
+	UserId            int              `dto:"UserId" db:"user_id"`
+	Name              string           `dto:"Name" db:"name"`
+	Description       string           `dto:"Description" db:"description"`
+	Error             string           `dto:"Error"`
 }
 
 type ProjectForm struct {

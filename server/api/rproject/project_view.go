@@ -31,15 +31,15 @@ func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter
 				Name:       "object",
 				TableName:  cnf.DBT_PROJECT,
 				Database:   database,
-				FillStruct: ProjectMessage{},
+				FillStruct: MsgProject{},
 				Slug:       "id",
 			},
 		},
 		DTO:     cnf.DTO,
-		Message: ProjectMessage{},
+		Message: MsgProject{},
 	}
 	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
-		msg, ok := message.(*ProjectMessage)
+		msg, ok := message.(*MsgProject)
 		if !ok {
 			return errors.New(("error converting a filled message"))
 		}
@@ -53,7 +53,7 @@ func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter
 			return err
 		}
 
-		author := make([]ProjectAuthor, len(res))
+		author := make([]MsgProjectAuthor, len(res))
 		err = mapper.FillStructSliceFromDb(&author, &res)
 		if err != nil {
 			return err

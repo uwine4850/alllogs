@@ -13,111 +13,111 @@ import (
 var AllowMessages = []rest.AllowMessage{
 	{
 		Package: "rauth",
-		Name:    "RegisterMessage",
+		Name:    "MsgRegister",
 	},
 	{
 		Package: "rauth",
-		Name:    "LoginMessage",
+		Name:    "MsgLogin",
 	},
 	{
 		Package: "rauth",
-		Name:    "LoginResponseMessage",
+		Name:    "MsgLoginResponse",
 	},
 	{
 		Package: "api",
-		Name:    "BaseResponseMessage",
+		Name:    "MsgBaseResponse",
 	},
 	{
 		Package: "rprofile",
-		Name:    "ProfileMessage",
+		Name:    "MsgProfile",
 	},
 	{
 		Package: "rprofile",
-		Name:    "UserMessage",
+		Name:    "MsgUser",
 	},
 	{
 		Package: "rprofile",
-		Name:    "GenTokenMessage",
+		Name:    "MsgGenToken",
 	},
 	{
 		Package: "rprofile",
-		Name:    "TokenResponse",
+		Name:    "MsgTokenResponse",
 	},
 	{
 		Package: "rprofile",
-		Name:    "ProfileUpdateMessage",
+		Name:    "MsgProfileUpdate",
 	},
 	{
 		Package: "notifications",
-		Name:    "NotificationInfoMessage",
+		Name:    "MsgNotificationInfo",
 	},
 	{
 		Package: "rproject",
-		Name:    "ProjectMessage",
+		Name:    "MsgProject",
 	},
 	{
 		Package: "rproject",
-		Name:    "ProjectAuthor",
+		Name:    "MsgProjectAuthor",
 	},
 	{
 		Package: "rproject",
-		Name:    "ProjectLogGroupMessage",
+		Name:    "MsgProjectLogGroup",
 	},
 	{
 		Package: "api",
-		Name:    "ClientErrorMessage",
+		Name:    "MsgClientError",
 	},
 	{
 		Package: "rauth",
-		Name:    "LogoutMessage",
+		Name:    "MsgLogout",
 	},
 	{
 		Package: "api",
-		Name:    "ServerErrorMessage",
+		Name:    "MsgServerError",
 	},
 	{
 		Package: "rproject",
-		Name:    "LogItemMessage",
+		Name:    "MsgLogItem",
 	},
 	{
 		Package: "rproject",
-		Name:    "LogItemPayload",
+		Name:    "MsgLogItemPayload",
 	},
 	{
 		Package: "rproject",
-		Name:    "LogItemsFilterMessage",
+		Name:    "MsgLogItemsFilter",
 	},
 }
 
 var TSGenMessages = map[string][]irest.IMessage{
 	"../client/src/dto/common.ts": {
-		api.BaseResponseMessage{},
-		api.ClientErrorMessage{},
-		api.ServerErrorMessage{},
+		api.MsgBaseResponse{},
+		api.MsgClientError{},
+		api.MsgServerError{},
 	},
 	"../client/src/dto/auth.ts": {
-		rauth.RegisterMessage{},
-		rauth.LoginMessage{},
-		rauth.LoginResponseMessage{},
-		rauth.LogoutMessage{},
+		rauth.MsgRegister{},
+		rauth.MsgLogin{},
+		rauth.MsgLoginResponse{},
+		rauth.MsgLogout{},
 	},
 	"../client/src/dto/profile.ts": {
-		rprofile.ProfileMessage{},
-		rprofile.UserMessage{},
-		rprofile.GenTokenMessage{},
-		rprofile.TokenResponse{},
-		rprofile.ProfileUpdateMessage{},
+		rprofile.MsgProfile{},
+		rprofile.MsgUser{},
+		rprofile.MsgGenToken{},
+		rprofile.MsgTokenResponse{},
+		rprofile.MsgProfileUpdate{},
 	},
 	"../client/src/dto/notifications.ts": {
-		notifications.NotificationInfoMessage{},
+		notifications.MsgNotificationInfo{},
 	},
 	"../client/src/dto/project.ts": {
-		rproject.ProjectMessage{},
-		rproject.ProjectAuthor{},
-		rproject.ProjectLogGroupMessage{},
-		rproject.LogItemMessage{},
-		rproject.LogItemPayload{},
-		rproject.LogItemsFilterMessage{},
+		rproject.MsgProject{},
+		rproject.MsgProjectAuthor{},
+		rproject.MsgProjectLogGroup{},
+		rproject.MsgLogItem{},
+		rproject.MsgLogItemPayload{},
+		rproject.MsgLogItemsFilter{},
 	},
 }
 

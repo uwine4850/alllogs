@@ -29,11 +29,11 @@ func LogGroupsAllView(database object.IViewDatabase) func(w http.ResponseWriter,
 				TableName:  cnf.DBT_PROJECT_LOG_GROUP,
 				Database:   database,
 				Slug:       "project_id",
-				FillStruct: ProjectLogGroupMessage{},
+				FillStruct: MsgProjectLogGroup{},
 			},
 		},
 		DTO:     cnf.DTO,
-		Message: ProjectLogGroupMessage{},
+		Message: MsgProjectLogGroup{},
 	}
 	return view.Call
 }

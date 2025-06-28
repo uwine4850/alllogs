@@ -29,11 +29,11 @@ func ProjectsAllView(database object.IViewDatabase) func(w http.ResponseWriter, 
 				TableName:  cnf.DBT_PROJECT,
 				Database:   database,
 				Slug:       "user_id",
-				FillStruct: ProjectMessage{},
+				FillStruct: MsgProject{},
 			},
 		},
 		DTO:     cnf.DTO,
-		Message: ProjectMessage{},
+		Message: MsgProject{},
 	}
 	return view.Call
 }

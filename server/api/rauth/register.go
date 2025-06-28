@@ -17,7 +17,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-type RegisterMessage struct {
+type MsgRegister struct {
 	rest.ImplementDTOMessage
 	TypRegisterMessage rest.TypeId `dto:"-typeid"`
 	Username           string      `dto:"Username"`

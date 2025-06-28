@@ -16,7 +16,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
-type LogItemsFilterMessage struct {
+type MsgLogItemsFilter struct {
 	rest.ImplementDTOMessage
 	TypLogItemsFilter rest.TypeId `dto:"-typeid"`
 	Text              string      `dto:"Text"`
@@ -39,7 +39,7 @@ func (v *LogItemsView) OnError(w http.ResponseWriter, r *http.Request, m interfa
 
 func (v *LogItemsView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	singleQueryMap := parseSingleQuery(r.URL.Query())
-	var logItemsFilterMessage LogItemsFilterMessage
+	var logItemsFilterMessage MsgLogItemsFilter
 	if err := mapper.JsonToDTOMessage(singleQueryMap, cnf.DTO, &logItemsFilterMessage); err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func LogItemsObjectView(database interfaces.IReadDatabase) func(w http.ResponseW
 				Name:       "logs",
 				TableName:  cnf.DBT_LOG_ITEM,
 				Database:   d,
-				FillStruct: LogItemPayload{},
+				FillStruct: MsgLogItemPayload{},
 			},
 			Database:       database,
 			LogGroupSlugId: "logGroupId",
@@ -116,7 +116,7 @@ func LogItemsObjectView(database interfaces.IReadDatabase) func(w http.ResponseW
 			CountSlug:      "count",
 		},
 		DTO:     cnf.DTO,
-		Message: LogItemPayload{},
+		Message: MsgLogItemPayload{},
 	}
 	return view.Call
 }
@@ -131,7 +131,7 @@ func parseSingleQuery(values url.Values) map[string]interface{} {
 	return out
 }
 
-func filterArgs(logItemsFilterMessage *LogItemsFilterMessage) []any {
+func filterArgs(logItemsFilterMessage *MsgLogItemsFilter) []any {
 	filterValue := []any{}
 	if logItemsFilterMessage.Text != "" {
 		typeText := qb.NoArgsCompare("text", qb.LIKE, "'%"+logItemsFilterMessage.Text+"%'")

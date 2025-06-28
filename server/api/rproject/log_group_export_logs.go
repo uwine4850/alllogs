@@ -37,7 +37,7 @@ func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) e
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	logItems := make([]LogItemPayload, len(res))
+	logItems := make([]MsgLogItemPayload, len(res))
 	if err := mapper.FillStructSliceFromDb(&logItems, &res); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}

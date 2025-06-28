@@ -25,16 +25,16 @@ const (
 	TYPE_LOGITEM = 1
 )
 
-type LogItemMessage struct {
+type MsgLogItem struct {
 	rest.ImplementDTOMessage
-	TypLogItemMessage rest.TypeId    `dto:"-typeid"`
-	Type              int            `dto:"Type"`
-	Token             string         `dto:"Token"`
-	Error             string         `dto:"Error"`
-	Payload           LogItemPayload `dto:"Payload"`
+	TypLogItemMessage rest.TypeId       `dto:"-typeid"`
+	Type              int               `dto:"Type"`
+	Token             string            `dto:"Token"`
+	Error             string            `dto:"Error"`
+	Payload           MsgLogItemPayload `dto:"Payload"`
 }
 
-type LogItemPayload struct {
+type MsgLogItemPayload struct {
 	rest.ImplementDTOMessage
 	TypLogItemPayload rest.TypeId `dto:"-typeid" json:"-"`
 	Id                int         `dto:"Id" db:"id"`
@@ -53,7 +53,7 @@ func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.
 	socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
-			if err := conn.WriteJSON(&LogItemMessage{Type: TYPE_ERROR, Error: "token not found"}); err != nil {
+			if err := conn.WriteJSON(&MsgLogItem{Type: TYPE_ERROR, Error: "token not found"}); err != nil {
 				fmt.Println("Client log send message error:", err)
 			}
 		}
@@ -64,9 +64,9 @@ func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.
 		removeConnection(conn)
 	})
 	socket.OnMessage(func(messageType int, msgData []byte, conn *websocket.Conn) {
-		var logItemMessage LogItemMessage
+		var logItemMessage MsgLogItem
 		if err := json.Unmarshal(msgData, &logItemMessage); err != nil {
-			if err := conn.WriteJSON(&LogItemMessage{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
+			if err := conn.WriteJSON(&MsgLogItem{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
 				fmt.Println("Client log send message error:", err)
 			}
 			return
@@ -74,7 +74,7 @@ func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.
 
 		insertedId, err := writeLogItem(&logItemMessage)
 		if err != nil {
-			if err := conn.WriteJSON(&LogItemMessage{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
+			if err := conn.WriteJSON(&MsgLogItem{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
 				fmt.Println("Client log send message error:", err)
 			}
 			return
@@ -83,7 +83,7 @@ func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.
 
 		logItemMessageBytes, err := json.Marshal(logItemMessage)
 		if err != nil {
-			if err := conn.WriteJSON(&LogItemMessage{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
+			if err := conn.WriteJSON(&MsgLogItem{Type: TYPE_ERROR, Error: err.Error()}); err != nil {
 				fmt.Println("Client log send message error:", err)
 			}
 			return
@@ -127,7 +127,7 @@ func removeConnection(conn *websocket.Conn) {
 	}
 }
 
-func writeLogItem(logItemMessage *LogItemMessage) (int64, error) {
+func writeLogItem(logItemMessage *MsgLogItem) (int64, error) {
 	params, err := mapper.ParamsValueFromDbStruct(typeopr.Ptr{}.New(&logItemMessage.Payload), []string{})
 	if err != nil {
 		return -1, err
