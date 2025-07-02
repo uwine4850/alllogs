@@ -1,12 +1,12 @@
-import type { GenTokenMessage, ProfileMessage, TokenResponse } from '@/dto/profile'
+import type { MsgGenToken, MsgProfile, MsgTokenResponse } from '@/dto/profile'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
-import type { BaseResponseMessage } from '@/dto/common'
+import type { MsgBaseResponse } from '@/dto/common'
 import { AxiosError, type AxiosResponse } from 'axios'
 import { ref, type Ref } from 'vue'
 import { useErrorStore } from '@/stores/error'
 
 export const getProfileData = async (
-  _profileDataRef: Ref<ProfileMessage | null>,
+  _profileDataRef: Ref<MsgProfile | null>,
   _tokenRef: Ref<string | null> | null,
   id: string,
   errorStore: ReturnType<typeof useErrorStore>,
@@ -18,7 +18,7 @@ export const getProfileData = async (
     withCredentials: true,
   })
   req.onResponse((response: AxiosResponse) => {
-    const profileResponse = response.data as ProfileMessage
+    const profileResponse = response.data as MsgProfile
     if (profileResponse.Error !== '') {
       errorStore.setText(profileResponse.Error)
     } else {
@@ -36,13 +36,13 @@ export const getProfileData = async (
 
 export const generateTokenForm = async (
   _tokenRef: Ref<string | null>,
-  profileData: ProfileMessage | null,
+  profileData: MsgProfile | null,
   errorStore: ReturnType<typeof useErrorStore>,
 ) => {
   if (!profileData) {
     return
   }
-  const formData = ref<GenTokenMessage>({
+  const formData = ref<MsgGenToken>({
     UserId: profileData.UserId,
   })
 
@@ -53,7 +53,7 @@ export const generateTokenForm = async (
     withCredentials: true,
   })
   req.onResponse((response: AxiosResponse) => {
-    const tokenResponse = response.data as TokenResponse
+    const tokenResponse = response.data as MsgTokenResponse
     if (tokenResponse.Error !== '') {
       errorStore.setText(tokenResponse.Error)
     } else {
@@ -68,21 +68,22 @@ export const generateTokenForm = async (
 }
 
 export const deleteToken = async (
+  uid: any,
   _tokenRef: Ref<string | null>,
-  profileData: ProfileMessage | null,
+  profileData: MsgProfile | null,
   errorStore: ReturnType<typeof useErrorStore>,
 ) => {
   if (!profileData) {
     return
   }
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/del-token', {
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/del-token/user/${uid}`, {
     headers: {
       'Content-Type': 'application/json',
     },
     withCredentials: true,
   })
   req.onResponse((response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (baseResponse.Error != '') {
       errorStore.setText(baseResponse.Error)
     } else {

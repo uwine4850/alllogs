@@ -1,13 +1,12 @@
 import { AsyncRequestWithAuthorization } from "@/classes/request"
-import type { LogoutMessage } from "@/dto/auth"
-import type { BaseResponseMessage } from "@/dto/common"
+import type { MsgLogout } from "@/dto/auth"
+import type { MsgBaseResponse } from "@/dto/common"
 import router from "@/router"
 import type { AxiosResponse } from "axios"
-import { useRouter } from "vue-router"
 
 
 export async function logout(UID: number){
-  const formData: LogoutMessage = {
+  const formData: MsgLogout = {
     UID: UID,
   }
     const req = new AsyncRequestWithAuthorization(`http://localhost:8000/logout`, {
@@ -17,7 +16,7 @@ export async function logout(UID: number){
         withCredentials: true,
       })
       req.onResponse((response: AxiosResponse) => {
-        const profileResponse = response.data as BaseResponseMessage
+        const profileResponse = response.data as MsgBaseResponse
         if (profileResponse.Error !== '') {
           throw profileResponse.Error
         } else {

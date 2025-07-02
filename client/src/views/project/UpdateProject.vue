@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request';
-import type { BaseResponseMessage } from '@/dto/common';
-import { type ProjectMessage } from '@/dto/project';
+import type { MsgBaseResponse } from '@/dto/common';
+import { type MsgProject } from '@/dto/project';
 import { getProject } from '@/services/project';
 import { useErrorStore } from '@/stores/error';
 import type { AxiosError, AxiosResponse } from 'axios';
@@ -16,13 +16,13 @@ import Button from '@/components/Button.vue';
 import { InputText, InputTextarea } from '@/components/input/index';
 import AlertPanelDelProject from '@/components/alertpanel/project/AlertPanelDelProject.vue';
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue';
-import type { ProfileMessage } from '@/dto/profile';
+import type { MsgProfile } from '@/dto/profile';
 
 var route = useRoute();
 var router = useRouter();
 var errorStore = useErrorStore();
 
-const formData = ref<ProjectMessage>({
+const formData = ref<MsgProject>({
   Id: 0,
   UserId: 0,
   Name: '',
@@ -31,16 +31,16 @@ const formData = ref<ProjectMessage>({
   Author: undefined,
 })
 
-const projectRef = ref<ProjectMessage | null>(null)
+const projectRef = ref<MsgProject | null>(null)
 onMounted(() => {
   getProject(route.params.id, projectRef, errorStore);
 })
 watch(projectRef, (project) => {
   if(project){
-    let profileData: ProfileMessage
+    let profileData: MsgProfile
     const profileJsonData = sessionStorage.getItem('profile')
     if (profileJsonData) {
-      profileData = JSON.parse(profileJsonData) as ProfileMessage
+      profileData = JSON.parse(profileJsonData) as MsgProfile
       if (projectRef.value?.UserId != profileData.UserId){
         router.replace("/error?code=403 Forbidden&text=no access for project updates")
         return
@@ -61,7 +61,7 @@ const submitForm = () => {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {

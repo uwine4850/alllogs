@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/apiform"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
@@ -34,14 +34,14 @@ type TokenForm struct {
 }
 
 func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	frm := form.NewForm(r)
-	if err := frm.Parse(); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
-	}
 	var tokenForm TokenForm
-	if err := mapper.FillStructFromForm(frm, &tokenForm); err != nil {
+	if err := apiform.ParseAndFill(r, &tokenForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
+	if err := ProfilePermission(manager, tokenForm.UserId, "no permissions to generate token"); err != nil {
+		return err
+	}
+
 	token, err := newToken(cnf.DatabaseReader)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
@@ -57,6 +57,14 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 }
 
 func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	slugUserId, err := SlugId(manager)
+	if err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	}
+	if err := ProfilePermission(manager, slugUserId, "no permissions to delete token"); err != nil {
+		return err
+	}
+
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
@@ -64,7 +72,7 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Update(cnf.DBT_PROFILE, map[string]any{"token": nil}).Where(qb.Compare("user_id", qb.EQUAL, UID))
 	newQB.Merge()
-	_, err := newQB.Exec()
+	_, err = newQB.Exec()
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}

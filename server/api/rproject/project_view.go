@@ -12,6 +12,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
 
+// TODO: add permission
+
 type ProjectView struct {
 	object.ObjView
 }
@@ -22,6 +24,19 @@ func (v *ProjectView) OnError(w http.ResponseWriter, r *http.Request, manager in
 
 func (v *ProjectView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	return object.Context{}, nil
+}
+
+func (v *ProjectView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+	slugProjectId, ok := manager.OneTimeData().GetSlugParams(v.Slug)
+	if !ok {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, "no slug")
+		}
+	}
+	if err := ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
+		return false, func() { api.SendClientError(w, http.StatusForbidden, err.Error()) }
+	}
+	return true, func() {}
 }
 
 func ProjectObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

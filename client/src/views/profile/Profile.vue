@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import type { ProfileMessage } from '@/dto/profile'
+import type { MsgProfile } from '@/dto/profile'
 import { deleteToken, generateTokenForm, getProfileData } from '@/services/profile'
 import { logout } from '@/services/auth'
 import MiddlePanel from '@/views/MiddlePanel.vue'
@@ -16,7 +16,7 @@ import { useErrorStore } from '@/stores/error'
 const errorStore = useErrorStore()
 const route = useRoute()
 
-const profileDataRef = ref<ProfileMessage | null>(null)
+const profileDataRef = ref<MsgProfile | null>(null)
 const tokenRef = ref('')
 
 const handleGetProfileData = () => {
@@ -28,7 +28,7 @@ const handleGenerateTokenForm = () => {
 }
 
 const handleDeleteToken = () => {
-  deleteToken(tokenRef, profileDataRef.value, errorStore)
+  deleteToken(route.params.id, tokenRef, profileDataRef.value, errorStore)
 }
 
 onMounted(async () => {

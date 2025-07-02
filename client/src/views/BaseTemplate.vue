@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProfileMessage } from '@/dto/profile'
+import type { MsgProfile } from '@/dto/profile'
 import { MyWebsocket } from '@/classes/websocket'
 import { onBeforeUnmount, ref } from 'vue'
 import Separator from '@/components/Separator.vue'
@@ -14,10 +14,10 @@ defineProps({
   },
 })
 
-let profileData: ProfileMessage
+let profileData: MsgProfile
 const profileJsonData = sessionStorage.getItem('profile')
 if (profileJsonData) {
-  profileData = JSON.parse(profileJsonData) as ProfileMessage
+  profileData = JSON.parse(profileJsonData) as MsgProfile
 }
 
 const socket = new MyWebsocket(

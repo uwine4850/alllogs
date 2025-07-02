@@ -4,11 +4,10 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/apiform"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/router/form"
 )
 
 type updateForm struct {
@@ -22,21 +21,14 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
-	frm := form.NewForm(r)
-	if err := frm.Parse(); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
-	}
 	updateForm := updateForm{}
-	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
+	if err := apiform.ParseAndFill(r, &updateForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	hasPermission, err := changeProjectPermissions(updateForm.Id, UID)
-	if err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	if err := ProjectPermission(updateForm.Id, manager, "no access to update the project"); err != nil {
+		return err
 	}
-	if !hasPermission {
-		return api.NewClientError(http.StatusForbidden, "no access to update the project")
-	}
+
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Update(cnf.DBT_PROJECT, map[string]any{
 		"name":        updateForm.Name,

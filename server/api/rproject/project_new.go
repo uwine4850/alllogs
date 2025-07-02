@@ -12,6 +12,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
+// TODO: add permission
+
 type MsgProjectAuthor struct {
 	rest.ImplementDTOMessage
 	TypProjectAuthor rest.TypeId `dto:"-typeid"`

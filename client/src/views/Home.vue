@@ -1,29 +1,29 @@
 <script setup lang="ts">
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { ProjectMessage } from '@/dto/project'
+import type { MsgProject } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
 import BaseTemplate from '../views/BaseTemplate.vue'
 import Panel from '../components/Panel.vue'
 import PanelTitle from '../components/PanelTitle.vue'
 import PanelItem from '@/components/PanelItem.vue'
-import type { ProfileMessage } from '@/dto/profile'
+import type { MsgProfile } from '@/dto/profile'
 
-const projectsRef = ref<ProjectMessage[]>()
+const projectsRef = ref<MsgProject[]>()
 const errorStore = useErrorStore()
 
-let profileData: ProfileMessage
+let profileData: MsgProfile
 const profileJsonData = sessionStorage.getItem('profile')
 if (profileJsonData) {
-  profileData = JSON.parse(profileJsonData) as ProfileMessage
+  profileData = JSON.parse(profileJsonData) as MsgProfile
 }
 
 const req = new AsyncRequestWithAuthorization(`http://localhost:8000/all-projects/${profileData!.UserId}`, {
   withCredentials: true,
 })
 req.onResponse(async (response: AxiosResponse) => {
-  const projectMessages = response.data as ProjectMessage[]
+  const projectMessages = response.data as MsgProject[]
   if (projectMessages[0].Error != '') {
     console.log('Error: ', projectMessages[0].Error)
   } else {

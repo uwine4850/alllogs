@@ -12,6 +12,13 @@ import (
 )
 
 func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+	slugId, err := SlugId(manager)
+	if err != nil {
+		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	}
+	if err := ProfilePermission(manager, slugId, "no permission to delete the profile"); err != nil {
+		return err
+	}
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
@@ -20,6 +27,7 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
+
 	transaction, err := cnf.DatabaseReader.NewTransaction()
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())

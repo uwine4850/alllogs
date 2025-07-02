@@ -1,10 +1,10 @@
 import { AsyncRequestWithAuthorization } from "@/classes/request"
-import type { LogItemMessage, LogItemPayload, LogItemsFilterMessage, ProjectLogGroupMessage, ProjectMessage } from "@/dto/project"
+import type { MsgLogItem, MsgLogItemPayload, MsgLogItemsFilter, MsgProjectLogGroup, MsgProject } from "@/dto/project"
 import type { AxiosError, AxiosResponse } from "axios"
 import { useErrorStore } from '@/stores/error'
 import { type Ref } from "vue"
 
-export function getProject(id: any, projectRef: Ref<ProjectMessage | null>, errorStore: ReturnType<typeof useErrorStore>){
+export function getProject(id: any, projectRef: Ref<MsgProject | null>, errorStore: ReturnType<typeof useErrorStore>){
   const req = new AsyncRequestWithAuthorization(
     `http://localhost:8000/project/${id}`,
     {
@@ -12,7 +12,7 @@ export function getProject(id: any, projectRef: Ref<ProjectMessage | null>, erro
     },
   )
   req.onResponse(async (response: AxiosResponse) => {
-    const projectMessage = response.data as ProjectMessage
+    const projectMessage = response.data as MsgProject
     if (projectMessage.Error != '') {
       errorStore.setText(projectMessage.Error)
     } else {
@@ -28,8 +28,8 @@ export function getProject(id: any, projectRef: Ref<ProjectMessage | null>, erro
 export function getProjectLogGroup(
   projectId: any,
   groupId: any,
-  groupRef: Ref<ProjectLogGroupMessage | null>,
-  projectRef: Ref<ProjectMessage | null>,
+  groupRef: Ref<MsgProjectLogGroup | null>,
+  projectRef: Ref<MsgProject | null>,
   errorStore: ReturnType<typeof useErrorStore>
   ){
   const req = new AsyncRequestWithAuthorization(
@@ -42,12 +42,12 @@ export function getProjectLogGroup(
     const _project = response.data['project']
     const _log = response.data['log']
     if (_log) {
-      const log = _log as ProjectLogGroupMessage
+      const log = _log as MsgProjectLogGroup
       if (log.Error != '') {
         errorStore.setText(log.Error)
       } else {
         if (_project) {
-          projectRef.value = _project as ProjectMessage
+          projectRef.value = _project as MsgProject
         }
         groupRef.value = log
       }
@@ -63,8 +63,8 @@ export function getLogGroupItems(
   logGroupId: any,
   startId: any,
   count: any,
-  logItemRef: Ref<LogItemPayload[] | null>,
-  filterRef: Ref<LogItemsFilterMessage | null>,
+  logItemRef: Ref<MsgLogItemPayload[] | null>,
+  filterRef: Ref<MsgLogItemsFilter | null>,
   isLastLogs: Ref<boolean>,
   errorStore: ReturnType<typeof useErrorStore>
   ){
@@ -88,7 +88,7 @@ export function getLogGroupItems(
     },
   )
   req.onResponse(async (response: AxiosResponse) => {
-    const logs = response.data as LogItemPayload[]
+    const logs = response.data as MsgLogItemPayload[]
     if (!logs){
       return
     }

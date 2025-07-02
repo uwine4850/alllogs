@@ -13,6 +13,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
+// TODO: add permission
+
 type MsgProjectLogGroup struct {
 	rest.ImplementDTOMessage
 	TypProjectLogGroupMessage rest.TypeId `dto:"-typeid"`
@@ -34,6 +36,19 @@ func (v *LogGroupView) OnError(w http.ResponseWriter, r *http.Request, manager i
 
 func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
 	return object.Context{}, nil
+}
+
+func (v *LogGroupView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+	slugProjectId, ok := manager.OneTimeData().GetSlugParams("projID")
+	if !ok {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, "no slug")
+		}
+	}
+	if err := ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
+		return false, func() { api.SendClientError(w, http.StatusForbidden, err.Error()) }
+	}
+	return true, func() {}
 }
 
 func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

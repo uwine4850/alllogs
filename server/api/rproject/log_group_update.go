@@ -4,11 +4,10 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/apiform"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/mapper"
-	"github.com/uwine4850/foozy/pkg/router/form"
 )
 
 type UpdateLogGroupForm struct {
@@ -23,12 +22,8 @@ func UpdateLogGroup(w http.ResponseWriter, r *http.Request, m interfaces.IManage
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
 	}
-	frm := form.NewForm(r)
-	if err := frm.Parse(); err != nil {
-		return api.NewClientError(http.StatusBadRequest, err.Error())
-	}
 	var updateLogGroupForm UpdateLogGroupForm
-	if err := mapper.FillStructFromForm(frm, &updateLogGroupForm); err != nil {
+	if err := apiform.ParseAndFill(r, &updateLogGroupForm); err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
 	hasPermissions, err := changeProjectPermissions(updateLogGroupForm.ProjectId, UID)

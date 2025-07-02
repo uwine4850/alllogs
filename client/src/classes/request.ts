@@ -1,5 +1,5 @@
-import { isLoginResponseMessage, type LoginResponseMessage } from '@/dto/auth'
-import { isClientErrorMessage, isServerErrorMessage, type BaseResponseMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
+import { isMsgLoginResponse, type MsgLoginResponse } from '@/dto/auth'
+import { isMsgClientError, isMsgServerError, type MsgBaseResponse, type MsgClientError, type MsgServerError } from '@/dto/common'
 import router from '@/router'
 import type { useErrorStore } from '@/stores/error'
 import { AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios'
@@ -159,8 +159,8 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   public onResponse(fn: (response: AxiosResponse) => void) {
     this.onResponseFn = async () => {
       if (this.response) {
-        if (isLoginResponseMessage(this.response.data)) {
-          const loginResponse = this.response.data as LoginResponseMessage
+        if (isMsgLoginResponse(this.response.data)) {
+          const loginResponse = this.response.data as MsgLoginResponse
           if (loginResponse.JWT != '') {
             sessionStorage.setItem('authJWT', loginResponse.JWT)
             this.updateAuthToken()
@@ -177,13 +177,13 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   public override onError(fn: (error: AxiosError) => void, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string) {
     this.onErrorFn = async (error: AxiosError) => {
       if(error) {
-        if (error.response?.data && isClientErrorMessage(error.response.data)) {
-          const clientErrorMessage = error.response.data as ClientErrorMessage
+        if (error.response?.data && isMsgClientError(error.response.data)) {
+          const clientErrorMessage = error.response.data as MsgClientError
           catchClientError(clientErrorMessage, errorStore, storeId)
           return
         }
-        if (error.response?.data && isServerErrorMessage(error.response.data)) {
-          const serverErrorMessage = error.response.data as ServerErrorMessage
+        if (error.response?.data && isMsgServerError(error.response.data)) {
+          const serverErrorMessage = error.response.data as MsgServerError
           catchServerError(serverErrorMessage, errorStore, storeId)
           return
         }
@@ -193,7 +193,7 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   }
 }
 
-export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
+export function catchClientError(data: MsgClientError, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
   switch (data.Code){
     case 400:
       errorStore?.setText(data.Text, storeId)
@@ -212,7 +212,7 @@ export function catchClientError(data: ClientErrorMessage, errorStore?: ReturnTy
   }
 }
 
-export function catchServerError(data: ServerErrorMessage, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
+export function catchServerError(data: MsgServerError, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
   errorStore?.setText(data.Text, storeId)
 }
 
@@ -234,7 +234,7 @@ async function setToken(): Promise<void> {
   }, false)
   return new Promise((resolve, reject) => {
     req.onResponse((response: AxiosResponse) => {
-      const baseResponse = response.data as BaseResponseMessage
+      const baseResponse = response.data as MsgBaseResponse
       if (baseResponse.Error && baseResponse.Error == '') {
         reject(baseResponse.Error)
       } else {

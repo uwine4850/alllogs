@@ -1,5 +1,3 @@
-import { ref, onBeforeUnmount } from 'vue'
-
 const websockets: { [key: string]: MyWebsocket } = {}
 
 export function getSocket(key: string): MyWebsocket {

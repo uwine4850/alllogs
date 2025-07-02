@@ -1,9 +1,9 @@
 
-export interface NotificationInfoMessage {
+export interface MsgNotificationInfo {
     TypNotificationInfoMessage?: unknown;
     PID: string;
     Text: string;
 }
-export function isNotificationInfoMessage(obj: any): obj is NotificationInfoMessage {
+export function isMsgNotificationInfo(obj: any): obj is MsgNotificationInfo {
     return typeof obj === 'object' && obj !== null && 'TypNotificationInfoMessage' in obj;
 }

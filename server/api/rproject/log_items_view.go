@@ -16,6 +16,8 @@ import (
 	"github.com/uwine4850/foozy/pkg/typeopr"
 )
 
+// TODO: add permission
+
 type MsgLogItemsFilter struct {
 	rest.ImplementDTOMessage
 	TypLogItemsFilter rest.TypeId `dto:"-typeid"`
@@ -98,6 +100,42 @@ func (v *LogItemsView) fillObjects(objects []map[string]interface{}) ([]interfac
 		objectsStruct = append(objectsStruct, value.Interface())
 	}
 	return objectsStruct, nil
+}
+
+func (v *LogItemsView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+	slugLogGroupId, ok := manager.OneTimeData().GetSlugParams(v.LogGroupSlugId)
+	if !ok {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, "no slug")
+		}
+	}
+	currentUID, ok := manager.OneTimeData().GetUserContext("UID")
+	if !ok {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, "uid not exists")
+		}
+	}
+	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
+	newQB.Select(qb.Exists(qb.SQ(false, qb.NewNoDbQB().
+		SelectFrom(1, cnf.DBT_PROJECT).Where(
+		qb.Compare("id", qb.EQUAL, qb.SQ(true, qb.NewNoDbQB().
+			SelectFrom("project_id", cnf.DBT_PROJECT_LOG_GROUP).Where(qb.Compare("id", qb.EQUAL, slugLogGroupId)),
+		)), qb.AND,
+		qb.Compare("user_id", qb.EQUAL, currentUID),
+	),
+	))).As("ok").Merge()
+	res, err := newQB.Query()
+	if err != nil {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, err.Error())
+		}
+	}
+	if res[0]["ok"].(int64) != 1 {
+		return false, func() {
+			api.SendServerError(w, http.StatusInternalServerError, "no permission to view log items")
+		}
+	}
+	return true, func() {}
 }
 
 func LogItemsObjectView(database interfaces.IReadDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
-import type { LoginMessage, LoginResponseMessage } from '@/dto/auth'
+import type { MsgLogin, MsgLoginResponse } from '@/dto/auth'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
 import PasswordInp from '@/components/input/InputPassword.vue'
@@ -11,15 +11,15 @@ import { ref } from 'vue'
 import { AxiosError, type AxiosResponse } from 'axios'
 import Error from '@/components/Error.vue'
 import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
-import type { ProfileMessage } from '@/dto/profile'
-import { isClientErrorMessage, isServerErrorMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
+import type { MsgProfile } from '@/dto/profile'
+import { isMsgClientError, isMsgServerError, type MsgClientError, type MsgServerError } from '@/dto/common'
 </script>
 
 <script setup lang="ts">
 const errorStore = useErrorStore()
 const router = useRouter()
 
-const formData = ref<LoginMessage>({
+const formData = ref<MsgLogin>({
   Username: '',
   Password: '',
 })
@@ -32,7 +32,7 @@ const submitForm = async () => {
     withCredentials: true,
   })
   loginReq.onResponse((response: AxiosResponse) => {
-    const loginResponse = response.data as LoginResponseMessage
+    const loginResponse = response.data as MsgLoginResponse
     if (loginResponse && loginResponse.Error != '') {
       errorStore.setText(loginResponse.Error)
     } else if(loginResponse) {
@@ -45,7 +45,7 @@ const submitForm = async () => {
         withCredentials: true,
       })
       req.onResponse(function (response: AxiosResponse) {
-        const profileResponse = response.data as ProfileMessage
+        const profileResponse = response.data as MsgProfile
         if (profileResponse.Error && profileResponse.Error != '') {
           errorStore.setText(profileResponse.Error)
           sessionStorage.remove('authJWT');
@@ -55,10 +55,10 @@ const submitForm = async () => {
         }
       })
       req.onError((error: AxiosError) => {
-        if(error.response?.data, isClientErrorMessage(error.response?.data)){
-          catchClientError(error.response?.data as ClientErrorMessage, errorStore)
-        } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
-          catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+        if(error.response?.data, isMsgClientError(error.response?.data)){
+          catchClientError(error.response?.data as MsgClientError, errorStore)
+        } else if (error.response?.data, isMsgServerError(error.response?.data)){
+          catchServerError(error.response?.data as MsgServerError, errorStore)
         } else {
           errorStore.setText("unexpected error: " + error.message)
         }
@@ -67,10 +67,10 @@ const submitForm = async () => {
     }
   })
   loginReq.onError((error: AxiosError) => {
-    if(error.response?.data, isClientErrorMessage(error.response?.data)){
-      catchClientError(error.response?.data as ClientErrorMessage, errorStore)
-    } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
-      catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+    if(error.response?.data, isMsgClientError(error.response?.data)){
+      catchClientError(error.response?.data as MsgClientError, errorStore)
+    } else if (error.response?.data, isMsgServerError(error.response?.data)){
+      catchServerError(error.response?.data as MsgServerError, errorStore)
     } else {
       errorStore.setText("unexpected error: " + error.message)
     }

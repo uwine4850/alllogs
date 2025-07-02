@@ -2,7 +2,7 @@
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { isLogItemMessage, type LogItemMessage, type LogItemPayload, type LogItemsFilterMessage, type ProjectLogGroupMessage, type ProjectMessage } from '@/dto/project'
+import { isMsgLogItem, type MsgLogItem, type MsgLogItemPayload, type MsgLogItemsFilter, type MsgProjectLogGroup, type MsgProject } from '@/dto/project'
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
@@ -20,9 +20,9 @@ import AlertClearLogs from '@/components/alertpanel/project/AlertClearLogs.vue'
 
 const route = useRoute()
 const errorStore = useErrorStore()
-const projectRef = ref<ProjectMessage | null>(null)
-const logRef = ref<ProjectLogGroupMessage | null>(null)
-const logItemsPayloadRef = ref<LogItemPayload[] | null>(null)
+const projectRef = ref<MsgProject | null>(null)
+const logRef = ref<MsgProjectLogGroup | null>(null)
+const logItemsPayloadRef = ref<MsgLogItemPayload[] | null>(null)
 const isLastLogs = ref<boolean>(false)
 
 enum LogMessageType {
@@ -30,7 +30,7 @@ enum LogMessageType {
   TYPE_LOGITEM = 1,
 }
 
-let filterFormRef = ref<LogItemsFilterMessage>({
+let filterFormRef = ref<MsgLogItemsFilter>({
   Text: "",
   Type: "",
   Tag: "",
@@ -61,10 +61,10 @@ onMounted(() => {
 })
 
 var socket: MyWebsocket
-var items = ref<LogItemPayload[]>([])
+var items = ref<MsgLogItemPayload[]>([])
 
 watch(logRef, (log) => {
-  socket = new MyWebsocket<LogItemMessage>(
+  socket = new MyWebsocket<MsgLogItem>(
   'log_item',
   `ws://localhost:8000/logitem?token=${log?.AuthorToken}`,
   )
@@ -77,7 +77,7 @@ watch(logRef, (log) => {
 
   socket.OnMessage((event: MessageEvent) => {
     const data = JSON.parse(event.data)
-    if (data && isLogItemMessage(data)){
+    if (data && isMsgLogItem(data)){
       if (data.Type == LogMessageType.TYPE_ERROR){
         errorStore.setText(data.Error)
         return

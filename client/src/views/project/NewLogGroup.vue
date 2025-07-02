@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
+import type { MsgProjectLogGroup } from '@/dto/project'
 import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import { useErrorStore } from '@/stores/error'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { BaseResponseMessage } from '@/dto/common'
+import type { MsgBaseResponse } from '@/dto/common'
 import BaseTemplate from '@/views/BaseTemplate.vue'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import PanelTitle from '@/components/PanelTitle.vue'
@@ -19,7 +19,7 @@ const errorStore = useErrorStore()
 const router = useRouter()
 const route = useRoute()
 
-const formData = ref<ProjectLogGroupMessage>({
+const formData = ref<MsgProjectLogGroup>({
   Id: 0,
   ProjectId: parseInt(String(route.params.id)),
   Name: '',
@@ -36,7 +36,7 @@ const submitForm = () => {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {

@@ -1,26 +1,26 @@
 
-export interface ProjectMessage {
+export interface MsgProject {
     TypProjectMessage?: unknown;
-    Author: ProjectAuthor | undefined;
+    Author: MsgProjectAuthor | undefined;
     Id: number;
     UserId: number;
     Name: string;
     Description: string;
     Error: string;
 }
-export function isProjectMessage(obj: any): obj is ProjectMessage {
+export function isMsgProject(obj: any): obj is MsgProject {
     return typeof obj === 'object' && obj !== null && 'TypProjectMessage' in obj;
 }
-export interface ProjectAuthor {
+export interface MsgProjectAuthor {
     TypProjectAuthor?: unknown;
     UID: number;
     Username: string;
     Avatar: string;
 }
-export function isProjectAuthor(obj: any): obj is ProjectAuthor {
+export function isMsgProjectAuthor(obj: any): obj is MsgProjectAuthor {
     return typeof obj === 'object' && obj !== null && 'TypProjectAuthor' in obj;
 }
-export interface ProjectLogGroupMessage {
+export interface MsgProjectLogGroup {
     TypProjectLogGroupMessage?: unknown;
     Id: number;
     ProjectId: number;
@@ -29,20 +29,20 @@ export interface ProjectLogGroupMessage {
     Error: string;
     AuthorToken: string;
 }
-export function isProjectLogGroupMessage(obj: any): obj is ProjectLogGroupMessage {
+export function isMsgProjectLogGroup(obj: any): obj is MsgProjectLogGroup {
     return typeof obj === 'object' && obj !== null && 'TypProjectLogGroupMessage' in obj;
 }
-export interface LogItemMessage {
+export interface MsgLogItem {
     TypLogItemMessage?: unknown;
     Type: number;
     Token: string;
     Error: string;
-    Payload: LogItemPayload | undefined;
+    Payload: MsgLogItemPayload | undefined;
 }
-export function isLogItemMessage(obj: any): obj is LogItemMessage {
+export function isMsgLogItem(obj: any): obj is MsgLogItem {
     return typeof obj === 'object' && obj !== null && 'TypLogItemMessage' in obj;
 }
-export interface LogItemPayload {
+export interface MsgLogItemPayload {
     TypLogItemPayload?: unknown;
     Id: number;
     LogGroupId: number;
@@ -51,16 +51,16 @@ export interface LogItemPayload {
     Tag: string;
     Datetime: string;
 }
-export function isLogItemPayload(obj: any): obj is LogItemPayload {
+export function isMsgLogItemPayload(obj: any): obj is MsgLogItemPayload {
     return typeof obj === 'object' && obj !== null && 'TypLogItemPayload' in obj;
 }
-export interface LogItemsFilterMessage {
+export interface MsgLogItemsFilter {
     TypLogItemsFilter?: unknown;
     Text: string;
     Type: string;
     Tag: string;
     DateTime: string;
 }
-export function isLogItemsFilterMessage(obj: any): obj is LogItemsFilterMessage {
+export function isMsgLogItemsFilter(obj: any): obj is MsgLogItemsFilter {
     return typeof obj === 'object' && obj !== null && 'TypLogItemsFilter' in obj;
 }

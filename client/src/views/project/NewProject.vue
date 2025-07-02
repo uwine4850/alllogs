@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ProjectMessage } from '@/dto/project'
+import type { MsgProject } from '@/dto/project'
 import { ref } from 'vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import { useErrorStore } from '@/stores/error'
 import { useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { BaseResponseMessage } from '@/dto/common'
+import type { MsgBaseResponse } from '@/dto/common'
 import BaseTemplate from '@/views/BaseTemplate.vue';
 import MiddlePanel from '@/views/MiddlePanel.vue';
 import Error from '@/components/Error.vue';
@@ -17,7 +17,7 @@ import { InputText, InputTextarea } from '@/components/input/index';
 const errorStore = useErrorStore()
 const router = useRouter()
 
-const formData = ref<ProjectMessage>({
+const formData = ref<MsgProject>({
   Id: 0,
   UserId: 0,
   Name: '',
@@ -34,7 +34,7 @@ const submitForm = () => {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {

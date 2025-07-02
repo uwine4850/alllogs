@@ -1,8 +1,3 @@
-<script lang="ts">
-import groupIcon from '@/assets/svg/group.svg'
-import checkBoxIcon from '@/assets/svg/checkbox.svg'
-</script>
-
 <script setup lang="ts">
 import BaseTemplate from './BaseTemplate.vue'
 import MiddlePanel from './MiddlePanel.vue'

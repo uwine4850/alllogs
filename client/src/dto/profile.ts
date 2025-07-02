@@ -1,40 +1,40 @@
 
-export interface ProfileMessage {
+export interface MsgProfile {
     TypProfileMessage?: unknown;
-    User: UserMessage | undefined;
+    User: MsgUser | undefined;
     UserId: number;
     Description: string;
     Avatar: string;
     Token: string;
     Error: string;
 }
-export function isProfileMessage(obj: any): obj is ProfileMessage {
+export function isMsgProfile(obj: any): obj is MsgProfile {
     return typeof obj === 'object' && obj !== null && 'TypProfileMessage' in obj;
 }
-export interface UserMessage {
+export interface MsgUser {
     TypUserMessage?: unknown;
     Id: number;
     Username: string;
 }
-export function isUserMessage(obj: any): obj is UserMessage {
+export function isMsgUser(obj: any): obj is MsgUser {
     return typeof obj === 'object' && obj !== null && 'TypUserMessage' in obj;
 }
-export interface GenTokenMessage {
+export interface MsgGenToken {
     TypGenTokenMessage?: unknown;
     UserId: number;
 }
-export function isGenTokenMessage(obj: any): obj is GenTokenMessage {
+export function isMsgGenToken(obj: any): obj is MsgGenToken {
     return typeof obj === 'object' && obj !== null && 'TypGenTokenMessage' in obj;
 }
-export interface TokenResponse {
+export interface MsgTokenResponse {
     TypTokenResponse?: unknown;
     Token: string;
     Error: string;
 }
-export function isTokenResponse(obj: any): obj is TokenResponse {
+export function isMsgTokenResponse(obj: any): obj is MsgTokenResponse {
     return typeof obj === 'object' && obj !== null && 'TypTokenResponse' in obj;
 }
-export interface ProfileUpdateMessage {
+export interface MsgProfileUpdate {
     TypProfileUpdateMessage?: unknown;
     UID: number;
     Description: string;
@@ -42,6 +42,6 @@ export interface ProfileUpdateMessage {
     OldAvatarPath: string;
     DelAvatar: boolean;
 }
-export function isProfileUpdateMessage(obj: any): obj is ProfileUpdateMessage {
+export function isMsgProfileUpdate(obj: any): obj is MsgProfileUpdate {
     return typeof obj === 'object' && obj !== null && 'TypProfileUpdateMessage' in obj;
 }

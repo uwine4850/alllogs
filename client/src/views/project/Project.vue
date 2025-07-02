@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { ProjectLogGroupMessage, ProjectMessage } from '@/dto/project'
+import type { MsgProjectLogGroup, MsgProject } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
 import { onMounted, ref, watch } from 'vue'
 import { getProject } from '@/services/project'
@@ -14,8 +14,8 @@ import Error from '@/components/Error.vue'
 
 const route = useRoute()
 const errorStore = useErrorStore()
-const projectRef = ref<ProjectMessage | null>(null)
-const logGroupsRef = ref<ProjectLogGroupMessage[]>()
+const projectRef = ref<MsgProject | null>(null)
+const logGroupsRef = ref<MsgProjectLogGroup[]>()
 
 const getLogGroups = (project_id: number) => {
   const req = new AsyncRequestWithAuthorization(
@@ -25,7 +25,7 @@ const getLogGroups = (project_id: number) => {
     },
   )
   req.onResponse(async (response: AxiosResponse) => {
-    const projectMessages = response.data as ProjectLogGroupMessage[]
+    const projectMessages = response.data as MsgProjectLogGroup[]
     if (projectMessages && projectMessages.length != 0) {
       if (projectMessages[0].Error != '') {
         errorStore.setText(projectMessages[0].Error)

@@ -9,14 +9,14 @@ import Button from '@/components/Button.vue'
 import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
-import type { RegisterMessage } from '@/dto/auth'
-import { isClientErrorMessage, isServerErrorMessage, type BaseResponseMessage, type ClientErrorMessage, type ServerErrorMessage } from '@/dto/common'
+import type { MsgRegister } from '@/dto/auth'
+import { isMsgClientError, isMsgServerError, type MsgBaseResponse, type MsgClientError, type MsgServerError } from '@/dto/common'
 import { AxiosError, type AxiosResponse } from 'axios'
 
 const errorStore = useErrorStore()
 const router = useRouter()
 
-const formData = ref<RegisterMessage>({
+const formData = ref<MsgRegister>({
   Username: '',
   Password: '',
   RepeatPassword: '',
@@ -29,7 +29,7 @@ const submitForm = async () => {
     },
   })
   req.onResponse((response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {
@@ -37,10 +37,10 @@ const submitForm = async () => {
     }
   })
   req.onError((error: AxiosError) => {
-    if(error.response?.data, isClientErrorMessage(error.response?.data)){
-      catchClientError(error.response?.data as ClientErrorMessage, errorStore)
-    } else if (error.response?.data, isServerErrorMessage(error.response?.data)){
-      catchServerError(error.response?.data as ServerErrorMessage, errorStore)
+    if(error.response?.data, isMsgClientError(error.response?.data)){
+      catchClientError(error.response?.data as MsgClientError, errorStore)
+    } else if (error.response?.data, isMsgServerError(error.response?.data)){
+      catchServerError(error.response?.data as MsgServerError, errorStore)
     } else {
       errorStore.setText("unexpected error: " + error.message)
     }

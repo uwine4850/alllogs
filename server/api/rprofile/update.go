@@ -1,7 +1,6 @@
 package rprofile
 
 import (
-	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,10 +8,10 @@ import (
 	"strconv"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/apiform"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
-	"github.com/uwine4850/foozy/pkg/mapper"
 	"github.com/uwine4850/foozy/pkg/router/form"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
@@ -36,21 +35,15 @@ type UpdateForm struct {
 }
 
 func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
-	frm := form.NewForm(r)
-	if err := frm.Parse(); err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
-	}
 	updateForm := UpdateForm{}
-	if err := mapper.FillStructFromForm(frm, &updateForm); err != nil {
+	if err := apiform.ParseAndFill(r, &updateForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
+
 	}
-	hasPermission, err := permission(manager, updateForm.UID)
-	if err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	if err := ProfilePermission(manager, updateForm.UID, "no access for user profile updates"); err != nil {
+		return err
 	}
-	if !hasPermission {
-		return api.NewClientError(http.StatusForbidden, "no access for user profile updates")
-	}
+
 	var oldRelativeAvatarPath string
 	if updateForm.OldAvatarPath != "" {
 		if updateForm.OldAvatarPath == cnf.DEFAULT_AVATAR_PATH {
@@ -74,18 +67,6 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	}
 	api.SendBeseResponse(w, true, nil)
 	return nil
-}
-
-func permission(m interfaces.IManager, formUID int) (bool, error) {
-	UID, ok := m.OneTimeData().GetUserContext("UID")
-	if !ok {
-		return false, errors.New("uid not exists")
-	}
-	if UID.(int) != formUID {
-		return false, nil
-	} else {
-		return true, nil
-	}
 }
 
 func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.IManager) error {

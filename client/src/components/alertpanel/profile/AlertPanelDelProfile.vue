@@ -3,27 +3,28 @@ import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/Ale
 import Button from '@/components/Button.vue'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { BaseResponseMessage } from '@/dto/common'
+import type { MsgBaseResponse } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
 import Error from '@/components/Error.vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const errorStore = useErrorStore()
 const router = useRouter()
+const route = useRoute()
 
 const cancelButton = () => {
   closeAlertPanel()
 }
 
 const deleteUser = () => {
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/profile/del', {
+  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/profile/del/${route.params.id}`, {
     headers: {
       'Content-Type': 'application/json',
     },
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {

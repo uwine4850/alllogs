@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import type { ProfileMessage, ProfileUpdateMessage } from '@/dto/profile'
+import type { MsgProfile, MsgProfileUpdate } from '@/dto/profile'
 import { getProfileData } from '@/services/profile'
 import { useRoute, useRouter } from 'vue-router'
 import { useErrorStore } from '@/stores/error'
 import { AsyncRequestWithAuthorization } from '@/classes/request'
 import type { AxiosError, AxiosResponse } from 'axios'
-import type { BaseResponseMessage } from '@/dto/common'
+import type { MsgBaseResponse } from '@/dto/common'
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import BaseTemplate from '@/views/BaseTemplate.vue'
@@ -22,9 +22,9 @@ import AlertPanelDelProfile from '@/components/alertpanel/profile/AlertPanelDelP
 const errorStore = useErrorStore()
 const router = useRouter()
 const route = useRoute()
-const profileDataRef = ref<ProfileMessage | null>(null)
+const profileDataRef = ref<MsgProfile | null>(null)
 
-const formData = ref<ProfileUpdateMessage>({
+const formData = ref<MsgProfileUpdate>({
   UID: 0,
   Description: '',
   Avatar: null,
@@ -36,11 +36,11 @@ const saveChanges = async () => {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
-    const baseResponse = response.data as BaseResponseMessage
+    const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
       errorStore.setText(baseResponse.Error)
     } else {
-      const newProfileDataRef = ref<ProfileMessage | null>(null)
+      const newProfileDataRef = ref<MsgProfile | null>(null)
       await getProfileData(newProfileDataRef, null, route.params.id as string, errorStore)
       sessionStorage.setItem('profile', JSON.stringify(newProfileDataRef.value))
       router.push('/')
@@ -73,10 +73,10 @@ onMounted(() => {
 
 watch(profileDataRef, (profile) => {
   if (profile) {
-    let profileData: ProfileMessage
+    let profileData: MsgProfile
     const profileJsonData = sessionStorage.getItem('profile')
     if (profileJsonData) {
-      profileData = JSON.parse(profileJsonData) as ProfileMessage
+      profileData = JSON.parse(profileJsonData) as MsgProfile
       if (profileDataRef.value?.UserId != profileData.UserId){
         router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
         return

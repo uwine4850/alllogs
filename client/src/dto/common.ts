@@ -1,25 +1,25 @@
 
-export interface BaseResponseMessage {
+export interface MsgBaseResponse {
     TypBaseResponseMessage?: unknown;
     Ok: boolean;
     Error: string;
 }
-export function isBaseResponseMessage(obj: any): obj is BaseResponseMessage {
+export function isMsgBaseResponse(obj: any): obj is MsgBaseResponse {
     return typeof obj === 'object' && obj !== null && 'TypBaseResponseMessage' in obj;
 }
-export interface ClientErrorMessage {
+export interface MsgClientError {
     TypClientErrorMessage?: unknown;
     Code: number;
     Text: string;
 }
-export function isClientErrorMessage(obj: any): obj is ClientErrorMessage {
+export function isMsgClientError(obj: any): obj is MsgClientError {
     return typeof obj === 'object' && obj !== null && 'TypClientErrorMessage' in obj;
 }
-export interface ServerErrorMessage {
+export interface MsgServerError {
     TypServerErrorMessage?: unknown;
     Code: number;
     Text: string;
 }
-export function isServerErrorMessage(obj: any): obj is ServerErrorMessage {
+export function isMsgServerError(obj: any): obj is MsgServerError {
     return typeof obj === 'object' && obj !== null && 'TypServerErrorMessage' in obj;
 }
