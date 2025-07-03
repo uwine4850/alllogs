@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/uwine4850/alllogs/api"
-	"github.com/uwine4850/alllogs/api/rprofile"
+	"github.com/uwine4850/alllogs/api/permissions/profileperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/object"
@@ -38,7 +38,7 @@ func (v *AllProjectsView) Permissions(w http.ResponseWriter, r *http.Request, ma
 			api.SendServerError(w, http.StatusInternalServerError, err.Error())
 		}
 	}
-	if err := rprofile.ProfilePermission(manager, intSlugUserId, "no permission to view log groups"); err != nil {
+	if err := profileperm.ProfilePermission(manager, intSlugUserId, "no permission to view log groups"); err != nil {
 		return false, func() {
 			api.SendClientError(w, http.StatusForbidden, err.Error())
 		}

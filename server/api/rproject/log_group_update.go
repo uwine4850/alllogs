@@ -5,6 +5,7 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/api/apiform"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -18,20 +19,12 @@ type UpdateLogGroupForm struct {
 }
 
 func UpdateLogGroup(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
-	UID, ok := m.OneTimeData().GetUserContext("UID")
-	if !ok {
-		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
-	}
 	var updateLogGroupForm UpdateLogGroupForm
 	if err := apiform.ParseAndFill(r, &updateLogGroupForm); err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
-	hasPermissions, err := changeProjectPermissions(updateLogGroupForm.ProjectId, UID)
-	if err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
-	}
-	if !hasPermissions {
-		return api.NewClientError(http.StatusForbidden, "no access to update the log group")
+	if err := projectperm.ProjectPermission(updateLogGroupForm.ProjectId, m, "no access to update the log group"); err != nil {
+		return err
 	}
 
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())

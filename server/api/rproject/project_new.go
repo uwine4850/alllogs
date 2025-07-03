@@ -12,8 +12,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
 
-// TODO: add permission
-
 type MsgProjectAuthor struct {
 	rest.ImplementDTOMessage
 	TypProjectAuthor rest.TypeId `dto:"-typeid"`
@@ -71,21 +69,4 @@ func IsProjectAuthor(UID int, projectId int, dbRead interfaces.IReadDatabase) (b
 	return qb.SelectExists(newQB, cnf.DBT_PROJECT,
 		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
 		qb.Compare("user_id", qb.EQUAL, UID))
-}
-
-func changeProjectPermissions(projectId int, UID any) (bool, error) {
-	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.SelectFrom("id", cnf.DBT_PROJECT).Where(
-		qb.Compare("id", qb.EQUAL, projectId), qb.AND,
-		qb.Compare("user_id", qb.EQUAL, UID),
-	).Merge()
-	res, err := newQB.Query()
-	if err != nil {
-		return false, err
-	}
-	if len(res) != 0 {
-		return true, nil
-	} else {
-		return false, nil
-	}
 }

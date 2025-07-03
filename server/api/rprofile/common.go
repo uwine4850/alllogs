@@ -2,10 +2,8 @@ package rprofile
 
 import (
 	"errors"
-	"net/http"
 	"strconv"
 
-	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -27,18 +25,6 @@ func GetProfileByUID(dbRes interfaces.IReadDatabase, UID int) (*ProfileDBView, e
 		return nil, err
 	}
 	return &profileDBView, nil
-}
-
-func ProfilePermission(m interfaces.IManager, UID int, errorText string) error {
-	currentUID, ok := m.OneTimeData().GetUserContext("UID")
-	if !ok {
-		return api.NewServerError(http.StatusInternalServerError, "uid not exists")
-	}
-	if currentUID.(int) != UID {
-		return api.NewClientError(http.StatusForbidden, errorText)
-	} else {
-		return nil
-	}
 }
 
 func SlugId(m interfaces.IManager) (int, error) {

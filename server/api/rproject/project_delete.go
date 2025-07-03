@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -24,13 +25,10 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())
 	}
-	hasPermission, err := changeProjectPermissions(projectId, UID)
-	if err != nil {
-		return api.NewServerError(http.StatusInternalServerError, err.Error())
+	if err := projectperm.ProjectPermission(projectId, manager, "no access to delete the project"); err != nil {
+		return err
 	}
-	if !hasPermission {
-		return api.NewClientError(http.StatusForbidden, "no access to delete the project")
-	}
+
 	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
 	newQB.Delete(cnf.DBT_PROJECT).Where(
 		qb.Compare("id", qb.EQUAL, projectId), qb.AND,

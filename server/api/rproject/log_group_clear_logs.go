@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -20,7 +21,7 @@ func ClearLogs(w http.ResponseWriter, r *http.Request, m interfaces.IManager) er
 	}
 
 	// Check permission.
-	hasPermission, err := EditLogGroupPermission(logGroupIdSlug, UID)
+	hasPermission, err := projectperm.EditLogGroupPermission(logGroupIdSlug, UID)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}

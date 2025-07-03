@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
@@ -12,8 +13,6 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/object"
 	"github.com/uwine4850/foozy/pkg/router/rest"
 )
-
-// TODO: add permission
 
 type MsgProjectLogGroup struct {
 	rest.ImplementDTOMessage
@@ -45,7 +44,7 @@ func (v *LogGroupView) Permissions(w http.ResponseWriter, r *http.Request, manag
 			api.SendServerError(w, http.StatusInternalServerError, "no slug")
 		}
 	}
-	if err := ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
+	if err := projectperm.ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
 		return false, func() { api.SendClientError(w, http.StatusForbidden, err.Error()) }
 	}
 	return true, func() {}

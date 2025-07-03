@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/profileperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -16,7 +17,7 @@ func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	if err := ProfilePermission(manager, slugId, "no permission to delete the profile"); err != nil {
+	if err := profileperm.ProfilePermission(manager, slugId, "no permission to delete the profile"); err != nil {
 		return err
 	}
 	UID, ok := manager.OneTimeData().GetUserContext("UID")

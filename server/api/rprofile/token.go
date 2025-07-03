@@ -7,6 +7,7 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/api/apiform"
+	"github.com/uwine4850/alllogs/api/permissions/profileperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
@@ -38,7 +39,7 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	if err := apiform.ParseAndFill(r, &tokenForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	if err := ProfilePermission(manager, tokenForm.UserId, "no permissions to generate token"); err != nil {
+	if err := profileperm.ProfilePermission(manager, tokenForm.UserId, "no permissions to generate token"); err != nil {
 		return err
 	}
 
@@ -61,7 +62,7 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	if err := ProfilePermission(manager, slugUserId, "no permissions to delete token"); err != nil {
+	if err := profileperm.ProfilePermission(manager, slugUserId, "no permissions to delete token"); err != nil {
 		return err
 	}
 

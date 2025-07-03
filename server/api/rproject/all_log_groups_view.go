@@ -4,12 +4,11 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
-
-// TODO: add permission
 
 type AllLogGroupsView struct {
 	object.AllView
@@ -30,7 +29,7 @@ func (v *AllLogGroupsView) Permissions(w http.ResponseWriter, r *http.Request, m
 			api.SendServerError(w, http.StatusInternalServerError, "no slug")
 		}
 	}
-	if err := ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
+	if err := projectperm.ProjectPermission(slugProjectId, manager, "no permission to view log groups"); err != nil {
 		return false, func() { api.SendClientError(w, http.StatusForbidden, err.Error()) }
 	}
 	return true, func() {}

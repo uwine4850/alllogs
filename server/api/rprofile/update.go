@@ -9,6 +9,7 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/api/apiform"
+	"github.com/uwine4850/alllogs/api/permissions/profileperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -40,7 +41,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 
 	}
-	if err := ProfilePermission(manager, updateForm.UID, "no access for user profile updates"); err != nil {
+	if err := profileperm.ProfilePermission(manager, updateForm.UID, "no access for user profile updates"); err != nil {
 		return err
 	}
 

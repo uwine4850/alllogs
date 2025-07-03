@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/uwine4850/alllogs/api"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
-	"github.com/uwine4850/foozy/pkg/database/dbutils"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
 	"github.com/uwine4850/foozy/pkg/mapper"
@@ -22,7 +22,7 @@ func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) e
 		return api.NewClientError(http.StatusBadRequest, "log group id not found")
 	}
 
-	hasPermission, err := EditLogGroupPermission(logGroupIdSlug, UID)
+	hasPermission, err := projectperm.EditLogGroupPermission(logGroupIdSlug, UID)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
@@ -49,33 +49,4 @@ func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) e
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(jsonData)
 	return nil
-}
-
-func EditLogGroupPermission(logGroupId any, UID any) (bool, error) {
-	newQB := qb.NewSyncQB(cnf.DatabaseReader.SyncQ())
-	newQB.Select(qb.Exists(qb.SQ(
-		false,
-		qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).SelectFrom("*", cnf.DBT_PROJECT).
-			InnerJoin(
-				cnf.DBT_PROJECT_LOG_GROUP,
-				qb.NoArgsCompare(cnf.DBT_PROJECT+".id", qb.EQUAL, cnf.DBT_PROJECT_LOG_GROUP+".project_id"),
-			).
-			Where(
-				qb.Compare(cnf.DBT_PROJECT_LOG_GROUP+".id", qb.EQUAL, logGroupId), qb.AND,
-				qb.Compare(cnf.DBT_PROJECT+".user_id", qb.EQUAL, UID),
-			),
-	))).As("ok").Merge()
-	res, err := newQB.Query()
-	if err != nil {
-		return false, err
-	}
-	if len(res) > 0 {
-		ok, err := dbutils.ParseInt(res[0]["ok"])
-		if err != nil {
-			return false, err
-		}
-		return ok != 0, nil
-	} else {
-		return false, nil
-	}
 }

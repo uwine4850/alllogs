@@ -5,6 +5,7 @@ import (
 
 	"github.com/uwine4850/alllogs/api"
 	"github.com/uwine4850/alllogs/api/apiform"
+	"github.com/uwine4850/alllogs/api/permissions/projectperm"
 	"github.com/uwine4850/alllogs/cnf/cnf"
 	qb "github.com/uwine4850/foozy/pkg/database/querybuld"
 	"github.com/uwine4850/foozy/pkg/interfaces"
@@ -25,7 +26,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	if err := apiform.ParseAndFill(r, &updateForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}
-	if err := ProjectPermission(updateForm.Id, manager, "no access to update the project"); err != nil {
+	if err := projectperm.ProjectPermission(updateForm.Id, manager, "no access to update the project"); err != nil {
 		return err
 	}
 
