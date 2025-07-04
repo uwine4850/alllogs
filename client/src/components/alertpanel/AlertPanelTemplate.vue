@@ -9,7 +9,7 @@ const props = defineProps({
   customId: {
     type: String,
   },
-});
+})
 
 onMounted(() => {
   const alertPanel = document.getElementById(props.customId || 'alert-panel')
@@ -24,7 +24,7 @@ onMounted(() => {
 <script lang="ts">
 export function openAlertPanel(customId?: string) {
   let alertPanel: HTMLElement | null
-  if (customId){
+  if (customId) {
     alertPanel = document.getElementById(customId)
   } else {
     alertPanel = document.getElementById('alert-panel')
@@ -45,7 +45,7 @@ export function closeAlertPanel(customId?: string) {
 <template>
   <div v-if="props.width">
     <div :id="props.customId || 'alert-panel'" class="alert-panel-c hide">
-      <Panel :style="{width: props.width}" class="alert-inner-panel" @click.stop>
+      <Panel :style="{ width: props.width }" class="alert-inner-panel" @click.stop>
         <slot></slot>
       </Panel>
     </div>

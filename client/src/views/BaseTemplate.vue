@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { MsgProfile } from '@/dto/profile'
-import { MyWebsocket } from '@/classes/websocket'
+import { MyWebsocket } from '@/common/websocket'
 import { onBeforeUnmount, ref } from 'vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
@@ -56,12 +56,7 @@ onBeforeUnmount(() => {
         <Separator />
         <div class="partition">
           <div class="partition-title">projects</div>
-          <Button
-            class="partition-button"
-            icon="group"
-            text="Group owner"
-            link="/my-own-groups"
-          />
+          <Button class="partition-button" icon="group" text="Group owner" link="/my-own-groups" />
         </div>
       </div>
     </div>

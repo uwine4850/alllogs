@@ -2,7 +2,14 @@
 import { useErrorStore } from '@/stores/error'
 import { useRoute } from 'vue-router'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { isMsgLogItem, type MsgLogItem, type MsgLogItemPayload, type MsgLogItemsFilter, type MsgProjectLogGroup, type MsgProject } from '@/dto/project'
+import {
+  isMsgLogItem,
+  type MsgLogItem,
+  type MsgLogItemPayload,
+  type MsgLogItemsFilter,
+  type MsgProjectLogGroup,
+  type MsgProject,
+} from '@/dto/project'
 import ProjectTemplate from '@/views/project/ProjectTemplate.vue'
 import Separator from '@/components/Separator.vue'
 import Button from '@/components/Button.vue'
@@ -11,10 +18,10 @@ import AlertFilter from '@/components/alertpanel/project/AlertFilter.vue'
 import Error from '@/components/Error.vue'
 import SvgIcon from '@/components/icons/SvgIcon.vue'
 import { getLogGroupItems, getProjectLogGroup } from '@/services/project'
-import { MyWebsocket } from '@/classes/websocket'
-import { WrappedObserver } from '@/classes/observer'
+import { MyWebsocket } from '@/common/websocket'
+import { WrappedObserver } from '@/common/observer'
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import AlertClearLogs from '@/components/alertpanel/project/AlertClearLogs.vue'
 
@@ -31,26 +38,42 @@ enum LogMessageType {
 }
 
 let filterFormRef = ref<MsgLogItemsFilter>({
-  Text: "",
-  Type: "",
-  Tag: "",
-  DateTime: "",
+  Text: '',
+  Type: '',
+  Tag: '',
+  DateTime: '',
 })
 
 let wrappedObserver: WrappedObserver
 onMounted(() => {
-  getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore);
-  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
+  getProjectLogGroup(route.params.projID, route.params.logID, logRef, projectRef, errorStore)
+  getLogGroupItems(
+    route.params.logID,
+    -1,
+    10,
+    logItemsPayloadRef,
+    filterFormRef,
+    isLastLogs,
+    errorStore,
+  )
   const CLASS_NAME = 'lastlog'
   wrappedObserver = new WrappedObserver(CLASS_NAME)
   wrappedObserver.onTrigger((el: HTMLElement) => {
-    if(isLastLogs.value){
+    if (isLastLogs.value) {
       wrappedObserver.intersectionObserver?.disconnect()
       return
     }
     el.classList.remove(CLASS_NAME)
-    const lastLogID = el.getAttribute("data-logID")
-    getLogGroupItems(route.params.logID, lastLogID, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
+    const lastLogID = el.getAttribute('data-logID')
+    getLogGroupItems(
+      route.params.logID,
+      lastLogID,
+      10,
+      logItemsPayloadRef,
+      filterFormRef,
+      isLastLogs,
+      errorStore,
+    )
   })
   wrappedObserver.watch()
 
@@ -65,8 +88,8 @@ var items = ref<MsgLogItemPayload[]>([])
 
 watch(logRef, (log) => {
   socket = new MyWebsocket<MsgLogItem>(
-  'log_item',
-  `ws://localhost:8000/logitem?token=${log?.AuthorToken}`,
+    'log_item',
+    `ws://localhost:8000/logitem?token=${log?.AuthorToken}`,
   )
   socket.OnOpen(() => {
     console.log('CLIENT log connected')
@@ -77,12 +100,12 @@ watch(logRef, (log) => {
 
   socket.OnMessage((event: MessageEvent) => {
     const data = JSON.parse(event.data)
-    if (data && isMsgLogItem(data)){
-      if (data.Type == LogMessageType.TYPE_ERROR){
+    if (data && isMsgLogItem(data)) {
+      if (data.Type == LogMessageType.TYPE_ERROR) {
         errorStore.setText(data.Error)
         return
       }
-      if(data.Payload && data.Type == LogMessageType.TYPE_LOGITEM){
+      if (data.Payload && data.Type == LogMessageType.TYPE_LOGITEM) {
         items.value.unshift(data.Payload)
       }
     }
@@ -97,22 +120,24 @@ onBeforeUnmount(() => {
   wrappedObserver.intersectionObserver?.disconnect()
 })
 
-function exportJson(){
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/logs-export-json/${logRef.value?.Id}`, {
+function exportJson() {
+  const req = new MutatedAsyncRequest(
+    `http://localhost:8000/logs-export-json/${logRef.value?.Id}`,
+    {
       withCredentials: true,
-      responseType: "blob",
-    }
+      responseType: 'blob',
+    },
   )
   req.onResponse(async (response: AxiosResponse) => {
-    const blob = new Blob([response.data], {type: "application/json"})
-    const link = document.createElement("a")
+    const blob = new Blob([response.data], { type: 'application/json' })
+    const link = document.createElement('a')
     link.href = window.URL.createObjectURL(blob)
     link.download = `PJ-${projectRef.value?.Name}-LG-${logRef.value?.Name}-logs.json`
     link.click()
     window.URL.revokeObjectURL(link.href)
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.get()
 }
@@ -120,16 +145,24 @@ function exportJson(){
 function searchLogs() {
   logItemsPayloadRef.value = null
   isLastLogs.value = false
-  getLogGroupItems(route.params.logID, -1, 10, logItemsPayloadRef, filterFormRef, isLastLogs, errorStore);
+  getLogGroupItems(
+    route.params.logID,
+    -1,
+    10,
+    logItemsPayloadRef,
+    filterFormRef,
+    isLastLogs,
+    errorStore,
+  )
 }
 defineExpose({ searchLogs })
 </script>
 
 <template>
-  <AlertFilter 
-    v-on:search="searchLogs" 
-    v-model:model-value-type="filterFormRef.Type" 
-    v-model:model-value-tag="filterFormRef.Tag" 
+  <AlertFilter
+    v-on:search="searchLogs"
+    v-model:model-value-type="filterFormRef.Type"
+    v-model:model-value-tag="filterFormRef.Tag"
     v-model:model-value-date-time="filterFormRef.DateTime"
   />
   <AlertClearLogs custom-id="alert-clear-logs" logs-container-class="table" />
@@ -152,11 +185,7 @@ defineExpose({ searchLogs })
           <button type="button" @click="searchLogs">Search</button>
         </form>
         <Separator :vertical="true" />
-        <button
-          class="il-button"
-          id="filter-btn1"
-          @click="openAlertPanel()"
-        >
+        <button class="il-button" id="filter-btn1" @click="openAlertPanel()">
           <SvgIcon name="filter" class="icon" />
           <p>filters</p>
         </button>
@@ -206,7 +235,13 @@ defineExpose({ searchLogs })
           <Separator />
         </div>
         <div v-for="(log, index) in logItemsPayloadRef" :key="log.Id">
-          <div class="row" :class="{'lastlog': index == Object.keys(logItemsPayloadRef!).length-1 && !isLastLogs}" :data-logID="log.Id">
+          <div
+            class="row"
+            :class="{
+              lastlog: index == Object.keys(logItemsPayloadRef!).length - 1 && !isLastLogs,
+            }"
+            :data-logID="log.Id"
+          >
             <div class="cell c-type" :class="`c-type-${log.Type}`">
               {{ log.Type }}
             </div>
@@ -225,8 +260,18 @@ defineExpose({ searchLogs })
       <PanelTitle icon="project" text="log group management" />
       <div class="pm-wrapper">
         <Button @click="exportJson" class="pm-button" icon="upload" text="Export as JSON" link="" />
-        <Button class="pm-button" icon="update" text="Update" :link="`/project/${projectRef?.Id}/log-group/${logRef?.Id}/update`" />
-        <Button class="pm-button" icon="clear" text="Clear" @click="openAlertPanel('alert-clear-logs')" />
+        <Button
+          class="pm-button"
+          icon="update"
+          text="Update"
+          :link="`/project/${projectRef?.Id}/log-group/${logRef?.Id}/update`"
+        />
+        <Button
+          class="pm-button"
+          icon="clear"
+          text="Clear"
+          @click="openAlertPanel('alert-clear-logs')"
+        />
         <Button class="pm-button" icon="bell" text="Setup notfications" link="" />
       </div>
     </template>
@@ -252,11 +297,11 @@ defineExpose({ searchLogs })
     font-family: vars.$fnt-hint-madurai;
   }
 }
-.log-group-id{
+.log-group-id {
   display: flex;
   font-size: 1.1rem;
   padding: 5px 10px;
-  span{
+  span {
     margin-right: 5px;
   }
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import Button from '@/components/Button.vue'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgBaseResponse } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
@@ -26,7 +26,7 @@ const cancelButton = () => {
 }
 
 const clearLogs = () => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/log-items/${route.params.logID}`, {
+  const req = new MutatedAsyncRequest(`http://localhost:8000/log-items/${route.params.logID}`, {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
@@ -35,15 +35,19 @@ const clearLogs = () => {
       errorStore.setText(baseResponse.Error)
     } else {
       const logsContainer = document.getElementsByClassName(props.logsContainerClass)
-      if (logsContainer.length > 0){
-        logsContainer[0].innerHTML = ""
+      if (logsContainer.length > 0) {
+        logsContainer[0].innerHTML = ''
         closeAlertPanel(props.customId)
       }
     }
   })
-  req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
-  }, errorStore, "alertClearLogsStoreId")
+  req.onError(
+    (error: AxiosError) => {
+      errorStore.setText('unexpected error: ' + error.message)
+    },
+    errorStore,
+    'alertClearLogsStoreId',
+  )
   req.delete()
 }
 </script>
@@ -53,13 +57,7 @@ const clearLogs = () => {
     <Error store-id="alertClearLogsStoreId" />
     <div class="text">Clear logs?</div>
     <div class="buttons">
-      <Button
-		  @click="clearLogs"
-        type="button"
-        class="_btn"
-        icon="delete"
-        text="Clear logs"
-      />
+      <Button @click="clearLogs" type="button" class="_btn" icon="delete" text="Clear logs" />
       <Button @click="cancelButton" type="button" class="_btn" icon="delete" text="Cancel" />
     </div>
   </AlertPanelTemplate>

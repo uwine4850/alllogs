@@ -23,15 +23,15 @@ const emit = defineEmits<{
 
 const formType = computed({
   get: () => props.modelValueType,
-  set: value => emit('update:modelValueType', value),
+  set: (value) => emit('update:modelValueType', value),
 })
 const formTag = computed({
   get: () => props.modelValueTag,
-  set: value => emit('update:modelValueTag', value),
+  set: (value) => emit('update:modelValueTag', value),
 })
 const formDateTime = computed({
   get: () => props.modelValueDateTime,
-  set: value => emit('update:modelValueDateTime', value),
+  set: (value) => emit('update:modelValueDateTime', value),
 })
 
 type Option = {
@@ -44,7 +44,7 @@ const options: Option[] = [
   { value: 'error', name: 'error' },
   { value: 'info', name: 'info' },
 ]
-function search(){
+function search() {
   closeAlertPanel()
   props.onSearch()
 }

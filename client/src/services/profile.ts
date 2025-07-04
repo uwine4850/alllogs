@@ -1,5 +1,5 @@
 import type { MsgGenToken, MsgProfile, MsgTokenResponse } from '@/dto/profile'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { MsgBaseResponse } from '@/dto/common'
 import { AxiosError, type AxiosResponse } from 'axios'
 import { ref, type Ref } from 'vue'
@@ -11,7 +11,7 @@ export const getProfileData = async (
   id: string,
   errorStore: ReturnType<typeof useErrorStore>,
 ) => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/profile/${id}`, {
+  const req = new MutatedAsyncRequest(`http://localhost:8000/profile/${id}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -29,7 +29,7 @@ export const getProfileData = async (
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   await req.get()
 }
@@ -46,7 +46,7 @@ export const generateTokenForm = async (
     UserId: profileData.UserId,
   })
 
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/gen-token', {
+  const req = new MutatedAsyncRequest('http://localhost:8000/gen-token', {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -61,7 +61,7 @@ export const generateTokenForm = async (
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.setData(formData.value)
   req.post()
@@ -76,7 +76,7 @@ export const deleteToken = async (
   if (!profileData) {
     return
   }
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/del-token/user/${uid}`, {
+  const req = new MutatedAsyncRequest(`http://localhost:8000/del-token/user/${uid}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -91,7 +91,7 @@ export const deleteToken = async (
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.delete()
 }

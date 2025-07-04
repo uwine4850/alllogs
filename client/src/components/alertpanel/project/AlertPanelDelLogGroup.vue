@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import Button from '@/components/Button.vue'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgBaseResponse } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
@@ -17,12 +17,15 @@ const cancelButton = () => {
 }
 
 const deleteProject = () => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/project/${route.params.projId}/log-group/${route.params.logId}`, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+  const req = new MutatedAsyncRequest(
+    `http://localhost:8000/project/${route.params.projId}/log-group/${route.params.logId}`,
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      withCredentials: true,
     },
-    withCredentials: true,
-  })
+  )
   req.onResponse(async (response: AxiosResponse) => {
     const baseResponse = response.data as MsgBaseResponse
     if (!baseResponse.Ok) {
@@ -31,9 +34,13 @@ const deleteProject = () => {
       router.push(`/project/${route.params.projId}`)
     }
   })
-  req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
-  }, errorStore, "alertPanelDelLogGroupStoreId")
+  req.onError(
+    (error: AxiosError) => {
+      errorStore.setText('unexpected error: ' + error.message)
+    },
+    errorStore,
+    'alertPanelDelLogGroupStoreId',
+  )
   req.delete()
 }
 </script>
@@ -44,7 +51,7 @@ const deleteProject = () => {
     <div class="text">Delete current log group?</div>
     <div class="buttons">
       <Button
-		@click="deleteProject"
+        @click="deleteProject"
         type="button"
         class="_btn"
         icon="delete"

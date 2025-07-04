@@ -104,7 +104,7 @@ export const router = createRouter({
     },
     {
       path: '/project/:projId/log-group/:logId/update',
-      name: "update-log-group",
+      name: 'update-log-group',
       component: UpdateLogGroup,
       meta: { authorized: true },
     },

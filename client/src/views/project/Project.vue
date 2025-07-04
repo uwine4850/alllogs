@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgProjectLogGroup, MsgProject } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
@@ -18,12 +18,9 @@ const projectRef = ref<MsgProject | null>(null)
 const logGroupsRef = ref<MsgProjectLogGroup[]>()
 
 const getLogGroups = (project_id: number) => {
-  const req = new AsyncRequestWithAuthorization(
-    `http://localhost:8000/all-log-groups/${project_id}`,
-    {
-      withCredentials: true,
-    },
-  )
+  const req = new MutatedAsyncRequest(`http://localhost:8000/all-log-groups/${project_id}`, {
+    withCredentials: true,
+  })
   req.onResponse(async (response: AxiosResponse) => {
     const projectMessages = response.data as MsgProjectLogGroup[]
     if (projectMessages && projectMessages.length != 0) {
@@ -35,13 +32,13 @@ const getLogGroups = (project_id: number) => {
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.get()
 }
 
 onMounted(() => {
-  getProject(route.params.id, projectRef, errorStore);
+  getProject(route.params.id, projectRef, errorStore)
 })
 
 watch(projectRef, (project) => {
@@ -97,7 +94,12 @@ watch(projectRef, (project) => {
       <Separator />
       <div class="pm-wrapper">
         <Button class="pm-button" icon="user" text="Users" link="#" />
-        <Button class="pm-button" icon="update" text="Update" :link="`/project/${ projectRef?.Id }/update`" />
+        <Button
+          class="pm-button"
+          icon="update"
+          text="Update"
+          :link="`/project/${projectRef?.Id}/update`"
+        />
         <Button class="pm-button" icon="upload" text="Export all as JSON" />
       </div>
     </template>

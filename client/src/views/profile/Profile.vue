@@ -36,8 +36,8 @@ onMounted(async () => {
   const logoutBtn = document.getElementById('logout-btn')
   if (logoutBtn) {
     logoutBtn.onclick = function () {
-      if(profileDataRef.value?.User?.Id){
-        try{
+      if (profileDataRef.value?.User?.Id) {
+        try {
           logout(profileDataRef.value.User.Id)
         } catch (e) {
           errorStore.setText(String(e))

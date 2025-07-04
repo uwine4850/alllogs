@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
+import { AsyncRequest, catchClientError, catchServerError } from '@/common/request'
 import MiddlePanel from '@/views/MiddlePanel.vue'
 import InputTemplate from '@/components/input/InputTemplate.vue'
 import PasswordInp from '@/components/input/InputPassword.vue'
@@ -10,7 +10,13 @@ import Error from '@/components/Error.vue'
 import { useErrorStore } from '@/stores/error'
 import { ref } from 'vue'
 import type { MsgRegister } from '@/dto/auth'
-import { isMsgClientError, isMsgServerError, type MsgBaseResponse, type MsgClientError, type MsgServerError } from '@/dto/common'
+import {
+  isMsgClientError,
+  isMsgServerError,
+  type MsgBaseResponse,
+  type MsgClientError,
+  type MsgServerError,
+} from '@/dto/common'
 import { AxiosError, type AxiosResponse } from 'axios'
 
 const errorStore = useErrorStore()
@@ -37,12 +43,12 @@ const submitForm = async () => {
     }
   })
   req.onError((error: AxiosError) => {
-    if(error.response?.data, isMsgClientError(error.response?.data)){
+    if ((error.response?.data, isMsgClientError(error.response?.data))) {
       catchClientError(error.response?.data as MsgClientError, errorStore)
-    } else if (error.response?.data, isMsgServerError(error.response?.data)){
+    } else if ((error.response?.data, isMsgServerError(error.response?.data))) {
       catchServerError(error.response?.data as MsgServerError, errorStore)
     } else {
-      errorStore.setText("unexpected error: " + error.message)
+      errorStore.setText('unexpected error: ' + error.message)
     }
   })
   req.setData(formData.value)

@@ -10,9 +10,14 @@ import Button from '@/components/Button.vue'
 import { ref } from 'vue'
 import { AxiosError, type AxiosResponse } from 'axios'
 import Error from '@/components/Error.vue'
-import { AsyncRequest, catchClientError, catchServerError } from '@/classes/request'
+import { AsyncRequest, catchClientError, catchServerError } from '@/common/request'
 import type { MsgProfile } from '@/dto/profile'
-import { isMsgClientError, isMsgServerError, type MsgClientError, type MsgServerError } from '@/dto/common'
+import {
+  isMsgClientError,
+  isMsgServerError,
+  type MsgClientError,
+  type MsgServerError,
+} from '@/dto/common'
 </script>
 
 <script setup lang="ts">
@@ -35,48 +40,51 @@ const submitForm = async () => {
     const loginResponse = response.data as MsgLoginResponse
     if (loginResponse && loginResponse.Error != '') {
       errorStore.setText(loginResponse.Error)
-    } else if(loginResponse) {
+    } else if (loginResponse) {
       sessionStorage.setItem('authJWT', loginResponse.JWT)
-      // Get profile data.
-      const req = new AsyncRequest('http://localhost:8000/profile/' + loginResponse.UID, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      })
-      req.onResponse(function (response: AxiosResponse) {
-        const profileResponse = response.data as MsgProfile
-        if (profileResponse.Error && profileResponse.Error != '') {
-          errorStore.setText(profileResponse.Error)
-          sessionStorage.remove('authJWT');
-        } else {
-          sessionStorage.setItem('profile', JSON.stringify(profileResponse))
-          router.push('/')
-        }
-      })
-      req.onError((error: AxiosError) => {
-        if(error.response?.data, isMsgClientError(error.response?.data)){
-          catchClientError(error.response?.data as MsgClientError, errorStore)
-        } else if (error.response?.data, isMsgServerError(error.response?.data)){
-          catchServerError(error.response?.data as MsgServerError, errorStore)
-        } else {
-          errorStore.setText("unexpected error: " + error.message)
-        }
-      })
-      req.get()
+      getProfile(loginResponse.UID)
     }
   })
   loginReq.onError((error: AxiosError) => {
-    if(error.response?.data, isMsgClientError(error.response?.data)){
+    if ((error.response?.data, isMsgClientError(error.response?.data))) {
       catchClientError(error.response?.data as MsgClientError, errorStore)
-    } else if (error.response?.data, isMsgServerError(error.response?.data)){
+    } else if ((error.response?.data, isMsgServerError(error.response?.data))) {
       catchServerError(error.response?.data as MsgServerError, errorStore)
     } else {
-      errorStore.setText("unexpected error: " + error.message)
+      errorStore.setText('unexpected error: ' + error.message)
     }
   })
   loginReq.setData(formData.value)
   loginReq.post()
+}
+
+async function getProfile(uid: number) {
+  const req = new AsyncRequest('http://localhost:8000/profile/' + uid, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    withCredentials: true,
+  })
+  req.onResponse(function (response: AxiosResponse) {
+    const profileResponse = response.data as MsgProfile
+    if (profileResponse.Error && profileResponse.Error != '') {
+      errorStore.setText(profileResponse.Error)
+      sessionStorage.remove('authJWT')
+    } else {
+      sessionStorage.setItem('profile', JSON.stringify(profileResponse))
+      router.push('/')
+    }
+  })
+  req.onError((error: AxiosError) => {
+    if ((error.response?.data, isMsgClientError(error.response?.data))) {
+      catchClientError(error.response?.data as MsgClientError, errorStore)
+    } else if ((error.response?.data, isMsgServerError(error.response?.data))) {
+      catchServerError(error.response?.data as MsgServerError, errorStore)
+    } else {
+      errorStore.setText('unexpected error: ' + error.message)
+    }
+  })
+  req.get()
 }
 </script>
 

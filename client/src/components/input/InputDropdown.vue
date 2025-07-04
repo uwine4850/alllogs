@@ -26,7 +26,6 @@ const props = defineProps({
 
 const selectElement = ref<HTMLElement | null>(null)
 
-
 const emit = defineEmits(['update:modelValue'])
 
 onMounted(() => {
@@ -37,7 +36,10 @@ onMounted(() => {
 </script>
 
 <script lang="ts">
-function dropdown(selectEl: HTMLElement | null, emit: (event: 'update:modelValue', value: string) => void) {
+function dropdown(
+  selectEl: HTMLElement | null,
+  emit: (event: 'update:modelValue', value: string) => void,
+) {
   const selectButton = selectEl?.querySelector('#select-button') as HTMLElement
   const options = selectEl?.querySelectorAll('.option') as NodeListOf<HTMLElement>
   const selectInput = selectEl?.querySelector('#custom-select-input') as HTMLInputElement

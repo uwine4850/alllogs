@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-    const props = defineProps({
-        name:{
-            type: String,
-            required: true,
-        },
-    })
-    const iconName = computed(() => `#icon-${props.name}`)
+import { computed } from 'vue'
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+})
+const iconName = computed(() => `#icon-${props.name}`)
 </script>
 
 <template>

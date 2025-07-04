@@ -4,7 +4,7 @@ import type { MsgProfile, MsgProfileUpdate } from '@/dto/profile'
 import { getProfileData } from '@/services/profile'
 import { useRoute, useRouter } from 'vue-router'
 import { useErrorStore } from '@/stores/error'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgBaseResponse } from '@/dto/common'
 import { openAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
@@ -32,7 +32,7 @@ const formData = ref<MsgProfileUpdate>({
   DelAvatar: false,
 })
 const saveChanges = async () => {
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/profile/update', {
+  const req = new MutatedAsyncRequest('http://localhost:8000/profile/update', {
     withCredentials: true,
   })
   req.onResponse(async (response: AxiosResponse) => {
@@ -47,7 +47,7 @@ const saveChanges = async () => {
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
 
   const data = new FormData()
@@ -77,8 +77,8 @@ watch(profileDataRef, (profile) => {
     const profileJsonData = sessionStorage.getItem('profile')
     if (profileJsonData) {
       profileData = JSON.parse(profileJsonData) as MsgProfile
-      if (profileDataRef.value?.UserId != profileData.UserId){
-        router.replace("/error?code=403 Forbidden&text=no access for user profile updates")
+      if (profileDataRef.value?.UserId != profileData.UserId) {
+        router.replace('/error?code=403 Forbidden&text=no access for user profile updates')
         return
       }
     }

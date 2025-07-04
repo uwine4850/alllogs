@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AlertPanelTemplate, { closeAlertPanel } from '@/components/alertpanel/AlertPanelTemplate.vue'
 import Button from '@/components/Button.vue'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgBaseResponse } from '@/dto/common'
 import { useErrorStore } from '@/stores/error'
@@ -17,7 +17,7 @@ const cancelButton = () => {
 }
 
 const deleteUser = () => {
-  const req = new AsyncRequestWithAuthorization(`http://localhost:8000/profile/del/${route.params.id}`, {
+  const req = new MutatedAsyncRequest(`http://localhost:8000/profile/del/${route.params.id}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -33,9 +33,13 @@ const deleteUser = () => {
       router.push('/login')
     }
   })
-  req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
-  }, errorStore, "alertPanelDelProfileStoreId")
+  req.onError(
+    (error: AxiosError) => {
+      errorStore.setText('unexpected error: ' + error.message)
+    },
+    errorStore,
+    'alertPanelDelProfileStoreId',
+  )
   req.delete()
 }
 </script>
@@ -45,13 +49,7 @@ const deleteUser = () => {
     <Error store-id="alertPanelDelProfileStoreId" />
     <div class="text">Delete profile?</div>
     <div class="buttons">
-      <Button
-        @click="deleteUser"
-        type="button"
-        class="_btn"
-        icon="delete"
-        text="Delete profile"
-      />
+      <Button @click="deleteUser" type="button" class="_btn" icon="delete" text="Delete profile" />
       <Button @click="cancelButton" type="button" class="_btn" icon="delete" text="Cancel" />
     </div>
   </AlertPanelTemplate>

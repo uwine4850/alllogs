@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import type { AxiosError, AxiosResponse } from 'axios'
 import type { MsgProject } from '@/dto/project'
 import { useErrorStore } from '@/stores/error'
@@ -19,7 +19,7 @@ if (profileJsonData) {
   profileData = JSON.parse(profileJsonData) as MsgProfile
 }
 
-const req = new AsyncRequestWithAuthorization(`http://localhost:8000/all-projects/${profileData!.UserId}`, {
+const req = new MutatedAsyncRequest(`http://localhost:8000/all-projects/${profileData!.UserId}`, {
   withCredentials: true,
 })
 req.onResponse(async (response: AxiosResponse) => {
@@ -31,7 +31,7 @@ req.onResponse(async (response: AxiosResponse) => {
   }
 })
 req.onError((error: AxiosError) => {
-  errorStore.setText("unexpected error: " + error.message)
+  errorStore.setText('unexpected error: ' + error.message)
 }, errorStore)
 req.get()
 </script>

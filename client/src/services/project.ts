@@ -1,16 +1,23 @@
-import { AsyncRequestWithAuthorization } from "@/classes/request"
-import type { MsgLogItem, MsgLogItemPayload, MsgLogItemsFilter, MsgProjectLogGroup, MsgProject } from "@/dto/project"
-import type { AxiosError, AxiosResponse } from "axios"
+import { MutatedAsyncRequest } from '@/common/request'
+import type {
+  MsgLogItem,
+  MsgLogItemPayload,
+  MsgLogItemsFilter,
+  MsgProjectLogGroup,
+  MsgProject,
+} from '@/dto/project'
+import type { AxiosError, AxiosResponse } from 'axios'
 import { useErrorStore } from '@/stores/error'
-import { type Ref } from "vue"
+import { type Ref } from 'vue'
 
-export function getProject(id: any, projectRef: Ref<MsgProject | null>, errorStore: ReturnType<typeof useErrorStore>){
-  const req = new AsyncRequestWithAuthorization(
-    `http://localhost:8000/project/${id}`,
-    {
-      withCredentials: true,
-    },
-  )
+export function getProject(
+  id: any,
+  projectRef: Ref<MsgProject | null>,
+  errorStore: ReturnType<typeof useErrorStore>,
+) {
+  const req = new MutatedAsyncRequest(`http://localhost:8000/project/${id}`, {
+    withCredentials: true,
+  })
   req.onResponse(async (response: AxiosResponse) => {
     const projectMessage = response.data as MsgProject
     if (projectMessage.Error != '') {
@@ -20,7 +27,7 @@ export function getProject(id: any, projectRef: Ref<MsgProject | null>, errorSto
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.get()
 }
@@ -30,9 +37,9 @@ export function getProjectLogGroup(
   groupId: any,
   groupRef: Ref<MsgProjectLogGroup | null>,
   projectRef: Ref<MsgProject | null>,
-  errorStore: ReturnType<typeof useErrorStore>
-  ){
-  const req = new AsyncRequestWithAuthorization(
+  errorStore: ReturnType<typeof useErrorStore>,
+) {
+  const req = new MutatedAsyncRequest(
     `http://localhost:8000/project-detail/${projectId}/log-group/${groupId}`,
     {
       withCredentials: true,
@@ -54,7 +61,7 @@ export function getProjectLogGroup(
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.get()
 }
@@ -66,10 +73,10 @@ export function getLogGroupItems(
   logItemRef: Ref<MsgLogItemPayload[] | null>,
   filterRef: Ref<MsgLogItemsFilter | null>,
   isLastLogs: Ref<boolean>,
-  errorStore: ReturnType<typeof useErrorStore>
-  ){
-  let queryParams = ""
-  if (filterRef.value){
+  errorStore: ReturnType<typeof useErrorStore>,
+) {
+  let queryParams = ''
+  if (filterRef.value) {
     let isFirst = true
     for (const [key, value] of Object.entries(filterRef.value)) {
       if (!value) continue
@@ -81,7 +88,7 @@ export function getLogGroupItems(
       }
     }
   }
-  const req = new AsyncRequestWithAuthorization(
+  const req = new MutatedAsyncRequest(
     `http://localhost:8000/log-items/${logGroupId}/${startId}/${count}?${queryParams}`,
     {
       withCredentials: true,
@@ -89,20 +96,20 @@ export function getLogGroupItems(
   )
   req.onResponse(async (response: AxiosResponse) => {
     const logs = response.data as MsgLogItemPayload[]
-    if (!logs){
+    if (!logs) {
       return
     }
-    if (logs.length != count){
+    if (logs.length != count) {
       isLastLogs.value = true
     }
-    if (logItemRef.value){
+    if (logItemRef.value) {
       logItemRef.value.push(...logs)
     } else {
       logItemRef.value = logs
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   req.get()
 }

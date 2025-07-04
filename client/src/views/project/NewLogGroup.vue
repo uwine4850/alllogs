@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MsgProjectLogGroup } from '@/dto/project'
 import { ref } from 'vue'
-import { AsyncRequestWithAuthorization } from '@/classes/request'
+import { MutatedAsyncRequest } from '@/common/request'
 import { useErrorStore } from '@/stores/error'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosError, AxiosResponse } from 'axios'
@@ -25,11 +25,11 @@ const formData = ref<MsgProjectLogGroup>({
   Name: '',
   Description: '',
   Error: '',
-  AuthorToken: ''
+  AuthorToken: '',
 })
 
 const submitForm = () => {
-  const req = new AsyncRequestWithAuthorization('http://localhost:8000/new-log-group', {
+  const req = new MutatedAsyncRequest('http://localhost:8000/new-log-group', {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -44,7 +44,7 @@ const submitForm = () => {
     }
   })
   req.onError((error: AxiosError) => {
-    errorStore.setText("unexpected error: " + error.message)
+    errorStore.setText('unexpected error: ' + error.message)
   }, errorStore)
   console.log(formData.value)
   req.setData(formData.value)
@@ -60,13 +60,7 @@ const submitForm = () => {
       <InputText v-model="formData.Name" text="Name" name="name" />
       <InputTextarea v-model="formData.Description" text="Description" name="description" />
       <Separator />
-      <Button
-        @click="submitForm"
-        type="button"
-        class="create-btn"
-        icon="checkbox"
-        text="Create"
-      />
+      <Button @click="submitForm" type="button" class="create-btn" icon="checkbox" text="Create" />
     </MiddlePanel>
   </BaseTemplate>
 </template>

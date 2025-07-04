@@ -1,5 +1,11 @@
 import { isMsgLoginResponse, type MsgLoginResponse } from '@/dto/auth'
-import { isMsgClientError, isMsgServerError, type MsgBaseResponse, type MsgClientError, type MsgServerError } from '@/dto/common'
+import {
+  isMsgClientError,
+  isMsgServerError,
+  type MsgBaseResponse,
+  type MsgClientError,
+  type MsgServerError,
+} from '@/dto/common'
 import router from '@/router'
 import type { useErrorStore } from '@/stores/error'
 import { AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios'
@@ -24,23 +30,21 @@ export class AsyncRequest<D = any> {
     this.config.headers.Authorization = sessionStorage.getItem('authJWT')
   }
 
-  protected async csrfToken(){
-    if (!this.withCSRF){
+  protected async csrfToken() {
+    if (!this.withCSRF) {
       return
     }
-    const csrfToken = getCookie("CSRF_TOKEN")
-    if(!csrfToken){
+    const csrfToken = getCookie('CSRF_TOKEN')
+    if (!csrfToken) {
       try {
         await setToken()
       } catch (err: any) {
-        const axiosError = axios.isAxiosError(err)
-        ? err
-        : new AxiosError(err || String(err))
-        if(this.onErrorFn){
+        const axiosError = axios.isAxiosError(err) ? err : new AxiosError(err || String(err))
+        if (this.onErrorFn) {
           this.onErrorFn(axiosError)
         }
-      } finally{
-        const newToken = getCookie("CSRF_TOKEN")
+      } finally {
+        const newToken = getCookie('CSRF_TOKEN')
         this.config.headers = {
           ...this.config.headers,
           'X-CSRF-TOKEN': newToken,
@@ -137,7 +141,7 @@ export class AsyncRequest<D = any> {
       }
     }
   }
-  
+
   public async patch() {
     await this.csrfToken()
     this.currentRequest = this.patch.bind(this)
@@ -155,7 +159,7 @@ export class AsyncRequest<D = any> {
   }
 }
 
-export class AsyncRequestWithAuthorization extends AsyncRequest {
+export class MutatedAsyncRequest extends AsyncRequest {
   public onResponse(fn: (response: AxiosResponse) => void) {
     this.onResponseFn = async () => {
       if (this.response) {
@@ -174,9 +178,13 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
       }
     }
   }
-  public override onError(fn: (error: AxiosError) => void, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string) {
+  public override onError(
+    fn: (error: AxiosError) => void,
+    errorStore?: ReturnType<typeof useErrorStore>,
+    storeId?: string,
+  ) {
     this.onErrorFn = async (error: AxiosError) => {
-      if(error) {
+      if (error) {
         if (error.response?.data && isMsgClientError(error.response.data)) {
           const clientErrorMessage = error.response.data as MsgClientError
           catchClientError(clientErrorMessage, errorStore, storeId)
@@ -193,26 +201,34 @@ export class AsyncRequestWithAuthorization extends AsyncRequest {
   }
 }
 
-export function catchClientError(data: MsgClientError, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
-  switch (data.Code){
+export function catchClientError(
+  data: MsgClientError,
+  errorStore?: ReturnType<typeof useErrorStore>,
+  storeId?: string,
+) {
+  switch (data.Code) {
     case 400:
       errorStore?.setText(data.Text, storeId)
-      break;
+      break
     case 401:
       sessionStorage.removeItem('authJWT')
       sessionStorage.removeItem('profile')
       router.push('/login')
-      break;
+      break
     case 403:
-      router.push(`/error?code=${"403 Forbidden"}&text=${data.Text}`)
-      break;
+      router.push(`/error?code=${'403 Forbidden'}&text=${data.Text}`)
+      break
     case 409:
       errorStore?.setText(data.Text, storeId)
-      break;
+      break
   }
 }
 
-export function catchServerError(data: MsgServerError, errorStore?: ReturnType<typeof useErrorStore>, storeId?: string){
+export function catchServerError(
+  data: MsgServerError,
+  errorStore?: ReturnType<typeof useErrorStore>,
+  storeId?: string,
+) {
   errorStore?.setText(data.Text, storeId)
 }
 
@@ -226,12 +242,16 @@ export function getCookie(name: string): string | null {
 }
 
 async function setToken(): Promise<void> {
-  const req = new AsyncRequest(`http://localhost:8000/set-csrf`, {
+  const req = new AsyncRequest(
+    `http://localhost:8000/set-csrf`,
+    {
       headers: {
         'Content-Type': 'application/json',
       },
       withCredentials: true,
-  }, false)
+    },
+    false,
+  )
   return new Promise((resolve, reject) => {
     req.onResponse((response: AxiosResponse) => {
       const baseResponse = response.data as MsgBaseResponse
@@ -241,7 +261,7 @@ async function setToken(): Promise<void> {
         resolve()
       }
     })
-    
+
     req.onError((error: AxiosError) => {
       reject(error)
     })

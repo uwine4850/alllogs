@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Separator from '@/components/Separator.vue'
-import SvgIcon from './icons/SvgIcon.vue';
+import SvgIcon from './icons/SvgIcon.vue'
 
 const props = defineProps({
   icon: {
