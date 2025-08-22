@@ -13,12 +13,12 @@ import (
 
 var skipUrl = []string{"/login", "/register", "/notifications", "/logitem", "/set-csrf"}
 
-func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	if slices.Contains(skipUrl, r.URL.Path) {
 		return nil
 	}
 	err := builtin_mddl.AuthJWT(
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (string, error) {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (string, error) {
 			tokenStr := r.Header.Get("Authorization")
 			if tokenStr == "" {
 				authJWT := r.URL.Query().Get("authJWT")
@@ -30,16 +30,16 @@ func CheckJWT(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 			}
 			return tokenStr, nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, token string, AID int) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, token string, AID int) error {
 			middlewares.SkipNextPage(manager.OneTimeData())
 			rauth.SendLoginResponse(w, token, AID, "")
 			return nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, AID int) error {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, AID int) error {
 			manager.OneTimeData().SetUserContext("UID", AID)
 			return nil
 		},
-		func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+		func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 			middlewares.SkipNextPage(manager.OneTimeData())
 			api.SendClientError(w, http.StatusUnauthorized, "")
 		},

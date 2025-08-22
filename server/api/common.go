@@ -73,7 +73,7 @@ func SendBeseResponse(w http.ResponseWriter, ok bool, _err error) {
 	}
 }
 
-func SendAnyMessage(message irest.IMessage, w http.ResponseWriter, code int) {
+func SendAnyMessage(message irest.Message, w http.ResponseWriter, code int) {
 	if err := mapper.SendSafeJsonDTOMessage(w, code, cnf.DTO, typeopr.Ptr{}.New(message)); err != nil {
 		sendUntypeServerError("DTO error", http.StatusInternalServerError, w)
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/mapper"
 )
 
-func GetProfileByUID(dbRes interfaces.IReadDatabase, UID int) (*ProfileDBView, error) {
+func GetProfileByUID(dbRes interfaces.DatabaseInteraction, UID int) (*ProfileDBView, error) {
 	newQB := qb.NewSyncQB(dbRes.SyncQ()).SelectFrom("*", cnf.DBT_PROFILE).Where(qb.Compare("user_id", qb.EQUAL, UID))
 	newQB.Merge()
 	res, err := newQB.Query()
@@ -27,7 +27,7 @@ func GetProfileByUID(dbRes interfaces.IReadDatabase, UID int) (*ProfileDBView, e
 	return &profileDBView, nil
 }
 
-func SlugId(m interfaces.IManager) (int, error) {
+func SlugId(m interfaces.Manager) (int, error) {
 	slugId, ok := m.OneTimeData().GetSlugParams("id")
 	if !ok {
 		return 0, errors.New("slug id not found")

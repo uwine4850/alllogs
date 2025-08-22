@@ -11,7 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")

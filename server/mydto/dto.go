@@ -89,7 +89,7 @@ var AllowMessages = []rest.AllowMessage{
 	},
 }
 
-var TSGenMessages = map[string][]irest.IMessage{
+var TSGenMessages = map[string][]irest.Message{
 	"../client/src/dto/common.ts": {
 		api.MsgBaseResponse{},
 		api.MsgClientError{},

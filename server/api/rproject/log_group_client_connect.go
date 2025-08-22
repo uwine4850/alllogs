@@ -48,7 +48,7 @@ type MsgLogItemPayload struct {
 var connections = map[string][]*websocket.Conn{}
 var connectionsToClient = map[*websocket.Conn]string{}
 
-func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func LogClientSocket(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	socket := router.NewWebsocket(router.Upgrader)
 	socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
 		token := r.URL.Query().Get("token")

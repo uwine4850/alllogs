@@ -17,7 +17,7 @@ type updateForm struct {
 	Description string `form:"Description"`
 }
 
-func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Update(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")

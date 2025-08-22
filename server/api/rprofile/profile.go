@@ -42,15 +42,15 @@ type JsonProfileObject struct {
 	object.ObjView
 }
 
-func (v *JsonProfileObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *JsonProfileObject) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
-func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+func (v *JsonProfileObject) Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (object.Context, error) {
 	return object.Context{}, nil
 }
 
-func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	view := object.JsonObjectTemplateView{
 		View: &JsonProfileObject{
 			object.ObjView{
@@ -64,7 +64,7 @@ func JsonProfileObjectView(database object.IViewDatabase) func(w http.ResponseWr
 		DTO:     cnf.DTO,
 		Message: MsgProfile{},
 	}
-	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
+	view.OnMessageFilled(func(message any, manager interfaces.Manager) error {
 		profileMessage := message.(*MsgProfile)
 		querybuild := qb.NewSyncQB(cnf.DatabaseReader.SyncQ()).SelectFrom("id, username", cnf.DBT_AUTH).
 			Where(qb.Compare("id", qb.EQUAL, profileMessage.UserId))

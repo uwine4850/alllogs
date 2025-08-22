@@ -42,7 +42,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	newManager := manager.NewManager(manager.NewOneTimeData(), render, manager.NewDatabasePool())
+	newManager := manager.NewManager(manager.NewOneTimeData(), render, database.NewDatabasePool())
 	database.InitDatabasePool(newManager, gDB)
 
 	dbRead, err := newManager.Database().ConnectionPool(config.LoadedConfig().Default.Database.MainConnectionPoolName)

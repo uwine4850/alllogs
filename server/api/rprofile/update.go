@@ -35,7 +35,7 @@ type UpdateForm struct {
 	DelAvatar     string        `form:"DelAvatar" empty:"-err"`
 }
 
-func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Update(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	updateForm := UpdateForm{}
 	if err := apiform.ParseAndFill(r, &updateForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
@@ -70,7 +70,7 @@ func Update(w http.ResponseWriter, r *http.Request, manager interfaces.IManager)
 	return nil
 }
 
-func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.IManager) error {
+func updateAvatar(newAvatarPath *string, oldRelativeAvatarPath string, updateForm *UpdateForm, manager interfaces.Manager) error {
 	isDelAvatar, err := strconv.ParseBool(updateForm.DelAvatar)
 	if err != nil {
 		return err

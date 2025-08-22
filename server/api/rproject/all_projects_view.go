@@ -17,15 +17,15 @@ type AllProjectsView struct {
 	object.AllView
 }
 
-func (v *AllProjectsView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *AllProjectsView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
-func (v *AllProjectsView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+func (v *AllProjectsView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (object.Context, error) {
 	return object.Context{}, nil
 }
 
-func (v *AllProjectsView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+func (v *AllProjectsView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func()) {
 	slugUserId, ok := manager.OneTimeData().GetSlugParams(v.Slug)
 	if !ok {
 		return false, func() {
@@ -46,7 +46,7 @@ func (v *AllProjectsView) Permissions(w http.ResponseWriter, r *http.Request, ma
 	return true, func() {}
 }
 
-func ProjectsAllView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func ProjectsAllView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	view := object.JsonAllTemplateView{
 		View: &AllProjectsView{
 			object.AllView{

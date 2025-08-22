@@ -29,15 +29,15 @@ type LogGroupView struct {
 	object.MultipleObjectView
 }
 
-func (v *LogGroupView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.IManager, err error) {
+func (v *LogGroupView) OnError(w http.ResponseWriter, r *http.Request, manager interfaces.Manager, err error) {
 	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
-func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+func (v *LogGroupView) Context(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (object.Context, error) {
 	return object.Context{}, nil
 }
 
-func (v *LogGroupView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+func (v *LogGroupView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func()) {
 	slugProjectId, ok := manager.OneTimeData().GetSlugParams("projID")
 	if !ok {
 		return false, func() {
@@ -50,7 +50,7 @@ func (v *LogGroupView) Permissions(w http.ResponseWriter, r *http.Request, manag
 	return true, func() {}
 }
 
-func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	view := object.JsonMultipleObjectTemplateView{
 		View: &LogGroupView{
 			object.MultipleObjectView{
@@ -74,12 +74,12 @@ func LogGroupObjectView(database object.IViewDatabase) func(w http.ResponseWrite
 			},
 		},
 		DTO: cnf.DTO,
-		Messages: map[string]irest.IMessage{
+		Messages: map[string]irest.Message{
 			"project": MsgProject{},
 			"log":     MsgProjectLogGroup{},
 		},
 	}
-	view.OnMessageFilled(func(message any, manager interfaces.IManager) error {
+	view.OnMessageFilled(func(message any, manager interfaces.Manager) error {
 		logGroupMessage, ok := message.(*MsgProjectLogGroup)
 		if !ok {
 			return nil

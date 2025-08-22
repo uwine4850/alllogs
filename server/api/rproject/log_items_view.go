@@ -29,17 +29,17 @@ type MsgLogItemsFilter struct {
 
 type LogItemsView struct {
 	object.AllView
-	Database       interfaces.IReadDatabase
+	Database       interfaces.DatabaseInteraction
 	LogGroupSlugId string
 	StartSlugId    string
 	CountSlug      string
 }
 
-func (v *LogItemsView) OnError(w http.ResponseWriter, r *http.Request, m interfaces.IManager, err error) {
+func (v *LogItemsView) OnError(w http.ResponseWriter, r *http.Request, m interfaces.Manager, err error) {
 	api.SendServerError(w, http.StatusInternalServerError, err.Error())
 }
 
-func (v *LogItemsView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (object.Context, error) {
+func (v *LogItemsView) Object(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (object.Context, error) {
 	singleQueryMap := parseSingleQuery(r.URL.Query())
 	var logItemsFilterMessage MsgLogItemsFilter
 	if err := mapper.JsonToDTOMessage(singleQueryMap, cnf.DTO, &logItemsFilterMessage); err != nil {
@@ -102,7 +102,7 @@ func (v *LogItemsView) fillObjects(objects []map[string]interface{}) ([]interfac
 	return objectsStruct, nil
 }
 
-func (v *LogItemsView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) (bool, func()) {
+func (v *LogItemsView) Permissions(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) (bool, func()) {
 	slugLogGroupId, ok := manager.OneTimeData().GetSlugParams(v.LogGroupSlugId)
 	if !ok {
 		return false, func() {
@@ -138,7 +138,7 @@ func (v *LogItemsView) Permissions(w http.ResponseWriter, r *http.Request, manag
 	return true, func() {}
 }
 
-func LogItemsObjectView(database interfaces.IReadDatabase) func(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func LogItemsObjectView(database interfaces.DatabaseInteraction) func(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	d := object.NewViewMysqlDatabase(database)
 	view := object.JsonAllTemplateView{
 		View: &LogItemsView{

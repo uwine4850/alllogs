@@ -42,7 +42,7 @@ type LoginForm struct {
 	Password string `form:"Password" empty:"-err"`
 }
 
-func Login(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Login(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	var loginForm LoginForm
 	if err := apiform.ParseAndFill(r, &loginForm); err != nil {
 		return api.NewServerError(http.StatusBadRequest, err.Error())

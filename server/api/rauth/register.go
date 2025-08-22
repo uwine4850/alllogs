@@ -28,7 +28,7 @@ type RegisterForm struct {
 	RepeatPassword string `form:"RepeatPassword" emty:"-err"`
 }
 
-func Register(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Register(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	var registerForm RegisterForm
 	if err := apiform.ParseAndFill(r, &registerForm); err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())
@@ -52,7 +52,7 @@ func Register(w http.ResponseWriter, r *http.Request, manager interfaces.IManage
 	return nil
 }
 
-func createProfile(dbRead interfaces.IReadDatabase, userID int) error {
+func createProfile(dbRead interfaces.DatabaseInteraction, userID int) error {
 	qb := qb.NewSyncQB(dbRead.SyncQ()).Insert(cnf.DBT_PROFILE, map[string]any{"user_id": userID})
 	qb.Merge()
 	_, err := qb.Exec()

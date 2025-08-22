@@ -36,7 +36,7 @@ type ProjectForm struct {
 	Description string `form:"Description" empty:"-err"`
 }
 
-func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
@@ -64,7 +64,7 @@ func NewProject(w http.ResponseWriter, r *http.Request, manager interfaces.IMana
 	return nil
 }
 
-func IsProjectAuthor(UID int, projectId int, dbRead interfaces.IReadDatabase) (bool, error) {
+func IsProjectAuthor(UID int, projectId int, dbRead interfaces.DatabaseInteraction) (bool, error) {
 	newQB := qb.NewSyncQB(dbRead.SyncQ())
 	return qb.SelectExists(newQB, cnf.DBT_PROJECT,
 		qb.Compare("id", qb.EQUAL, projectId), qb.AND,

@@ -18,7 +18,7 @@ type UpdateLogGroupForm struct {
 	Description string `form:"Description"`
 }
 
-func UpdateLogGroup(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func UpdateLogGroup(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	var updateLogGroupForm UpdateLogGroupForm
 	if err := apiform.ParseAndFill(r, &updateLogGroupForm); err != nil {
 		return api.NewClientError(http.StatusBadRequest, err.Error())

@@ -8,7 +8,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/secure"
 )
 
-func SetCSRFToken(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func SetCSRFToken(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	if err := secure.SetCSRFToken(3600, false, w, r, m); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
 	}

@@ -11,7 +11,7 @@ import (
 
 var skipUrl = []string{"/set-csrf", "/notifications", "/logitem"}
 
-func ValidateCSRFToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func ValidateCSRFToken(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	if slices.Contains(skipUrl, r.URL.Path) {
 		return nil
 	}

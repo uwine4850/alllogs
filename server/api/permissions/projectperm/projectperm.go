@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func ProjectPermission(projectId any, m interfaces.IManager, errorText string) error {
+func ProjectPermission(projectId any, m interfaces.Manager, errorText string) error {
 	currentUID, ok := m.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "uid not exists")

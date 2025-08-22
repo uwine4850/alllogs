@@ -20,7 +20,7 @@ type LogoutForm struct {
 	UID int `form:"UID" empty:"-err"`
 }
 
-func Logout(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Logout(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	_aid, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "UID not exists")

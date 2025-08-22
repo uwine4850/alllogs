@@ -37,7 +37,7 @@ type WSMessage struct {
 var connections = map[int][]*websocket.Conn{}
 var connectionToUser = map[*websocket.Conn]int{}
 
-func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Notification(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	socket := router.NewWebsocket(router.Upgrader)
 	socket.OnConnect(func(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) {
 		authJWT := r.URL.Query().Get("authJWT")

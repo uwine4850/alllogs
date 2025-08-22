@@ -29,4 +29,4 @@ const (
 	STORAGE_AVATAR_PATH = "/storage/avatars/"
 )
 
-var DatabaseReader interfaces.IReadDatabase
+var DatabaseReader interfaces.DatabaseInteraction

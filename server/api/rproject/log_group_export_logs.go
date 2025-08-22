@@ -12,7 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/mapper"
 )
 
-func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func ExportJson(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	UID, ok := m.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")

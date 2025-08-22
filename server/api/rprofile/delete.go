@@ -12,7 +12,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func Delete(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	slugId, err := SlugId(manager)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())

@@ -11,7 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func LogGroupDelete(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func LogGroupDelete(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	projectIdSlug, ok := manager.OneTimeData().GetSlugParams("projId")
 	if !ok {
 		return api.NewClientError(http.StatusBadRequest, "project id not found")

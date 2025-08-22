@@ -18,7 +18,7 @@ type LogGroupForm struct {
 	Description string `form:"Description" empty:"-err"`
 }
 
-func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func NewLogGroup(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	UID, ok := manager.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")

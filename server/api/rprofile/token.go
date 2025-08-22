@@ -34,7 +34,7 @@ type TokenForm struct {
 	UserId int `form:"UserId" empty:"-err"`
 }
 
-func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	var tokenForm TokenForm
 	if err := apiform.ParseAndFill(r, &tokenForm); err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
@@ -57,7 +57,7 @@ func GenerateToken(w http.ResponseWriter, r *http.Request, manager interfaces.IM
 	return nil
 }
 
-func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IManager) error {
+func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.Manager) error {
 	slugUserId, err := SlugId(manager)
 	if err != nil {
 		return api.NewServerError(http.StatusInternalServerError, err.Error())
@@ -81,7 +81,7 @@ func DeleteToken(w http.ResponseWriter, r *http.Request, manager interfaces.IMan
 	return nil
 }
 
-func newToken(dbRead interfaces.IReadDatabase) (string, error) {
+func newToken(dbRead interfaces.DatabaseInteraction) (string, error) {
 	bytes := make([]byte, 16)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
@@ -101,7 +101,7 @@ func newToken(dbRead interfaces.IReadDatabase) (string, error) {
 	return token, nil
 }
 
-func tokenExists(dbRead interfaces.IReadDatabase, token string) (bool, error) {
+func tokenExists(dbRead interfaces.DatabaseInteraction, token string) (bool, error) {
 	newQB := qb.NewSyncQB(dbRead.SyncQ()).
 		Select(qb.Exists(qb.SQ(
 			false,

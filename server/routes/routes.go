@@ -11,7 +11,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/router/object"
 )
 
-func Get(database interfaces.IDatabase) map[string][]map[string]router.Handler {
+func Get(database interfaces.Database) map[string][]map[string]router.Handler {
 	objectViewDb := object.NewViewMysqlDatabase(database)
 	return map[string][]map[string]router.Handler{
 		router.MethodGET: {

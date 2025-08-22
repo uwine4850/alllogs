@@ -7,7 +7,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func ProfilePermission(m interfaces.IManager, UID int, errorText string) error {
+func ProfilePermission(m interfaces.Manager, UID int, errorText string) error {
 	currentUID, ok := m.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "uid not exists")

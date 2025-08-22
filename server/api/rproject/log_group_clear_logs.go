@@ -10,7 +10,7 @@ import (
 	"github.com/uwine4850/foozy/pkg/interfaces"
 )
 
-func ClearLogs(w http.ResponseWriter, r *http.Request, m interfaces.IManager) error {
+func ClearLogs(w http.ResponseWriter, r *http.Request, m interfaces.Manager) error {
 	UID, ok := m.OneTimeData().GetUserContext("UID")
 	if !ok {
 		return api.NewServerError(http.StatusInternalServerError, "user ID not found")
